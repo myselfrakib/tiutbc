@@ -236,20 +236,12 @@
                     <div class="addresses-list-title">Saved Addresses</div>
                 </div>
                 <div id="addressCards"></div>
-                <button type="button" class="btn-secondary" onclick="APP.showAddressForm()" style="margin-top: 0.75rem;">+ Add New Address</button>
+                <button type="button" class="btn-secondary" onclick="APP.showAddressForm()" style="margin-top: 0.75rem;">+ Add Delivery Location</button>
             </div>
 
             <div id="addressFormContainer" style="display:none;">
                 <div class="map-instruction">
-                    <strong>⚠️ Location Required:</strong> You must set your exact delivery location on the map. Click "Use My Location" or drag the red marker to your address.
-                </div>
-                <button type="button" class="location-btn" id="locationBtn" onclick="APP.getLocation()">
-                    📍 Use My Location
-                </button>
-                <div class="location-status" id="locationStatus"></div>
-                <div id="map"></div>
-                <div class="coord-display error" id="coordDisplay">
-                    ❌ Location not set - Click "Use My Location" or drag the marker
+                    <strong>🏢 Campus Delivery:</strong> Enter your room/hostel details for quick delivery within TIU campus.
                 </div>
                 <form id="addressForm" onsubmit="event.preventDefault();">
                     <div class="form-group">
@@ -258,25 +250,33 @@
                     </div>
                     <div class="form-group">
                         <label for="phone">Phone Number *</label>
-                        <input type="tel" id="phone" required placeholder="10 digit number" pattern="[0-9]{10}">
+                        <input type="tel" id="phone" required placeholder="10 digit number" pattern="[0-9]{10}" maxlength="10">
                     </div>
                     <div class="form-group">
-                        <label for="address">Address *</label>
-                        <textarea id="address" required placeholder="House No., Street, Area" rows="2"></textarea>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="city">City *</label>
-                            <input type="text" id="city" required placeholder="City">
-                        </div>
-                        <div class="form-group">
-                            <label for="pincode">Pincode *</label>
-                            <input type="text" id="pincode" required placeholder="6 digits" pattern="[0-9]{6}">
+                        <label for="roomNumber">Room Number / Location *</label>
+                        <input type="text" id="roomNumber" required placeholder="e.g., Room 305, Hostel A" maxlength="50">
+                        <div class="location-status" style="margin-top: 0.3rem; font-size: 0.8rem; color: #666;">
+                            Enter your room number, hostel block, or building name
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="landmark">Landmark</label>
-                        <input type="text" id="landmark" placeholder="Optional">
+                        <label for="buildingBlock">Building/Block *</label>
+                        <select id="buildingBlock" required style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 0.95rem;">
+                            <option value="">Select Building/Block</option>
+                            <option value="Hostel A">Hostel A</option>
+                            <option value="Hostel B">Hostel B</option>
+                            <option value="Hostel C">Hostel C</option>
+                            <option value="Academic Block">Academic Block</option>
+                            <option value="Admin Block">Admin Block</option>
+                            <option value="Sports Complex">Sports Complex</option>
+                            <option value="Library">Library</option>
+                            <option value="Faculty Housing">Faculty Housing</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="landmark">Additional Instructions (Optional)</label>
+                        <textarea id="landmark" placeholder="e.g., Near staircase, Ground floor, etc." rows="2" style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 0.95rem; resize: vertical;"></textarea>
                     </div>
                     <div class="form-group">
                         <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 500;">
@@ -285,8 +285,8 @@
                         </label>
                     </div>
                     <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-                        <button type="button" class="btn" id="deliverHereBtn" onclick="APP.saveAndSelectAddress()" style="flex: 1; min-width: 150px;" disabled>
-                            <span id="deliverHereBtnText">Set Location First</span>
+                        <button type="button" class="btn" id="deliverHereBtn" onclick="APP.saveAndSelectAddress()" style="flex: 1; min-width: 150px;">
+                            <span id="deliverHereBtnText">Deliver Here</span>
                         </button>
                         <button type="button" class="btn-secondary" onclick="APP.showSavedAddresses()" id="backToSavedBtn" style="display: none; flex: 1; min-width: 150px;">Back</button>
                     </div>
@@ -922,49 +922,39 @@
             },
 
             async saveAndSelectAddress() {
-                // CRITICAL: Check if valid location is set
-                if (!this.validLocationSet || !this.finalPinLocation) {
-                    return this.showToast('error', 'Location Required', 'You must set your delivery location on the map. Click "Use My Location" or drag the red marker to your address.');
-                }
-
                 const name = document.getElementById('fullName').value.trim();
                 const phone = document.getElementById('phone').value.trim();
-                const addr = document.getElementById('address').value.trim();
-                const city = document.getElementById('city').value.trim();
-                const pin = document.getElementById('pincode').value.trim();
+                const roomNumber = document.getElementById('roomNumber').value.trim();
+                const buildingBlock = document.getElementById('buildingBlock').value.trim();
                 const landmark = document.getElementById('landmark').value.trim();
                 const save = document.getElementById('saveAddress').checked;
 
-                if (!name || !phone || !addr || !city || !pin) return this.showError('Fill all required fields');
-                if (!/^[0-9]{10}$/.test(phone)) return this.showError('Enter valid 10-digit phone');
-                if (!/^[0-9]{6}$/.test(pin)) return this.showError('Enter valid 6-digit pincode');
-
-                // Double-check coordinates before proceeding
-                if (!this.finalPinLocation || !this.finalPinLocation.lat || !this.finalPinLocation.lng) {
-                    return this.showToast('error', 'Invalid Location', 'Location data is missing. Please set your location on the map again.');
+                if (!name || !phone || !roomNumber || !buildingBlock) {
+                    return this.showError('Fill all required fields');
                 }
-
-                // Check if pincode is serviceable
-                const isServiceable = this.SERVICEABLE_PINCODES[pin] === true;
-                if (!isServiceable) {
-                    return this.showToast('error', 'Out of Service Area', `We don't deliver to pincode ${pin} yet. Please enter another pincode.`);
+                if (!/^[0-9]{10}$/.test(phone)) {
+                    return this.showError('Enter valid 10-digit phone');
                 }
 
                 const btn = document.getElementById('deliverHereBtn');
                 const btnText = document.getElementById('deliverHereBtnText');
                 btn.disabled = true;
                 btn.classList.add('processing');
-                btnText.textContent = 'Checking...';
+                btnText.textContent = 'Processing...';
 
                 try {
                     this.deliveryAddress = {
                         fullName: name,
                         phone,
-                        streetAddress: addr,
-                        city,
-                        pincode: pin,
+                        roomNumber,
+                        buildingBlock,
                         landmark,
-                        coordinates: { ...this.finalPinLocation },
+                        coordinates: {
+                            lat: 23.9654, // TIU campus coordinates
+                            lng: 88.4245
+                        },
+                        city: 'Kolkata',
+                        pincode: '742101',
                         serviceable: true
                     };
 
@@ -978,7 +968,7 @@
                         btnText.textContent = 'Saved!';
                         btn.style.background = '#60b246';
                         setTimeout(() => {
-                            this.showSuccess('Address saved successfully with location');
+                            this.showSuccess('Delivery location saved successfully');
                             this.renderAddressDisplay();
                             this.closeAddressModal();
                             btn.disabled = false;
@@ -1001,7 +991,7 @@
                     }
                 } catch (e) {
                     console.error('Error saving address:', e);
-                    this.showError('Failed to save address');
+                    this.showError('Failed to save location');
                     btn.disabled = false;
                     btn.classList.remove('processing');
                     btnText.textContent = 'Deliver Here';
