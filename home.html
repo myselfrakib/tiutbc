@@ -660,7 +660,7 @@
         };
 
         function syncCartFromDB(userId) {
-            const userCartRef = ref(db, `carts/${userId}`);
+            const userCartRef = ref(db, `tiutbc/carts/${userId}`);
             onValue(userCartRef, (snapshot) => {
                 if (snapshot.exists()) {
                     const dbCart = snapshot.val();
@@ -712,7 +712,7 @@
             container.innerHTML = '<div class="loading"><div class="spinner"></div>Loading menu...</div>';
 
             try {
-                const foodItemsRef = ref(db, 'foodItems');
+                const foodItemsRef = ref(db, 'tiutbc/foodItems');
                 
                 onValue(foodItemsRef, (snapshot) => {
                     if (!snapshot.exists()) {
@@ -873,7 +873,7 @@
         function syncCartToDB() {
             if (!currentUser) return;
             
-            const userCartRef = ref(db, `carts/${currentUser.uid}`);
+            const userCartRef = ref(db, `tiutbc/carts/${currentUser.uid}`);
             
             if (cart.length === 0) {
                 remove(userCartRef);
