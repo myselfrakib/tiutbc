@@ -854,7 +854,7 @@
             const ordersList = document.getElementById('ordersList');
             ordersList.innerHTML = '<div class="loading"><div class="spinner"></div>Setting up live updates...</div>';
 
-            const ordersRef = ref(db, 'orders');
+            const ordersRef = ref(db, 'tiutbc/orders');
             const ordersQuery = query(ordersRef, orderByChild('userId'), equalTo(userId));
 
             if (ordersListener) {
@@ -1047,7 +1047,7 @@
 
         async function checkIfReviewed(orderId) {
             try {
-                const reviewRef = ref(db, `orderReviews/${orderId}`);
+                const reviewRef = ref(db, `tiutbc/orderReviews/${orderId}`);
                 const snapshot = await get(reviewRef);
                 return snapshot.exists();
             } catch (error) {
@@ -1058,7 +1058,7 @@
 
         async function getOrderReviews(orderId) {
             try {
-                const reviewRef = ref(db, `orderReviews/${orderId}`);
+                const reviewRef = ref(db, `tiutbc/orderReviews/${orderId}`);
                 const snapshot = await get(reviewRef);
                 if (snapshot.exists()) {
                     const data = snapshot.val();
@@ -1197,7 +1197,7 @@
                         const itemName = item.name;
                         
                         try {
-                            const foodItemsSnapshot = await get(ref(db, 'foodItems'));
+                            const foodItemsSnapshot = await get(ref(db, 'tiutbc/foodItems'));
                             if (foodItemsSnapshot.exists()) {
                                 const allCategories = foodItemsSnapshot.val();
                                 
@@ -1225,9 +1225,9 @@
                             category: category
                         };
 
-                        await set(ref(db, `orderReviews/${orderId}/${i}`), reviewData);
+                        await set(ref(db, `tiutbc/orderReviews/${orderId}/${i}`), reviewData);
 
-                        const categoryRef = ref(db, `reviews/${category}/${itemName}`);
+                        const categoryRef = ref(db, `tiutbc/reviews/${category}/${itemName}`);
                         const categorySnapshot = await get(categoryRef);
                         
                         let totalRating = rating;
