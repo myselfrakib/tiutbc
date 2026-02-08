@@ -2336,12 +2336,12 @@
             const date = order.createdAt ? new Date(order.createdAt).toLocaleString() : 'N/A';
             const status = order.status || 'pending';
             
-            const fullAddress = order.deliveryRoom?.address || '';
-            const phone = order.deliveryRoom?.phone || '';
-            const customerName = order.deliveryRoom?.fullName || 'N/A';
+            const fullAddress = order.deliveryAddress?.address || '';
+            const phone = order.deliveryAddress?.phone || '';
+            const customerName = order.deliveryAddress?.fullName || 'N/A';
             
             // Better approach using coordinates
-const coords = order.deliveryRoom?.coordinates;
+const coords = order.deliveryAddress?.coordinates;
 const mapUrl = coords ? 
     `https://www.google.com/maps/search/?api=1&query=${coords.lat},${coords.lng}` : 
     (fullAddress ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}` : '');
