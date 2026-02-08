@@ -53,13 +53,13 @@
         .summary-row.delivery.free .delivery-value { text-decoration: line-through; color: #999; margin-right: 0.5rem; }
         .cart-total { display: flex; justify-content: space-between; font-size: clamp(1.3rem, 4vw, 1.5rem); font-weight: bold; color: var(--brown); margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #eee; }
         .section-title { font-size: clamp(1.1rem, 3vw, 1.3rem); font-weight: 600; color: #333; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
-        .room-display-card { border: 2px solid var(--secondary); border-radius: 10px; padding: 0.9rem; background: #f0f9ff; }
-        .room-display-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; }
-        .room-display-name { font-weight: 600; font-size: 1rem; color: #333; }
+        .address-display-card { border: 2px solid var(--secondary); border-radius: 10px; padding: 0.9rem; background: #f0f9ff; }
+        .address-display-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; }
+        .address-display-name { font-weight: 600; font-size: 1rem; color: #333; }
         .change-address-btn { background: var(--primary); color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: all 0.3s; }
         .change-address-btn:active { transform: scale(0.95); }
-        .room-display-phone { color: #666; font-size: 0.85rem; margin-bottom: 0.5rem; }
-        .room-display-text { color: #555; line-height: 1.5; font-size: 0.9rem; }
+        .address-display-phone { color: #666; font-size: 0.85rem; margin-bottom: 0.5rem; }
+        .address-display-text { color: #555; line-height: 1.5; font-size: 0.9rem; }
         .form-group { margin-bottom: 1rem; }
         .form-group label { display: block; margin-bottom: 0.4rem; font-weight: 600; color: #333; font-size: clamp(0.85rem, 2.5vw, 0.95rem); }
         .form-group input, .form-group textarea { width: 100%; padding: 0.75rem; border: 2px solid #e0e0e0; border-radius: 8px; font-size: clamp(0.85rem, 2.5vw, 0.95rem); font-family: inherit; transition: border-color 0.3s; }
@@ -68,8 +68,8 @@
         .form-group textarea { resize: vertical; min-height: 70px; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
         @media (max-width: 480px) { .form-row { grid-template-columns: 1fr; } }
-        /* Map CSS removed */
-        .info-instruction { background: #fffbf0; border-left: 4px solid var(--primary); padding: 0.75rem; margin-bottom: 1rem; border-radius: 4px; font-size: 0.85rem; color: #666; }
+        #map { width: 100%; height: 350px; border-radius: 8px; margin-bottom: 1rem; border: 2px solid #e0e0e0; }
+        .map-instruction { background: #fffbf0; border-left: 4px solid var(--primary); padding: 0.75rem; margin-bottom: 1rem; border-radius: 4px; font-size: 0.85rem; color: #666; }
         .location-btn { background: var(--secondary); color: white; border: none; padding: 0.6rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem; transition: all 0.3s; display: flex; align-items: center; gap: 0.5rem; }
         .location-btn:active { transform: scale(0.95); }
         .location-btn:disabled { background: #ccc; cursor: not-allowed; }
@@ -195,8 +195,8 @@
 
         <div id="checkoutSections" style="display: none;">
             <div class="section-container">
-                <div class="section-title">📍 Room Number</div>
-                <div id="roomDisplayArea"></div>
+                <div class="section-title">📍 Delivery Address</div>
+                <div id="addressDisplayArea"></div>
             </div>
 
             <div class="section-container">
@@ -224,28 +224,34 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="roomModal">
+    <div class="modal-overlay" id="addressModal">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title">📍 Room Number</div>
-                <button class="close-modal" onclick="APP.closeRoomModal()">&times;</button>
+                <div class="modal-title">📍 Delivery Address</div>
+                <button class="close-modal" onclick="APP.closeAddressModal()">&times;</button>
             </div>
 
-            <div id="savedRoomsList" style="display: none;">
+            <div id="savedAddressesList" style="display: none;">
                 <div class="addresses-list-header">
-                    <div class="addresses-list-title">Saved Rooms</div>
+                    <div class="addresses-list-title">Saved Addresses</div>
                 </div>
-                <div id="roomCards"></div>
-                <button type="button" class="btn-secondary" onclick="APP.showRoomForm()" style="margin-top: 0.75rem;">+ Add New Room</button>
+                <div id="addressCards"></div>
+                <button type="button" class="btn-secondary" onclick="APP.showAddressForm()" style="margin-top: 0.75rem;">+ Add New Address</button>
             </div>
 
-            <div id="roomFormContainer" style="display:none;">
-                <div class="info-instruction">📍 <strong>Campus Delivery:</strong> Enter your room number for quick delivery within the TIU campus.</div>
-                
+            <div id="addressFormContainer" style="display:none;">
+                <div class="map-instruction">
+                    <strong>⚠️ Location Required:</strong> You must set your exact delivery location on the map. Click "Use My Location" or drag the red marker to your address.
+                </div>
+                <button type="button" class="location-btn" id="locationBtn" onclick="APP.getLocation()">
+                    📍 Use My Location
+                </button>
                 <div class="location-status" id="locationStatus"></div>
-                <!-- Map removed for campus delivery -->
-                
-                <form id="roomForm" onsubmit="event.preventDefault();">
+                <div id="map"></div>
+                <div class="coord-display error" id="coordDisplay">
+                    ❌ Location not set - Click "Use My Location" or drag the marker
+                </div>
+                <form id="addressForm" onsubmit="event.preventDefault();">
                     <div class="form-group">
                         <label for="fullName">Full Name *</label>
                         <input type="text" id="fullName" required placeholder="Your full name">
@@ -274,7 +280,7 @@
                     </div>
                     <div class="form-group">
                         <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 500;">
-                            <input type="checkbox" id="saveRoom" checked style="width: auto;">
+                            <input type="checkbox" id="saveAddress" checked style="width: auto;">
                             <span>Save for future orders</span>
                         </label>
                     </div>
@@ -282,7 +288,7 @@
                         <button type="button" class="btn" id="deliverHereBtn" onclick="APP.saveAndSelectAddress()" style="flex: 1; min-width: 150px;" disabled>
                             <span id="deliverHereBtnText">Set Location First</span>
                         </button>
-                        <button type="button" class="btn-secondary" onclick="APP.showSavedRooms()" id="backToSavedBtn" style="display: none; flex: 1; min-width: 150px;">Back</button>
+                        <button type="button" class="btn-secondary" onclick="APP.showSavedAddresses()" id="backToSavedBtn" style="display: none; flex: 1; min-width: 150px;">Back</button>
                     </div>
                 </form>
             </div>
@@ -314,9 +320,9 @@
             cart: [],
             currentUser: null,
             selectedPayment: null,
-            deliveryRoom: null,
-            savedRooms: [],
-            selectedRoomId: null,
+            deliveryAddress: null,
+            savedAddresses: [],
+            selectedAddressId: null,
             map: null,
             marker: null,
             finalPinLocation: null,
@@ -344,8 +350,8 @@
 
             // Setup event listeners
             setupEventListeners() {
-                document.getElementById('roomModal').addEventListener('click', (e) => {
-                    if (e.target.id === 'roomModal') this.closeRoomModal();
+                document.getElementById('addressModal').addEventListener('click', (e) => {
+                    if (e.target.id === 'addressModal') this.closeAddressModal();
                 });
             },
 
@@ -357,7 +363,7 @@
                         await this.initializeUserOrderStats();
                         this.userTotalOrders = await this.getUserTotalOrdersCount();
                         this.syncCartFromDB(user.uid);
-                        await this.loadSavedRooms();
+                        await this.loadSavedAddresses();
                         this.selectPayment('cod');
                         this.renderCart();
                     } else {
@@ -662,7 +668,7 @@
             // Sync cart
             syncCartFromDB(userId) {
                 if (this.cartSyncListener) this.cartSyncListener();
-                const userCartRef = ref(db, `carts/${userId}`);
+                const userCartRef = ref(db, `tiutbc/carts/${userId}`);
                 this.cartSyncListener = onValue(userCartRef, (snapshot) => {
                     if (snapshot.exists()) {
                         const dbCart = Object.keys(snapshot.val()).map(itemId => ({
@@ -679,7 +685,7 @@
             },
 
             syncCartToDB(userId) {
-                const userCartRef = ref(db, `carts/${userId}`);
+                const userCartRef = ref(db, `tiutbc/carts/${userId}`);
                 if (this.cart.length === 0) {
                     remove(userCartRef).catch(e => console.error('Cart removal error:', e));
                     return;
@@ -692,71 +698,71 @@
             },
 
             // Address operations
-            async loadSavedRooms() {
+            async loadSavedAddresses() {
                 if (!this.currentUser) return;
                 try {
                     const snap = await get(ref(db, `tiutbc/users/${this.currentUser.uid}/addresses`));
-                    this.savedRooms = [];
+                    this.savedAddresses = [];
                     if (snap.exists()) {
                         snap.forEach(child => {
-                            this.savedRooms.push({ id: child.key, ...child.val() });
+                            this.savedAddresses.push({ id: child.key, ...child.val() });
                         });
-                        this.savedRooms.sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
-                        if (this.savedRooms.length > 0) {
-                            const defaultAddr = this.savedRooms.find(a => a.isDefault) || this.savedRooms[0];
-                            this.selectedRoomId = defaultAddr.id;
-                            this.deliveryRoom = defaultAddr;
+                        this.savedAddresses.sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
+                        if (this.savedAddresses.length > 0) {
+                            const defaultAddr = this.savedAddresses.find(a => a.isDefault) || this.savedAddresses[0];
+                            this.selectedAddressId = defaultAddr.id;
+                            this.deliveryAddress = defaultAddr;
                         }
                     }
-                    this.renderRoomDisplay();
+                    this.renderAddressDisplay();
                 } catch (e) {
                     console.error('Load addresses error:', e);
                 }
             },
 
-            renderRoomDisplay() {
-                const area = document.getElementById('roomDisplayArea');
-                if (!this.deliveryRoom) {
+            renderAddressDisplay() {
+                const area = document.getElementById('addressDisplayArea');
+                if (!this.deliveryAddress) {
                     area.innerHTML = `
                         <div style="background: #fff3cd; border: 2px solid #ffc107; border-radius: 10px; padding: 1rem; margin-bottom: 1rem; text-align: center; color: #856404;">
-                            <div style="font-weight: 600; margin-bottom: 0.5rem;">⚠️ Room Number Required</div>
-                            <div style="font-size: 0.9rem; margin-bottom: 0.75rem;">Please add your room number with location to continue</div>
-                            <button class="btn-secondary" onclick="APP.showAddressModal()" style="margin-top: 0.5rem;">+ Add Room Number</button>
+                            <div style="font-weight: 600; margin-bottom: 0.5rem;">⚠️ Delivery Address Required</div>
+                            <div style="font-size: 0.9rem; margin-bottom: 0.75rem;">Please add your delivery address with location to continue</div>
+                            <button class="btn-secondary" onclick="APP.showAddressModal()" style="margin-top: 0.5rem;">+ Add Delivery Address</button>
                         </div>`;
                     this.updatePlaceOrderButtonState();
-                    if (this.savedRooms.length === 0 && this.googleMapsLoaded) {
+                    if (this.savedAddresses.length === 0 && this.googleMapsLoaded) {
                         setTimeout(() => this.showAddressModal(), 1500);
                     }
                     return;
                 }
 
-                const coords = this.deliveryRoom.coordinates ?
-                    `<div style="margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--secondary);font-size:0.8rem;color:#666;">📍 ${this.deliveryRoom.coordinates.lat.toFixed(6)}, ${this.deliveryRoom.coordinates.lng.toFixed(6)}</div>` : '';
+                const coords = this.deliveryAddress.coordinates ?
+                    `<div style="margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--secondary);font-size:0.8rem;color:#666;">📍 ${this.deliveryAddress.coordinates.lat.toFixed(6)}, ${this.deliveryAddress.coordinates.lng.toFixed(6)}</div>` : '';
 
                 area.innerHTML = `
-                    <div class="room-display-card">
-                        <div class="room-display-header">
+                    <div class="address-display-card">
+                        <div class="address-display-header">
                             <div>
-                                <div class="room-display-name">${this.deliveryRoom.fullName}</div>
-                                <div class="room-display-phone">${this.deliveryRoom.phone}</div>
+                                <div class="address-display-name">${this.deliveryAddress.fullName}</div>
+                                <div class="address-display-phone">📱 ${this.deliveryAddress.phone}</div>
                             </div>
                             <button class="change-address-btn" onclick="APP.showAddressModal()">Change</button>
                         </div>
-                        <div class="room-display-text">
-                            ${this.deliveryRoom.streetAddress || this.deliveryRoom.address || ''}<br>
-                            ${this.deliveryRoom.city || ''}, ${this.deliveryRoom.pincode || ''}
-                            ${this.deliveryRoom.landmark ? `<br>Landmark: ${this.deliveryRoom.landmark}` : ''}
+                        <div class="address-display-text">
+                            🏢 <strong>${this.deliveryAddress.buildingBlock || this.deliveryAddress.city || 'Building'}</strong><br>
+                            🚪 Room: ${this.deliveryAddress.roomNumber || this.deliveryAddress.streetAddress || this.deliveryAddress.address || 'Not specified'}
+                            ${this.deliveryAddress.landmark ? `<br>📌 ${this.deliveryAddress.landmark}` : ''}
                         </div>${coords}
                     </div>`;
                 this.updatePlaceOrderButtonState();
             },
 
             renderSavedAddresses() {
-                const list = document.getElementById('savedRoomsList');
-                const form = document.getElementById('roomFormContainer');
-                const cards = document.getElementById('roomCards');
+                const list = document.getElementById('savedAddressesList');
+                const form = document.getElementById('addressFormContainer');
+                const cards = document.getElementById('addressCards');
 
-                if (!this.savedRooms.length) {
+                if (!this.savedAddresses.length) {
                     list.style.display = 'none';
                     form.style.display = 'block';
                     document.getElementById('backToSavedBtn').style.display = 'none';
@@ -766,24 +772,21 @@
                 list.style.display = 'block';
                 form.style.display = 'none';
 
-                cards.innerHTML = this.savedRooms.map((a) => {
-                    const selectedClass = this.selectedRoomId === a.id ? 'selected' : '';
-                    const coordsDisplay = a.coordinates ? 
-                        `<div style="font-size: 0.75rem; color: #888; margin-top: 0.3rem;">📍 ${a.coordinates.lat.toFixed(4)}, ${a.coordinates.lng.toFixed(4)}</div>` : '';
+                cards.innerHTML = this.savedAddresses.map((a) => {
+                    const selectedClass = this.selectedAddressId === a.id ? 'selected' : '';
                     return `
                         <div class="address-card ${selectedClass}" onclick="APP.selectSavedAddress('${a.id}')">
                             <div class="address-card-header">
                                 <div>
                                     <div class="address-name">${a.fullName}</div>
-                                    <div class="address-phone">${a.phone}</div>
+                                    <div class="address-phone">📱 ${a.phone}</div>
                                 </div>
                                 ${a.isDefault ? '<span class="default-badge">Default</span>' : ''}
                             </div>
                             <div class="address-details">
-                                ${a.streetAddress || a.address || ''}<br>
-                                ${a.city || ''}, ${a.pincode || ''}
-                                ${a.landmark ? `<br>Landmark: ${a.landmark}` : ''}
-                                ${coordsDisplay}
+                                🏢 <strong>${a.buildingBlock || a.city || 'Building'}</strong><br>
+                                🚪 Room: ${a.roomNumber || a.streetAddress || a.address || 'Not specified'}
+                                ${a.landmark ? `<br>📌 ${a.landmark}` : ''}
                             </div>
                             <div class="address-actions">
                                 ${!a.isDefault ? `<button class="btn-small btn-set-default" onclick="event.stopPropagation(); APP.setDefaultAddress('${a.id}')">Set as Default</button>` : ''}
@@ -794,7 +797,7 @@
             },
 
             selectSavedAddress(id) {
-                const found = this.savedRooms.find(a => a.id === id);
+                const found = this.savedAddresses.find(a => a.id === id);
                 if (!found) return;
                 
                 // Check if address has valid coordinates
@@ -803,24 +806,24 @@
                     return;
                 }
                 
-                this.selectedRoomId = id;
-                this.deliveryRoom = found;
-                this.renderRoomDisplay();
-                setTimeout(() => this.closeRoomModal(), 300);
+                this.selectedAddressId = id;
+                this.deliveryAddress = found;
+                this.renderAddressDisplay();
+                setTimeout(() => this.closeAddressModal(), 300);
             },
 
             async setDefaultAddress(id) {
                 if (!this.currentUser) return;
                 try {
                     const updates = {};
-                    this.savedRooms.forEach(addr => {
+                    this.savedAddresses.forEach(addr => {
                         updates[`tiutbc/users/${this.currentUser.uid}/addresses/${addr.id}/isDefault`] = (addr.id === id);
                     });
                     await update(ref(db), updates);
-                    this.savedRooms.forEach(addr => {
+                    this.savedAddresses.forEach(addr => {
                         addr.isDefault = (addr.id === id);
                     });
-                    this.savedRooms.sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
+                    this.savedAddresses.sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
                     this.renderSavedAddresses();
                     this.showSuccess('Default address updated');
                 } catch (e) {
@@ -833,18 +836,18 @@
                 if (!confirm('Delete this address?')) return;
                 try {
                     await remove(ref(db, `tiutbc/users/${this.currentUser.uid}/addresses/${id}`));
-                    this.savedRooms = this.savedRooms.filter(a => a.id !== id);
-                    if (this.selectedRoomId === id) {
-                        this.selectedRoomId = null;
-                        this.deliveryRoom = null;
-                        if (this.savedRooms.length) {
-                            const defaultAddr = this.savedRooms.find(a => a.isDefault) || this.savedRooms[0];
-                            this.selectedRoomId = defaultAddr.id;
-                            this.deliveryRoom = defaultAddr;
+                    this.savedAddresses = this.savedAddresses.filter(a => a.id !== id);
+                    if (this.selectedAddressId === id) {
+                        this.selectedAddressId = null;
+                        this.deliveryAddress = null;
+                        if (this.savedAddresses.length) {
+                            const defaultAddr = this.savedAddresses.find(a => a.isDefault) || this.savedAddresses[0];
+                            this.selectedAddressId = defaultAddr.id;
+                            this.deliveryAddress = defaultAddr;
                         }
                     }
                     this.renderSavedAddresses();
-                    this.renderRoomDisplay();
+                    this.renderAddressDisplay();
                     this.showSuccess('Address deleted');
                 } catch (e) {
                     console.error('Delete error:', e);
@@ -853,17 +856,17 @@
             },
 
             showAddressModal() {
-                const modal = document.getElementById('roomModal');
+                const modal = document.getElementById('addressModal');
                 modal.classList.add('active');
-                if (this.savedRooms.length > 0) {
-                    this.showSavedRooms();
+                if (this.savedAddresses.length > 0) {
+                    this.showSavedAddresses();
                 } else {
-                    this.showRoomForm();
+                    this.showAddressForm();
                 }
                 setTimeout(() => {
                     if (this.map) {
                         google.maps.event.trigger(this.map, 'resize');
-                        if (document.getElementById('roomFormContainer').style.display !== 'none') {
+                        if (document.getElementById('addressFormContainer').style.display !== 'none') {
                             const defaultLocation = { lat: 22.9734, lng: 78.6569 };
                             this.finalPinLocation = null;
                             this.validLocationSet = false;
@@ -881,16 +884,16 @@
                 }, 300);
             },
 
-            closeRoomModal() {
-                document.getElementById('roomModal').classList.remove('active');
+            closeAddressModal() {
+                document.getElementById('addressModal').classList.remove('active');
             },
 
-            showRoomForm() {
-                document.getElementById('savedRoomsList').style.display = 'none';
-                document.getElementById('roomFormContainer').style.display = 'block';
-                document.getElementById('backToSavedBtn').style.display = this.savedRooms.length ? 'block' : 'none';
-                document.getElementById('roomForm').reset();
-                document.getElementById('saveRoom').checked = true;
+            showAddressForm() {
+                document.getElementById('savedAddressesList').style.display = 'none';
+                document.getElementById('addressFormContainer').style.display = 'block';
+                document.getElementById('backToSavedBtn').style.display = this.savedAddresses.length ? 'block' : 'none';
+                document.getElementById('addressForm').reset();
+                document.getElementById('saveAddress').checked = true;
                 
                 const defaultLocation = { lat: 22.9734, lng: 78.6569 };
                 this.finalPinLocation = null;
@@ -912,9 +915,9 @@
                 }, 100);
             },
 
-            showSavedRooms() {
-                document.getElementById('savedRoomsList').style.display = 'block';
-                document.getElementById('roomFormContainer').style.display = 'none';
+            showSavedAddresses() {
+                document.getElementById('savedAddressesList').style.display = 'block';
+                document.getElementById('addressFormContainer').style.display = 'none';
                 this.renderSavedAddresses();
             },
 
@@ -930,7 +933,7 @@
                 const city = document.getElementById('city').value.trim();
                 const pin = document.getElementById('pincode').value.trim();
                 const landmark = document.getElementById('landmark').value.trim();
-                const save = document.getElementById('saveRoom').checked;
+                const save = document.getElementById('saveAddress').checked;
 
                 if (!name || !phone || !addr || !city || !pin) return this.showError('Fill all required fields');
                 if (!/^[0-9]{10}$/.test(phone)) return this.showError('Enter valid 10-digit phone');
@@ -954,7 +957,7 @@
                 btnText.textContent = 'Checking...';
 
                 try {
-                    this.deliveryRoom = {
+                    this.deliveryAddress = {
                         fullName: name,
                         phone,
                         streetAddress: addr,
@@ -968,16 +971,16 @@
                     if (save && this.currentUser) {
                         btnText.textContent = 'Saving...';
                         const newRef = push(ref(db, `tiutbc/users/${this.currentUser.uid}/addresses`));
-                        const isFirstAddress = this.savedRooms.length === 0;
-                        await set(newRef, { ...this.deliveryRoom, createdAt: Date.now(), isDefault: isFirstAddress });
-                        this.savedRooms.push({ id: newRef.key, ...this.deliveryRoom, isDefault: isFirstAddress });
-                        this.selectedRoomId = newRef.key;
+                        const isFirstAddress = this.savedAddresses.length === 0;
+                        await set(newRef, { ...this.deliveryAddress, createdAt: Date.now(), isDefault: isFirstAddress });
+                        this.savedAddresses.push({ id: newRef.key, ...this.deliveryAddress, isDefault: isFirstAddress });
+                        this.selectedAddressId = newRef.key;
                         btnText.textContent = 'Saved!';
                         btn.style.background = '#60b246';
                         setTimeout(() => {
                             this.showSuccess('Address saved successfully with location');
-                            this.renderRoomDisplay();
-                            this.closeRoomModal();
+                            this.renderAddressDisplay();
+                            this.closeAddressModal();
                             btn.disabled = false;
                             btn.classList.remove('processing');
                             btn.style.background = '';
@@ -988,8 +991,8 @@
                         btnText.textContent = 'Selected!';
                         btn.style.background = '#60b246';
                         setTimeout(() => {
-                            this.renderRoomDisplay();
-                            this.closeRoomModal();
+                            this.renderAddressDisplay();
+                            this.closeAddressModal();
                             btn.disabled = false;
                             btn.classList.remove('processing');
                             btn.style.background = '';
@@ -1018,7 +1021,7 @@
 
             updatePlaceOrderButtonState() {
                 const btn = document.getElementById('placeOrderBtn');
-                const enabled = !!this.deliveryRoom && !!this.selectedPayment;
+                const enabled = !!this.deliveryAddress && !!this.selectedPayment;
                 btn.disabled = !enabled;
                 if (this.selectedPayment === 'cod') btn.textContent = 'Place Order (COD)';
                 else if (this.selectedPayment === 'online') btn.textContent = 'Pay Now';
@@ -1026,21 +1029,21 @@
             },
 
             async handlePlaceOrder() {
-                if (!this.deliveryRoom) {
-                    this.showError('Add room number');
+                if (!this.deliveryAddress) {
+                    this.showError('Add delivery address');
                     this.showAddressModal();
                     return;
                 }
                 
-                // Validate that room number has coordinates
-                if (!this.deliveryRoom.coordinates || !this.deliveryRoom.coordinates.lat || !this.deliveryRoom.coordinates.lng) {
+                // Validate that delivery address has coordinates
+                if (!this.deliveryAddress.coordinates || !this.deliveryAddress.coordinates.lat || !this.deliveryAddress.coordinates.lng) {
                     this.showToast('error', 'Invalid Address', 'Your selected address does not have location data. Please select a different address or add a new one with valid location.');
                     return;
                 }
                 
                 if (!this.selectedPayment) return this.showError('Select payment method');
 
-                const snap = await get(ref(db, 'storeStatus'));
+                const snap = await get(ref(db, 'tiutbc/storeStatus'));
                 if (!snap.exists() || !snap.val().isOpen) {
                     return this.showToast('error', 'Store Closed', 'Not taking orders now. Try again later.');
                 }
@@ -1060,7 +1063,7 @@
                     name: 'TIU The Biriyani Canteen',
                     description: 'Food Order',
                     handler: (res) => this.placeOrder('online', res.razorpay_payment_id),
-                    prefill: { name: this.deliveryRoom.fullName, email: this.currentUser.email, contact: this.deliveryRoom.phone },
+                    prefill: { name: this.deliveryAddress.fullName, email: this.currentUser.email, contact: this.deliveryAddress.phone },
                     theme: { color: '#fdc921' },
                     modal: { ondismiss: () => this.showError('Payment cancelled') }
                 }).open();
@@ -1082,7 +1085,7 @@
                 const isFreeByThreshold = subtotal >= this.FREE_DELIVERY_THRESHOLD;
 
                 try {
-                    const newOrderRef = push(ref(db, 'orders'));
+                    const newOrderRef = push(ref(db, 'tiutbc/orders'));
                     await set(newOrderRef, {
                         userId: this.currentUser.uid,
                         userEmail: this.currentUser.email,
@@ -1090,14 +1093,14 @@
                         subtotal, deliveryFee, total,
                         freeDelivery: deliveryFee === 0,
                         freeDeliveryReason: isFirstOrder ? 'first_order' : (isFreeByThreshold ? 'threshold' : null),
-                        deliveryRoom: {
-                            address: this.deliveryRoom.streetAddress || this.deliveryRoom.address,
-                            fullName: this.deliveryRoom.fullName,
-                            phone: this.deliveryRoom.phone,
-                            city: this.deliveryRoom.city,
-                            pincode: this.deliveryRoom.pincode,
-                            landmark: this.deliveryRoom.landmark || '',
-                            coordinates: this.deliveryRoom.coordinates
+                        deliveryAddress: {
+                            address: this.deliveryAddress.streetAddress || this.deliveryAddress.address,
+                            fullName: this.deliveryAddress.fullName,
+                            phone: this.deliveryAddress.phone,
+                            city: this.deliveryAddress.city,
+                            pincode: this.deliveryAddress.pincode,
+                            landmark: this.deliveryAddress.landmark || '',
+                            coordinates: this.deliveryAddress.coordinates
                         },
                         paymentMethod: method,
                         paymentStatus: method === 'online' ? 'paid' : 'pending',
@@ -1115,7 +1118,7 @@
                     localStorage.removeItem('midnightPlazaCart');
                     this.cart = [];
                     if (this.currentUser) {
-                        await remove(ref(db, `carts/${this.currentUser.uid}`)).catch(e => console.log('Cart cleanup:', e));
+                        await remove(ref(db, `tiutbc/carts/${this.currentUser.uid}`)).catch(e => console.log('Cart cleanup:', e));
                     }
                     setTimeout(() => window.location.href = 'orders.html', 2500);
                 } catch (e) {
