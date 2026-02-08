@@ -172,14 +172,14 @@
         </div>
 
         <div class="section-container">
-            <div class="section-title">📍 Saved Addresses</div>
+            <div class="section-title">📍 Saved Rooms</div>
             <div id="addressesList">
                 <div class="loading-spinner" style="display: block;">
                     <div class="spinner"></div>
                     <p style="margin-top: 0.5rem; color: #666;">Loading addresses...</p>
                 </div>
             </div>
-            <button class="add-address-btn" onclick="APP.showAddAddressModal()">+ Add New Address</button>
+            <button class="add-address-btn" onclick="APP.showAddAddressModal()">+ Add New Room</button>
         </div>
     </div>
 
@@ -225,7 +225,7 @@
     <div class="modal-overlay" id="addAddressModal">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title">📍 Add New Address</div>
+                <div class="modal-title">📍 Add New Room</div>
                 <button class="close-modal" onclick="APP.closeModal('addAddressModal')">&times;</button>
             </div>
             
@@ -309,7 +309,7 @@
         const APP = {
             currentUser: null,
             userDetails: null,
-            savedAddresses: [],
+            savedRooms: [],
             map: null,
             marker: null,
             finalPinLocation: null,
@@ -327,7 +327,7 @@
                     if (user) {
                         this.currentUser = user;
                         await this.loadUserDetails();
-                        await this.loadSavedAddresses();
+                        await this.loadSavedRooms();
                     } else {
                         window.location.href = 'index.html';
                     }
@@ -552,23 +552,23 @@
                 document.getElementById('displayEmail').textContent = this.userDetails.email || this.currentUser.email;
             },
 
-            async loadSavedAddresses() {
+            async loadSavedRooms() {
                 const listEl = document.getElementById('addressesList');
                 
                 try {
                     const addressRef = ref(db, `tiutbc/users/${this.currentUser.uid}/addresses`);
                     const snapshot = await get(addressRef);
                     
-                    this.savedAddresses = [];
+                    this.savedRooms = [];
                     
                     if (snapshot.exists()) {
                         snapshot.forEach(child => {
-                            this.savedAddresses.push({
+                            this.savedRooms.push({
                                 id: child.key,
                                 ...child.val()
                             });
                         });
-                        this.savedAddresses.sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
+                        this.savedRooms.sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
                     }
 
                     this.renderAddresses();
@@ -586,18 +586,18 @@
             renderAddresses() {
                 const listEl = document.getElementById('addressesList');
                 
-                if (this.savedAddresses.length === 0) {
+                if (this.savedRooms.length === 0) {
                     listEl.innerHTML = `
                         <div class="empty-state">
                             <div class="empty-icon">📍</div>
-                            <p>No saved addresses yet</p>
-                            <p style="font-size: 0.85rem; margin-top: 0.5rem;">Click "Add New Address" to get started</p>
+                            <p>No saved rooms yet</p>
+                            <p style="font-size: 0.85rem; margin-top: 0.5rem;">Click "Add New Room" to get started</p>
                         </div>
                     `;
                     return;
                 }
 
-                listEl.innerHTML = this.savedAddresses.map(addr => {
+                listEl.innerHTML = this.savedRooms.map(addr => {
                     const coordsDisplay = addr.coordinates ? 
                         `<div style="font-size: 0.75rem; color: #888; margin-top: 0.3rem;">📍 ${addr.coordinates.lat.toFixed(4)}, ${addr.coordinates.lng.toFixed(4)}</div>` : '';
                     
@@ -624,17 +624,17 @@
             async setDefaultAddress(id) {
                 try {
                     const updates = {};
-                    this.savedAddresses.forEach(addr => {
+                    this.savedRooms.forEach(addr => {
                         updates[`tiutbc/users/${this.currentUser.uid}/addresses/${addr.id}/isDefault`] = (addr.id === id);
                     });
                     
                     await update(ref(db), updates);
                     
-                    this.savedAddresses.forEach(addr => {
+                    this.savedRooms.forEach(addr => {
                         addr.isDefault = (addr.id === id);
                     });
                     
-                    this.savedAddresses.sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
+                    this.savedRooms.sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
                     this.renderAddresses();
                     this.showToast('success', 'Default address updated', '');
                 } catch (error) {
@@ -648,7 +648,7 @@
                 
                 try {
                     await remove(ref(db, `tiutbc/users/${this.currentUser.uid}/addresses/${id}`));
-                    this.savedAddresses = this.savedAddresses.filter(a => a.id !== id);
+                    this.savedRooms = this.savedRooms.filter(a => a.id !== id);
                     this.renderAddresses();
                     this.showToast('success', 'Address deleted successfully', '');
                 } catch (error) {
@@ -681,7 +681,7 @@
                     document.getElementById('addressPhone').value = phoneDigits;
                 }
                 
-                document.getElementById('setAsDefault').checked = this.savedAddresses.length === 0;
+                document.getElementById('setAsDefault').checked = this.savedRooms.length === 0;
                 
                 this.finalPinLocation = null;
                 this.validLocationSet = false;
@@ -809,12 +809,12 @@
                 btnText.textContent = 'Saving...';
 
                 try {
-                    const isFirstAddress = this.savedAddresses.length === 0;
+                    const isFirstAddress = this.savedRooms.length === 0;
                     const shouldBeDefault = setDefault || isFirstAddress;
 
-                    if (shouldBeDefault && this.savedAddresses.length > 0) {
+                    if (shouldBeDefault && this.savedRooms.length > 0) {
                         const updates = {};
-                        this.savedAddresses.forEach(addr => {
+                        this.savedRooms.forEach(addr => {
                             updates[`tiutbc/users/${this.currentUser.uid}/addresses/${addr.id}/isDefault`] = false;
                         });
                         await update(ref(db), updates);
@@ -846,7 +846,7 @@
                     setTimeout(async () => {
                         this.showToast('success', 'Address saved successfully', '');
                         this.closeModal('addAddressModal');
-                        await this.loadSavedAddresses();
+                        await this.loadSavedRooms();
                         btn.disabled = false;
                         btn.style.background = '';
                         btnText.textContent = 'Save Address';
