@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>TIU The Biriyani Canteen - My Profile</title>
+    <style>
+        :root {
+            --primary: #ff6b35;
+            --primary-dark: #e85d2e;
+            --bg-cream: #fff8f0;
+            --secondary: #f7931e;
+            --brown: #6b4423;
+            --success-green: #60b246;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-cream); color: #333; padding-bottom: 2rem; }
+        .navbar { background: white; padding: 0.75rem 1rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; }
+        .nav-left { display: flex; align-items: center; gap: 1rem; }
+        .logo { font-size: clamp(1.2rem, 4vw, 1.5rem); font-weight: bold; color: var(--primary); cursor: pointer; }
+        .hamburger { display: flex; flex-direction: column; gap: 4px; cursor: pointer; padding: 0.5rem; }
+        .hamburger span { width: 22px; height: 2.5px; background: var(--brown); border-radius: 3px; transition: all 0.3s; }
+        .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(7px, 7px); }
+        .hamburger.active span:nth-child(2) { opacity: 0; }
+        .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(6px, -6px); }
+        .nav-items { display: none; position: fixed; top: 60px; left: 0; right: 0; background: white; box-shadow: 0 4px 20px rgba(0,0,0,0.1); padding: 0.5rem; flex-direction: column; gap: 0; z-index: 999; }
+        .nav-items.active { display: flex; }
+        .nav-item { cursor: pointer; padding: 0.9rem; border-radius: 8px; transition: background 0.3s; text-decoration: none; color: #333; font-weight: 500; font-size: 0.95rem; border-bottom: 1px solid #f0f0f0; }
+        .nav-item:hover { background: var(--bg-cream); }
+        .container { max-width: 900px; margin: 1.5rem auto; padding: 0 0.75rem; }
+        .profile-header { background: linear-gradient(135deg, var(--brown) 0%, var(--secondary) 100%); color: white; padding: 2rem 1.5rem; border-radius: 12px; text-align: center; margin-bottom: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .profile-avatar { width: 80px; height: 80px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .profile-name { font-size: clamp(1.5rem, 4vw, 1.8rem); font-weight: bold; margin-bottom: 0.5rem; }
+        .profile-email { font-size: clamp(0.9rem, 2.5vw, 1rem); opacity: 0.9; }
+        .section-container { background: white; padding: 1.25rem; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); margin-bottom: 1rem; }
+        .section-title { font-size: clamp(1.1rem, 3vw, 1.3rem); font-weight: 600; color: #333; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; padding-bottom: 0.75rem; border-bottom: 2px solid var(--bg-cream); }
+        .info-row { display: flex; justify-content: space-between; align-items: center; padding: 0.9rem 0; border-bottom: 1px solid #f0f0f0; }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { font-weight: 600; color: #666; font-size: 0.9rem; }
+        .info-value { font-weight: 500; color: #333; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .edit-btn { background: var(--secondary); color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: all 0.3s; }
+        .edit-btn:active { transform: scale(0.95); }
+        .customer-care-card { background: linear-gradient(135deg, var(--success-green) 0%, #4a9635 100%); color: white; padding: 1.5rem; border-radius: 12px; text-align: center; }
+        .care-icon { font-size: 3rem; margin-bottom: 0.75rem; animation: ring 2s ease-in-out infinite; }
+        @keyframes ring { 0%, 100% { transform: rotate(0deg); } 10%, 30% { transform: rotate(-10deg); } 20% { transform: rotate(10deg); } }
+        .care-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 0.5rem; }
+        .care-subtitle { font-size: 0.9rem; opacity: 0.9; margin-bottom: 1rem; }
+        .call-btn { background: white; color: var(--success-green); border: none; padding: 0.9rem 2rem; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .call-btn:active { transform: scale(0.95); }
+        .address-card { border: 2px solid #e0e0e0; border-radius: 10px; padding: 1rem; margin-bottom: 0.75rem; position: relative; transition: all 0.3s; }
+        .address-card:hover { border-color: var(--primary); box-shadow: 0 4px 12px rgba(253, 201, 33, 0.2); }
+        .default-badge { background: var(--secondary); color: white; padding: 0.2rem 0.6rem; border-radius: 5px; font-size: 0.75rem; font-weight: 600; position: absolute; top: 1rem; right: 1rem; }
+        .address-name { font-weight: 600; font-size: 1rem; color: #333; margin-bottom: 0.3rem; }
+        .address-phone { color: #666; font-size: 0.85rem; margin-bottom: 0.5rem; }
+        .address-details { color: #666; line-height: 1.6; font-size: 0.9rem; margin-bottom: 0.75rem; }
+        .address-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+        .btn-small { padding: 0.4rem 0.8rem; font-size: 0.8rem; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .btn-edit { background: var(--primary); color: white; }
+        .btn-set-default { background: var(--secondary); color: white; }
+        .btn-delete { background: #dc3545; color: white; }
+        .btn-small:active { transform: scale(0.95); }
+        .add-address-btn { width: 100%; padding: 0.9rem; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+        .add-address-btn:active { transform: scale(0.98); }
+        .empty-state { text-align: center; padding: 2rem 1rem; color: #666; }
+        .empty-icon { font-size: 3rem; margin-bottom: 0.5rem; }
+        .toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 1.5rem 2rem; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); z-index: 10000; display: none; text-align: center; min-width: 280px; max-width: 90%; }
+        .toast.show { display: block; animation: toastSlideIn 0.3s ease-out; }
+        .toast-success { border-left: 5px solid var(--success-green); }
+        .toast-error { border-left: 5px solid #dc3545; }
+        .toast-icon { font-size: 3rem; margin-bottom: 0.75rem; }
+        .toast-message { font-size: 1.1rem; font-weight: 600; color: #333; margin-bottom: 0.5rem; }
+        .toast-submessage { font-size: 0.9rem; color: #666; }
+        @keyframes toastSlideIn { from { transform: translate(-50%, -60%); opacity: 0; } to { transform: translate(-50%, -50%); opacity: 1; } }
+        .toast-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 9999; display: none; }
+        .toast-overlay.show { display: block; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; padding: 1rem; animation: fadeIn 0.3s; }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: white; border-radius: 12px; padding: 1.5rem; max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+        .modal-title { font-size: 1.3rem; font-weight: 600; color: #333; }
+        .close-modal { background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #666; line-height: 1; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.4rem; font-weight: 600; color: #333; font-size: 0.9rem; }
+        .form-group input, .form-group textarea { width: 100%; padding: 0.75rem; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 0.95rem; font-family: inherit; transition: border-color 0.3s; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); }
+        .form-group input.auto-filled { border-color: var(--success-green); background-color: #f0fff4; }
+        .form-group textarea { resize: vertical; min-height: 70px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+        @media (max-width: 480px) { .form-row { grid-template-columns: 1fr; } }
+        .btn-primary { width: 100%; padding: 0.9rem; background: var(--brown); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-primary:disabled { background: #ccc; cursor: not-allowed; }
+        .map-instruction { background: #fffbf0; border-left: 4px solid var(--primary); padding: 0.75rem; margin-bottom: 1rem; border-radius: 4px; font-size: 0.85rem; color: #666; }
+        #map { width: 100%; height: 350px; border-radius: 8px; margin-bottom: 1rem; border: 2px solid #e0e0e0; }
+        .location-btn { background: var(--secondary); color: white; border: none; padding: 0.6rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem; transition: all 0.3s; display: flex; align-items: center; gap: 0.5rem; }
+        .location-btn:active { transform: scale(0.95); }
+        .location-btn:disabled { background: #ccc; cursor: not-allowed; }
+        .location-status { font-size: 0.8rem; color: #666; margin-top: 0.3rem; }
+        .coord-display { background: #f0f9ff; border: 2px solid var(--secondary); border-radius: 8px; padding: 0.75rem; margin-top: 0.75rem; font-size: 0.85rem; color: #666; text-align: center; }
+        .coord-display.warning { background: #fff3cd; border-color: #ffc107; color: #856404; }
+        .coord-display.error { background: #f8d7da; border-color: #dc3545; color: #721c24; font-weight: 600; }
+        .loading-spinner { display: none; text-align: center; padding: 1rem; }
+        .spinner { border: 3px solid #f3f3f3; border-top: 3px solid var(--primary); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @media (min-width: 768px) {
+            .hamburger { display: none; }
+            .nav-items { display: flex !important; position: static; flex-direction: row; padding: 0; box-shadow: none; gap: 0.75rem; }
+            .nav-item { border-bottom: none; padding: 0.4rem 0.6rem; }
+            .edit-btn:hover { background: #7eb3d4; }
+            .call-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.25); }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="nav-left">
+            <div class="hamburger" onclick="APP.toggleMenu()">
+                <span></span><span></span><span></span>
+            </div>
+            <div class="logo" onclick="window.location.href='home.html'">TIU The Biriyani Canteen</div>
+        </div>
+    </div>
+
+    <div class="nav-items" id="navMenu">
+        <a href="home.html" class="nav-item">Home</a>
+        <a href="orders.html" class="nav-item">Orders</a>
+        <a href="checkout.html" class="nav-item">Cart</a>
+        <span class="nav-item" style="cursor: default; background: var(--bg-cream);">Profile</span>
+        <span class="nav-item" onclick="APP.logout()">Logout</span>
+    </div>
+
+    <div class="container">
+        <div class="profile-header">
+            <div class="profile-avatar">👤</div>
+            <div class="profile-name" id="profileName">Loading...</div>
+            <div class="profile-email" id="profileEmail">Loading...</div>
+        </div>
+
+        <div class="section-container">
+            <div class="section-title">📋 Personal Information</div>
+            <div class="info-row">
+                <span class="info-label">Full Name</span>
+                <div class="info-value">
+                    <span id="displayName">Loading...</span>
+                    <button class="edit-btn" onclick="APP.showEditNameModal()">Edit</button>
+                </div>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Phone Number</span>
+                <div class="info-value">
+                    <span id="displayPhone">Loading...</span>
+                    <button class="edit-btn" onclick="APP.showEditPhoneModal()">Edit</button>
+                </div>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Email</span>
+                <div class="info-value">
+                    <span id="displayEmail">Loading...</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-container">
+            <div class="customer-care-card">
+                <div class="care-icon">📞</div>
+                <div class="care-title">Need Help?</div>
+                <div class="care-subtitle">Our customer care team is here for you</div>
+                <a href="tel:9883780399" class="call-btn">📱 Call 9883780399</a>
+            </div>
+        </div>
+
+        <div class="section-container">
+            <div class="section-title">📍 Saved Addresses</div>
+            <div id="addressesList">
+                <div class="loading-spinner" style="display: block;">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 0.5rem; color: #666;">Loading addresses...</p>
+                </div>
+            </div>
+            <button class="add-address-btn" onclick="APP.showAddAddressModal()">+ Add New Address</button>
+        </div>
+    </div>
+
+    <div class="toast-overlay" id="toastOverlay"></div>
+    <div class="toast" id="toast">
+        <div class="toast-icon" id="toastIcon"></div>
+        <div class="toast-message" id="toastMessage"></div>
+        <div class="toast-submessage" id="toastSubMessage"></div>
+    </div>
+
+    <div class="modal-overlay" id="editNameModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">✏️ Edit Name</div>
+                <button class="close-modal" onclick="APP.closeModal('editNameModal')">&times;</button>
+            </div>
+            <form id="editNameForm" onsubmit="APP.updateName(event)">
+                <div class="form-group">
+                    <label for="newName">Full Name *</label>
+                    <input type="text" id="newName" required minlength="3" placeholder="Enter your full name">
+                </div>
+                <button type="submit" class="btn-primary" id="nameSubmitBtn">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="editPhoneModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">✏️ Edit Phone Number</div>
+                <button class="close-modal" onclick="APP.closeModal('editPhoneModal')">&times;</button>
+            </div>
+            <form id="editPhoneForm" onsubmit="APP.updatePhone(event)">
+                <div class="form-group">
+                    <label for="newPhone">Phone Number *</label>
+                    <input type="tel" id="newPhone" required pattern="[0-9]{10}" maxlength="10" placeholder="10 digit number">
+                </div>
+                <button type="submit" class="btn-primary" id="phoneSubmitBtn">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="addAddressModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">📍 Add New Address</div>
+                <button class="close-modal" onclick="APP.closeModal('addAddressModal')">&times;</button>
+            </div>
+            
+            <div class="map-instruction">
+                <strong>⚠️ Location Required:</strong> You must set your exact delivery location on the map. Click "Use My Location" or drag the red marker to your address.
+            </div>
+            
+            <button type="button" class="location-btn" id="locationBtn" onclick="APP.getLocation()">📍 Use My Location</button>
+            <div class="location-status" id="locationStatus"></div>
+            
+            <div id="map"></div>
+            
+            <div class="coord-display error" id="coordDisplay">❌ Location not set - Click "Use My Location" or drag the marker</div>
+            
+            <form id="addAddressForm" onsubmit="APP.saveNewAddress(event)">
+                <div class="form-group">
+                    <label for="addressName">Full Name *</label>
+                    <input type="text" id="addressName" required placeholder="Your full name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="addressPhone">Phone Number *</label>
+                    <input type="tel" id="addressPhone" required placeholder="10 digit number" pattern="[0-9]{10}" maxlength="10">
+                </div>
+                
+                <div class="form-group">
+                    <label for="addressStreet">Address *</label>
+                    <textarea id="addressStreet" required placeholder="House No., Street, Area" rows="2"></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="addressCity">City *</label>
+                        <input type="text" id="addressCity" required placeholder="City">
+                    </div>
+                    <div class="form-group">
+                        <label for="addressPincode">Pincode *</label>
+                        <input type="text" id="addressPincode" required placeholder="6 digits" pattern="[0-9]{6}" maxlength="6">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="addressLandmark">Landmark</label>
+                    <input type="text" id="addressLandmark" placeholder="Optional">
+                </div>
+                
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 500;">
+                        <input type="checkbox" id="setAsDefault" style="width: auto;">
+                        <span>Set as default address</span>
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn-primary" id="addAddressBtn" disabled>
+                    <span id="addAddressBtnText">Set Location First</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+        import { getDatabase, ref, get, set, update, remove, push } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI",
+            authDomain: "hungrybites-c7930.firebaseapp.com",
+            projectId: "hungrybites-c7930",
+            storageBucket: "hungrybites-c7930.firebasestorage.app",
+            messagingSenderId: "346758544945",
+            appId: "1:346758544945:web:4bcad40016540d18e79f10",
+            measurementId: "G-B5GP5SYMRC",
+            databaseURL: "https://hungrybites-c7930-default-rtdb.firebaseio.com"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        const APP = {
+            currentUser: null,
+            userDetails: null,
+            savedAddresses: [],
+            map: null,
+            marker: null,
+            finalPinLocation: null,
+            googleMapsLoaded: false,
+            locationDetected: false,
+            validLocationSet: false,
+            SERVICEABLE_PINCODES: {
+                '742101': true, '742102': true, '742103': true, '742107': true,
+                '742149': true, '742187': true
+            },
+
+            init() {
+                this.loadGoogleMaps();
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        this.currentUser = user;
+                        await this.loadUserDetails();
+                        await this.loadSavedAddresses();
+                    } else {
+                        window.location.href = 'index.html';
+                    }
+                });
+            },
+
+            loadGoogleMaps() {
+                if (window.google?.maps) {
+                    this.googleMapsLoaded = true;
+                    console.log('Google Maps already loaded');
+                    return;
+                }
+                const script = document.createElement('script');
+                script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI&callback=APP.onMapsLoaded';
+                script.async = true;
+                script.defer = true;
+                document.head.appendChild(script);
+            },
+
+            onMapsLoaded() {
+                this.googleMapsLoaded = true;
+                console.log('Google Maps loaded successfully');
+            },
+
+            initMap() {
+                if (!window.google?.maps) {
+                    console.error('Google Maps not loaded yet');
+                    return;
+                }
+
+                const defaultLocation = { lat: 22.9734, lng: 78.6569 };
+                this.map = new google.maps.Map(document.getElementById('map'), {
+                    center: defaultLocation,
+                    zoom: 5,
+                    mapTypeControl: false,
+                    streetViewControl: false,
+                    fullscreenControl: false
+                });
+
+                this.marker = new google.maps.Marker({
+                    position: defaultLocation,
+                    map: this.map,
+                    draggable: true,
+                    animation: google.maps.Animation.DROP
+                });
+
+                this.finalPinLocation = null;
+                this.validLocationSet = false;
+                this.updateCoordinatesDisplay();
+                this.updateAddAddressButton();
+
+                this.map.addListener('click', (e) => this.setMarkerPosition(e.latLng, false));
+                this.marker.addListener('dragend', (e) => {
+                    this.setMarkerPosition(e.latLng, false);
+                    this.showToast('success', 'Pin location updated', '');
+                });
+                this.marker.addListener('drag', (e) => {
+                    this.finalPinLocation = { lat: e.latLng.lat(), lng: e.latLng.lng() };
+                    this.validLocationSet = true;
+                    this.updateCoordinatesDisplay();
+                    this.updateAddAddressButton();
+                });
+
+                console.log('Map initialized successfully');
+            },
+
+            setMarkerPosition(latLng, isInitialDetection = false) {
+                this.finalPinLocation = { lat: latLng.lat(), lng: latLng.lng() };
+                this.validLocationSet = true;
+                this.marker.setPosition(latLng);
+                this.map.panTo(latLng);
+                this.updateCoordinatesDisplay();
+                this.updateAddAddressButton();
+
+                new google.maps.Geocoder().geocode({ location: latLng }, (results, status) => {
+                    if (status === 'OK' && results[0]) {
+                        this.populateAddressFields(results[0], isInitialDetection);
+                    }
+                });
+            },
+
+            populateAddressFields(result, isInitialDetection) {
+                const comps = result.address_components;
+                const addrFields = {};
+
+                comps.forEach(comp => {
+                    const types = comp.types;
+                    if (types.includes('locality')) addrFields.city = comp.long_name;
+                    if (types.includes('postal_code')) addrFields.pin = comp.long_name;
+                    if (types.includes('sublocality')) addrFields.area = comp.long_name;
+                    if (types.includes('sublocality_level_1')) addrFields.subArea = comp.long_name;
+                    if (types.includes('route')) addrFields.street = comp.long_name;
+                });
+
+                const updateField = (id, value, highlightIfNew = false) => {
+                    const el = document.getElementById(id);
+                    if (el && value) {
+                        const oldVal = el.value;
+                        el.value = value;
+                        if (highlightIfNew && !oldVal) {
+                            el.classList.add('auto-filled');
+                            setTimeout(() => el.classList.remove('auto-filled'), 3000);
+                        }
+                    }
+                };
+
+                const addressParts = [addrFields.street, addrFields.area, addrFields.subArea].filter(Boolean);
+                const fullAddress = addressParts.join(', ');
+
+                updateField('addressStreet', fullAddress, !isInitialDetection);
+                updateField('addressCity', addrFields.city, !isInitialDetection);
+                updateField('addressPincode', addrFields.pin, !isInitialDetection);
+
+                if (!isInitialDetection) {
+                    this.showToast('success', 'Address auto-filled from location', '');
+                }
+            },
+
+            updateCoordinatesDisplay() {
+                const coordDisplay = document.getElementById('coordDisplay');
+                if (this.finalPinLocation && this.validLocationSet) {
+                    coordDisplay.className = 'coord-display';
+                    coordDisplay.innerHTML = `✓ Location Set: <strong>${this.finalPinLocation.lat.toFixed(6)}, ${this.finalPinLocation.lng.toFixed(6)}</strong>`;
+                } else {
+                    coordDisplay.className = 'coord-display error';
+                    coordDisplay.innerHTML = '❌ Location not set - Click "Use My Location" or drag the marker';
+                }
+            },
+
+            updateAddAddressButton() {
+                const btn = document.getElementById('addAddressBtn');
+                const btnText = document.getElementById('addAddressBtnText');
+                if (this.validLocationSet && this.finalPinLocation) {
+                    btn.disabled = false;
+                    btnText.textContent = 'Save Address';
+                } else {
+                    btn.disabled = true;
+                    btnText.textContent = 'Set Location First';
+                }
+            },
+
+            getLocation() {
+                const btn = document.getElementById('locationBtn');
+                const status = document.getElementById('locationStatus');
+                btn.disabled = true;
+                btn.innerHTML = '<span>⏳ Detecting...</span>';
+                status.textContent = 'Getting your location...';
+                this.locationDetected = false;
+
+                const onSuccess = (lat, lng) => {
+                    if (this.locationDetected) return;
+                    this.locationDetected = true;
+                    this.validLocationSet = true;
+                    const latLng = new google.maps.LatLng(lat, lng);
+                    this.map.setCenter(latLng);
+                    this.map.setZoom(15);
+                    this.setMarkerPosition(latLng, true);
+                    btn.innerHTML = '<span>✓ Location Detected</span>';
+                    btn.disabled = false;
+                    status.textContent = '✓ Location detected successfully - You can now save address';
+                    status.style.color = '#60b246';
+                    this.updateAddAddressButton();
+                };
+
+                const onError = (msg) => {
+                    if (this.locationDetected) return;
+                    btn.innerHTML = '<span>📍 Use My Location</span>';
+                    btn.disabled = false;
+                    status.textContent = msg + ' - You must drag the marker to your location';
+                    status.style.color = '#ff6b6b';
+                    this.validLocationSet = false;
+                    this.finalPinLocation = null;
+                    this.updateCoordinatesDisplay();
+                    this.updateAddAddressButton();
+                };
+
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (pos) => onSuccess(pos.coords.latitude, pos.coords.longitude),
+                        (err) => {
+                            let msg = 'Location permission denied';
+                            if (err.code === 1) msg = 'Location permission denied';
+                            if (err.code === 3) msg = 'Location request timed out';
+                            onError(msg);
+                        },
+                        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                    );
+                } else {
+                    onError('Geolocation unavailable');
+                }
+            },
+
+            async loadUserDetails() {
+                try {
+                    const userRef = ref(db, `tiutbc/users/${this.currentUser.uid}/allDetails`);
+                    const snapshot = await get(userRef);
+                    
+                    if (snapshot.exists()) {
+                        this.userDetails = snapshot.val();
+                    } else {
+                        this.userDetails = {
+                            name: this.currentUser.displayName || 'User',
+                            email: this.currentUser.email,
+                            phoneNumber: this.currentUser.phoneNumber || ''
+                        };
+                    }
+
+                    this.renderUserDetails();
+                } catch (error) {
+                    console.error('Error loading user details:', error);
+                    this.showToast('error', 'Failed to load profile details', '');
+                }
+            },
+
+            renderUserDetails() {
+                document.getElementById('profileName').textContent = this.userDetails.name || 'User';
+                document.getElementById('profileEmail').textContent = this.userDetails.email || this.currentUser.email;
+                document.getElementById('displayName').textContent = this.userDetails.name || 'Not set';
+                
+                const phoneDisplay = this.userDetails.phoneNumber || 'Not set';
+                document.getElementById('displayPhone').textContent = phoneDisplay;
+                document.getElementById('displayEmail').textContent = this.userDetails.email || this.currentUser.email;
+            },
+
+            async loadSavedAddresses() {
+                const listEl = document.getElementById('addressesList');
+                
+                try {
+                    const addressRef = ref(db, `tiutbc/users/${this.currentUser.uid}/addresses`);
+                    const snapshot = await get(addressRef);
+                    
+                    this.savedAddresses = [];
+                    
+                    if (snapshot.exists()) {
+                        snapshot.forEach(child => {
+                            this.savedAddresses.push({
+                                id: child.key,
+                                ...child.val()
+                            });
+                        });
+                        this.savedAddresses.sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
+                    }
+
+                    this.renderAddresses();
+                } catch (error) {
+                    console.error('Error loading addresses:', error);
+                    listEl.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">❌</div>
+                            <p>Failed to load addresses</p>
+                        </div>
+                    `;
+                }
+            },
+
+            renderAddresses() {
+                const listEl = document.getElementById('addressesList');
+                
+                if (this.savedAddresses.length === 0) {
+                    listEl.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">📍</div>
+                            <p>No saved addresses yet</p>
+                            <p style="font-size: 0.85rem; margin-top: 0.5rem;">Click "Add New Address" to get started</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                listEl.innerHTML = this.savedAddresses.map(addr => {
+                    const coordsDisplay = addr.coordinates ? 
+                        `<div style="font-size: 0.75rem; color: #888; margin-top: 0.3rem;">📍 ${addr.coordinates.lat.toFixed(4)}, ${addr.coordinates.lng.toFixed(4)}</div>` : '';
+                    
+                    return `
+                        <div class="address-card">
+                            ${addr.isDefault ? '<span class="default-badge">Default</span>' : ''}
+                            <div class="address-name">${addr.fullName || 'No Name'}</div>
+                            <div class="address-phone">${addr.phone || 'No Phone'}</div>
+                            <div class="address-details">
+                                ${addr.streetAddress || addr.address || 'No Address'}<br>
+                                ${addr.city || ''}, ${addr.pincode || ''}
+                                ${addr.landmark ? `<br>Landmark: ${addr.landmark}` : ''}
+                                ${coordsDisplay}
+                            </div>
+                            <div class="address-actions">
+                                ${!addr.isDefault ? `<button class="btn-small btn-set-default" onclick="APP.setDefaultAddress('${addr.id}')">Set as Default</button>` : ''}
+                                <button class="btn-small btn-delete" onclick="APP.deleteAddress('${addr.id}')">Delete</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            },
+
+            async setDefaultAddress(id) {
+                try {
+                    const updates = {};
+                    this.savedAddresses.forEach(addr => {
+                        updates[`tiutbc/users/${this.currentUser.uid}/addresses/${addr.id}/isDefault`] = (addr.id === id);
+                    });
+                    
+                    await update(ref(db), updates);
+                    
+                    this.savedAddresses.forEach(addr => {
+                        addr.isDefault = (addr.id === id);
+                    });
+                    
+                    this.savedAddresses.sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
+                    this.renderAddresses();
+                    this.showToast('success', 'Default address updated', '');
+                } catch (error) {
+                    console.error('Error setting default address:', error);
+                    this.showToast('error', 'Failed to update default address', '');
+                }
+            },
+
+            async deleteAddress(id) {
+                if (!confirm('Delete this address permanently?')) return;
+                
+                try {
+                    await remove(ref(db, `tiutbc/users/${this.currentUser.uid}/addresses/${id}`));
+                    this.savedAddresses = this.savedAddresses.filter(a => a.id !== id);
+                    this.renderAddresses();
+                    this.showToast('success', 'Address deleted successfully', '');
+                } catch (error) {
+                    console.error('Error deleting address:', error);
+                    this.showToast('error', 'Failed to delete address', '');
+                }
+            },
+
+            showEditNameModal() {
+                document.getElementById('newName').value = this.userDetails.name || '';
+                document.getElementById('editNameModal').classList.add('active');
+            },
+
+            showEditPhoneModal() {
+                const phone = this.userDetails.phoneNumber || '';
+                const phoneDigits = phone.replace(/^\+91/, '');
+                document.getElementById('newPhone').value = phoneDigits;
+                document.getElementById('editPhoneModal').classList.add('active');
+            },
+
+            showAddAddressModal() {
+                const modal = document.getElementById('addAddressModal');
+                modal.classList.add('active');
+                
+                document.getElementById('addAddressForm').reset();
+                
+                if (this.userDetails) {
+                    document.getElementById('addressName').value = this.userDetails.name || '';
+                    const phoneDigits = (this.userDetails.phoneNumber || '').replace(/^\+91/, '');
+                    document.getElementById('addressPhone').value = phoneDigits;
+                }
+                
+                document.getElementById('setAsDefault').checked = this.savedAddresses.length === 0;
+                
+                this.finalPinLocation = null;
+                this.validLocationSet = false;
+                this.locationDetected = false;
+                this.updateCoordinatesDisplay();
+                this.updateAddAddressButton();
+                
+                setTimeout(() => {
+                    if (!this.map) {
+                        this.initMap();
+                    }
+                    
+                    if (this.map) {
+                        google.maps.event.trigger(this.map, 'resize');
+                        const defaultLocation = { lat: 22.9734, lng: 78.6569 };
+                        this.map.setCenter(defaultLocation);
+                        this.map.setZoom(5);
+                        this.marker.setPosition(defaultLocation);
+                        setTimeout(() => this.getLocation(), 500);
+                    }
+                }, 300);
+            },
+
+            closeModal(modalId) {
+                document.getElementById(modalId).classList.remove('active');
+            },
+
+            async updateName(event) {
+                event.preventDefault();
+                const newName = document.getElementById('newName').value.trim();
+                
+                if (newName.length < 3) {
+                    this.showToast('error', 'Name must be at least 3 characters', '');
+                    return;
+                }
+
+                const btn = document.getElementById('nameSubmitBtn');
+                btn.disabled = true;
+                btn.textContent = 'Saving...';
+
+                try {
+                    await update(ref(db, `tiutbc/users/${this.currentUser.uid}/allDetails`), {
+                        name: newName
+                    });
+
+                    this.userDetails.name = newName;
+                    this.renderUserDetails();
+                    this.closeModal('editNameModal');
+                    this.showToast('success', 'Name updated successfully', '');
+                } catch (error) {
+                    console.error('Error updating name:', error);
+                    this.showToast('error', 'Failed to update name', '');
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = 'Save Changes';
+                }
+            },
+
+            async updatePhone(event) {
+                event.preventDefault();
+                const newPhone = document.getElementById('newPhone').value.trim();
+                
+                if (!/^[0-9]{10}$/.test(newPhone)) {
+                    this.showToast('error', 'Enter a valid 10-digit phone number', '');
+                    return;
+                }
+
+                const btn = document.getElementById('phoneSubmitBtn');
+                btn.disabled = true;
+                btn.textContent = 'Saving...';
+
+                try {
+                    const fullPhone = '+91' + newPhone;
+                    await update(ref(db, `tiutbc/users/${this.currentUser.uid}/allDetails`), {
+                        phoneNumber: fullPhone
+                    });
+
+                    this.userDetails.phoneNumber = fullPhone;
+                    this.renderUserDetails();
+                    this.closeModal('editPhoneModal');
+                    this.showToast('success', 'Phone number updated successfully', '');
+                } catch (error) {
+                    console.error('Error updating phone:', error);
+                    this.showToast('error', 'Failed to update phone number', '');
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = 'Save Changes';
+                }
+            },
+
+            async saveNewAddress(event) {
+                event.preventDefault();
+                
+                if (!this.validLocationSet || !this.finalPinLocation) {
+                    return this.showToast('error', 'Location Required', 'You must set your delivery location on the map');
+                }
+
+                const name = document.getElementById('addressName').value.trim();
+                const phone = document.getElementById('addressPhone').value.trim();
+                const street = document.getElementById('addressStreet').value.trim();
+                const city = document.getElementById('addressCity').value.trim();
+                const pincode = document.getElementById('addressPincode').value.trim();
+                const landmark = document.getElementById('addressLandmark').value.trim();
+                const setDefault = document.getElementById('setAsDefault').checked;
+
+                if (!name || !phone || !street || !city || !pincode) {
+                    return this.showToast('error', 'Fill all required fields', '');
+                }
+
+                if (!/^[0-9]{10}$/.test(phone)) {
+                    return this.showToast('error', 'Enter valid 10-digit phone', '');
+                }
+
+                if (!/^[0-9]{6}$/.test(pincode)) {
+                    return this.showToast('error', 'Enter valid 6-digit pincode', '');
+                }
+
+                if (!this.SERVICEABLE_PINCODES[pincode]) {
+                    return this.showToast('error', 'Out of Service Area', `We don't deliver to pincode ${pincode} yet`);
+                }
+
+                const btn = document.getElementById('addAddressBtn');
+                const btnText = document.getElementById('addAddressBtnText');
+                btn.disabled = true;
+                btnText.textContent = 'Saving...';
+
+                try {
+                    const isFirstAddress = this.savedAddresses.length === 0;
+                    const shouldBeDefault = setDefault || isFirstAddress;
+
+                    if (shouldBeDefault && this.savedAddresses.length > 0) {
+                        const updates = {};
+                        this.savedAddresses.forEach(addr => {
+                            updates[`tiutbc/users/${this.currentUser.uid}/addresses/${addr.id}/isDefault`] = false;
+                        });
+                        await update(ref(db), updates);
+                    }
+
+                    const newAddress = {
+                        fullName: name,
+                        phone: phone,
+                        streetAddress: street,
+                        city: city,
+                        pincode: pincode,
+                        landmark: landmark,
+                        coordinates: {
+                            lat: this.finalPinLocation.lat,
+                            lng: this.finalPinLocation.lng
+                        },
+                        serviceable: true,
+                        createdAt: Date.now(),
+                        isDefault: shouldBeDefault
+                    };
+
+                    const addressesRef = ref(db, `tiutbc/users/${this.currentUser.uid}/addresses`);
+                    const newRef = push(addressesRef);
+                    await set(newRef, newAddress);
+                    
+                    btnText.textContent = 'Saved!';
+                    btn.style.background = '#60b246';
+                    
+                    setTimeout(async () => {
+                        this.showToast('success', 'Address saved successfully', '');
+                        this.closeModal('addAddressModal');
+                        await this.loadSavedAddresses();
+                        btn.disabled = false;
+                        btn.style.background = '';
+                        btnText.textContent = 'Save Address';
+                    }, 800);
+                } catch (error) {
+                    console.error('Error saving address:', error);
+                    this.showToast('error', 'Failed to save address', '');
+                    btn.disabled = false;
+                    btnText.textContent = 'Save Address';
+                }
+            },
+
+            showToast(type, msg, sub) {
+                const toast = document.getElementById('toast');
+                const overlay = document.getElementById('toastOverlay');
+                toast.className = `toast show toast-${type}`;
+                overlay.classList.add('show');
+                document.getElementById('toastIcon').textContent = type === 'success' ? '✓' : '✕';
+                document.getElementById('toastMessage').textContent = msg;
+                document.getElementById('toastSubMessage').textContent = sub;
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    overlay.classList.remove('show');
+                }, 3000);
+            },
+
+            toggleMenu() {
+                document.querySelector('.hamburger').classList.toggle('active');
+                document.getElementById('navMenu').classList.toggle('active');
+            },
+
+            async logout() {
+                if (confirm('Are you sure you want to logout?')) {
+                    try {
+                        await signOut(auth);
+                        localStorage.removeItem('midnightPlazaCart');
+                        window.location.href = 'index.html';
+                    } catch (error) {
+                        console.error('Logout error:', error);
+                        this.showToast('error', 'Failed to logout', '');
+                    }
+                }
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => APP.init());
+
+        document.getElementById('editNameModal').addEventListener('click', (e) => {
+            if (e.target.id === 'editNameModal') APP.closeModal('editNameModal');
+        });
+
+        document.getElementById('editPhoneModal').addEventListener('click', (e) => {
+            if (e.target.id === 'editPhoneModal') APP.closeModal('editPhoneModal');
+        });
+
+        document.getElementById('addAddressModal').addEventListener('click', (e) => {
+            if (e.target.id === 'addAddressModal') APP.closeModal('addAddressModal');
+        });
+
+        window.APP = APP;
+    </script>
+</body>
+</html>

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HungryBites - Admin Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .auth-container {
+            max-width: 450px;
+            width: 90%;
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .tagline {
+            text-align: center;
+            color: #666;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+
+        h2 {
+            margin-bottom: 2rem;
+            color: #333;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #2c3e50;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            background: #2c3e50;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+
+        .btn:hover {
+            background: #34495e;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(44, 62, 80, 0.4);
+        }
+
+        .btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .back-link a {
+            color: #fc8019;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+
+        .error {
+            color: #e74c3c;
+            margin-top: 1rem;
+            text-align: center;
+            font-size: 0.9rem;
+            background: #fadbd8;
+            padding: 0.8rem;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .success {
+            color: #27ae60;
+            margin-top: 1rem;
+            text-align: center;
+            font-size: 0.9rem;
+            background: #d4edda;
+            padding: 0.8rem;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #2c3e50;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="logo">🔐 TIU Admin Panel</div>
+        <div class="tagline">HungryBites Administration</div>
+        
+        <h2>Admin Login</h2>
+        
+        <form id="adminForm" onsubmit="handleAdminLogin(event)">
+            <div class="form-group">
+                <label>Admin Email</label>
+                <input type="email" id="adminEmail" placeholder="Enter admin email" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="adminPassword" placeholder="Enter password" required>
+            </div>
+            <button type="submit" class="btn" id="loginBtn">Login as Admin</button>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+        </div>
+
+        <div class="back-link">
+            <a href="index.html">← Back to User Login</a>
+        </div>
+
+        <div class="error" id="authError"></div>
+        <div class="success" id="authSuccess"></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+        import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI",
+            authDomain: "hungrybites-c7930.firebaseapp.com",
+            projectId: "hungrybites-c7930",
+            storageBucket: "hungrybites-c7930.firebasestorage.app",
+            messagingSenderId: "346758544945",
+            appId: "1:346758544945:web:4bcad30016540d18e79f10",
+            measurementId: "G-B5GP5SYMRC",
+            databaseURL: "https://hungrybites-c7930-default-rtdb.firebaseio.com"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+
+        window.handleAdminLogin = async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+
+            hideMessages();
+            showLoading(true);
+
+            try {
+                // First authenticate with Firebase Auth
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // Then check if user is admin in Realtime Database
+                const dbRef = ref(database);
+                const snapshot = await get(child(dbRef, `tiutbc/admins/${user.uid}`));
+                
+                if (snapshot.exists()) {
+                    const adminData = snapshot.val();
+                    
+                    // Check if admin flag is true
+                    if (adminData.admin === true) {
+                        showSuccess(`Welcome ${adminData.name || 'Admin'}! Redirecting to dashboard...`);
+                        
+                        // Store admin info in sessionStorage for the dashboard
+                        sessionStorage.setItem('adminData', JSON.stringify({
+                            uid: user.uid,
+                            email: adminData.email,
+                            name: adminData.name,
+                            role: adminData.role
+                        }));
+                        
+                        setTimeout(() => {
+                            window.location.href = 'admin.html';
+                        }, 1000);
+                    } else {
+                        // Admin flag is false or doesn't exist
+                        await auth.signOut();
+                        showLoading(false);
+                        showError('Access denied. Admin privileges not granted.');
+                    }
+                } else {
+                    // User not found in admins database
+                    await auth.signOut();
+                    showLoading(false);
+                    showError('Access denied. You are not an admin.');
+                }
+            } catch (error) {
+                showLoading(false);
+                let errorMessage = 'An error occurred. Please try again.';
+                
+                if (error.code === 'auth/invalid-email') {
+                    errorMessage = 'Invalid email address.';
+                } else if (error.code === 'auth/user-not-found') {
+                    errorMessage = 'Admin account not found.';
+                } else if (error.code === 'auth/wrong-password') {
+                    errorMessage = 'Incorrect password.';
+                } else if (error.code === 'auth/invalid-credential') {
+                    errorMessage = 'Invalid credentials. Please check your email and password.';
+                } else if (error.code === 'auth/too-many-requests') {
+                    errorMessage = 'Too many failed attempts. Please try again later.';
+                }
+                
+                showError(errorMessage);
+            }
+        };
+
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+            document.getElementById('loginBtn').disabled = show;
+        }
+
+        function showError(message) {
+            const errorEl = document.getElementById('authError');
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+        }
+
+        function showSuccess(message) {
+            showLoading(false);
+            const successEl = document.getElementById('authSuccess');
+            successEl.textContent = message;
+            successEl.style.display = 'block';
+        }
+
+        function hideMessages() {
+            document.getElementById('authError').style.display = 'none';
+            document.getElementById('authSuccess').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

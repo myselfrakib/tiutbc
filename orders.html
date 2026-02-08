@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>TIU The Biriyani Canteen - My Orders</title>
+    <style>
+        :root {
+            --primary: #ff6b35;
+            --primary-dark: #e85d2e;
+            --bg-cream: #fff8f0;
+            --secondary: #f7931e;
+            --brown: #6b4423;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-cream);
+            color: #333;
+        }
+
+        .navbar {
+            background: white;
+            padding: 0.75rem 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
+            font-weight: bold;
+            color: var(--primary);
+            cursor: pointer;
+        }
+
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            cursor: pointer;
+            padding: 0.5rem;
+            touch-action: manipulation;
+        }
+
+        .hamburger span {
+            width: 22px;
+            height: 2.5px;
+            background: var(--brown);
+            border-radius: 3px;
+            transition: all 0.3s;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(7px, 7px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
+        }
+
+        .nav-items {
+            display: none;
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            padding: 0.5rem;
+            flex-direction: column;
+            gap: 0;
+            z-index: 999;
+        }
+
+        .nav-items.active {
+            display: flex;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-item {
+            cursor: pointer;
+            padding: 0.9rem;
+            border-radius: 8px;
+            transition: background 0.3s;
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            font-size: 0.95rem;
+            position: relative;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            touch-action: manipulation;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-cream);
+        }
+
+        .cart-item {
+            cursor: pointer;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            transition: background 0.3s;
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            font-size: clamp(0.85rem, 2vw, 0.95rem);
+            position: relative;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            touch-action: manipulation;
+        }
+
+        .cart-item:hover {
+            background: var(--bg-cream);
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            min-width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 0 4px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 1.5rem 0.75rem;
+        }
+
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        h2 {
+            font-size: clamp(1.5rem, 4vw, 1.8rem);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--brown) 100%);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: clamp(0.8rem, 2vw, 0.9rem);
+            font-weight: 600;
+            color: white;
+            box-shadow: 0 2px 10px rgba(103, 152, 192, 0.3);
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .orders-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .order-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.2rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .order-card.updated {
+            animation: highlight 1s ease-in-out;
+        }
+
+        @keyframes highlight {
+            0%, 100% { background: white; }
+            50% { background: #fff3cd; }
+        }
+
+        .order-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f0f0;
+            gap: 1rem;
+        }
+
+        .order-number {
+            font-size: clamp(1.1rem, 3vw, 1.3rem);
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 0.3rem;
+        }
+
+        .order-id {
+            font-size: clamp(0.75rem, 2vw, 0.8rem);
+            color: #666;
+        }
+
+        .order-date {
+            color: #888;
+            font-size: clamp(0.75rem, 2vw, 0.8rem);
+            margin-top: 0.2rem;
+        }
+
+        .order-status {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: clamp(0.75rem, 2vw, 0.8rem);
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .status-pending {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            color: #856404;
+        }
+
+        .status-confirmed {
+            background: linear-gradient(135deg, var(--secondary) 0%, #b3e5fc 100%);
+            color: #0c5460;
+        }
+
+        .status-preparing, .status-cooking {
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+            color: #333;
+        }
+
+        .status-packing {
+            background: linear-gradient(135deg, #e8daef 0%, #d7bde2 100%);
+            color: #5b2c6f;
+        }
+
+        .status-out-for-delivery, .status-outfordelivery {
+            background: linear-gradient(135deg, var(--brown) 0%, #5a8db3 100%);
+            color: white;
+        }
+
+        .status-delivered {
+            background: linear-gradient(135deg, #d4edda 0%, #a8d9b5 100%);
+            color: #155724;
+        }
+
+        .status-cancelled, .status-rejected {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            color: #721c24;
+        }
+
+        .order-items {
+            margin-bottom: 1rem;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .order-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-details {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex: 1;
+        }
+
+        .item-emoji {
+            font-size: clamp(1.5rem, 4vw, 1.8rem);
+        }
+
+        .item-info {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: 600;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+        }
+
+        .item-quantity {
+            color: #666;
+            font-size: clamp(0.8rem, 2vw, 0.85rem);
+        }
+
+        .item-price {
+            font-weight: 600;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            color: var(--brown);
+            white-space: nowrap;
+            margin-left: 0.5rem;
+        }
+
+        .order-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 2px solid #f0f0f0;
+            font-size: clamp(1.1rem, 3vw, 1.2rem);
+            font-weight: bold;
+        }
+
+        .total-label {
+            color: #333;
+        }
+
+        .total-amount {
+            color: var(--brown);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem 1rem;
+            font-size: clamp(1rem, 3vw, 1rem);
+            color: #666;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-orders {
+            text-align: center;
+            padding: 3rem 1rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+
+        .empty-orders-icon {
+            font-size: clamp(3rem, 10vw, 4rem);
+            margin-bottom: 1rem;
+        }
+
+        .empty-orders h3 {
+            color: #666;
+            margin-bottom: 1rem;
+            font-size: clamp(1.2rem, 4vw, 1.3rem);
+        }
+
+        .order-now-btn {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.8rem 2rem;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s;
+            min-height: 44px;
+            touch-action: manipulation;
+        }
+
+        .order-now-btn:active {
+            transform: scale(0.95);
+        }
+
+        .status-timeline {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-size: clamp(0.8rem, 2vw, 0.85rem);
+            color: #666;
+        }
+
+        .timeline-icon {
+            font-size: 1rem;
+        }
+
+        .review-section {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: linear-gradient(135deg, #fff9e6 0%, #fff3cd 100%);
+            border-radius: 10px;
+            border: 2px solid var(--primary);
+        }
+
+        .review-header {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 0.8rem;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .review-prompt {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0.8rem;
+        }
+
+        .items-to-review {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .review-item-card {
+            background: white;
+            padding: 0.8rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .review-item-header {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .review-item-emoji {
+            font-size: 1.5rem;
+        }
+
+        .review-item-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #333;
+        }
+
+        .star-rating {
+            display: flex;
+            gap: 0.4rem;
+            margin-bottom: 0.8rem;
+            align-items: center;
+        }
+
+        .star {
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+            position: relative;
+        }
+
+        .star:hover {
+            transform: scale(1.3);
+        }
+
+        .star:active {
+            transform: scale(1.1);
+        }
+
+        .star.filled {
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            animation: starFill 0.3s ease-out;
+        }
+
+        .star.filled::before {
+            content: '★';
+        }
+
+        .star.empty {
+            color: #e0e0e0;
+        }
+
+        .star.empty::before {
+            content: '☆';
+        }
+
+        .star.hover-preview {
+            color: #ffed4e;
+            transform: scale(1.15);
+        }
+
+        .star.hover-preview::before {
+            content: '★';
+        }
+
+        @keyframes starFill {
+            0% { 
+                transform: scale(0.5) rotate(-15deg); 
+                opacity: 0.5;
+            }
+            50% { 
+                transform: scale(1.3) rotate(5deg); 
+            }
+            100% { 
+                transform: scale(1) rotate(0deg); 
+                opacity: 1;
+            }
+        }
+
+        .rating-label {
+            margin-left: 0.8rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #666;
+            min-width: 80px;
+        }
+
+        .rating-label.excellent { color: #27ae60; }
+        .rating-label.good { color: #60b246; }
+        .rating-label.average { color: #f39c12; }
+        .rating-label.poor { color: #e67e22; }
+        .rating-label.bad { color: #e74c3c; }
+
+        .review-textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            resize: vertical;
+            min-height: 80px;
+            transition: border-color 0.3s;
+        }
+
+        .review-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .submit-review-btn {
+            width: 100%;
+            padding: 0.9rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+
+        .submit-review-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(253, 201, 33, 0.4);
+        }
+
+        .submit-review-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .review-submitted {
+            padding: 1rem;
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-radius: 10px;
+            border: 2px solid #28a745;
+            margin-top: 1rem;
+        }
+
+        .review-submitted-header {
+            font-weight: 700;
+            color: #155724;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .review-submitted-text {
+            color: #155724;
+            font-size: 0.9rem;
+        }
+
+        .existing-reviews {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .existing-review-item {
+            padding: 0.8rem;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 0.8rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .existing-review-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .review-stars-display {
+            color: #ffd700;
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .review-comment {
+            color: #555;
+            font-size: 0.85rem;
+            font-style: italic;
+            margin-bottom: 0.3rem;
+        }
+
+        .review-date {
+            color: #888;
+            font-size: 0.75rem;
+        }
+
+        @media (min-width: 480px) {
+            .navbar {
+                padding: 0.75rem 1.5rem;
+            }
+
+            .container {
+                padding: 2rem 1rem;
+            }
+
+            .order-header {
+                flex-direction: row;
+                align-items: flex-start;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                padding: 2.5rem 1.5rem;
+            }
+
+            .order-card:hover {
+                transform: translateY(-4px);
+            }
+
+            .order-now-btn:hover {
+                background: var(--secondary);
+                transform: translateY(-2px);
+            }
+
+            .hamburger {
+                display: none;
+            }
+
+            .nav-items {
+                display: flex !important;
+                position: static;
+                flex-direction: row;
+                padding: 0;
+                box-shadow: none;
+                gap: 0.75rem;
+            }
+
+            .nav-item {
+                border-bottom: none;
+                padding: 0.4rem 0.6rem;
+                min-height: 40px;
+            }
+
+            .nav-right {
+                gap: 1rem;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .nav-items {
+                gap: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="nav-left">
+            <div class="hamburger" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="logo" onclick="window.location.href='home.html'">TIU The Biriyani Canteen</div>
+        </div>
+        <a href="checkout.html" class="cart-item">
+            Cart
+            <span class="cart-badge" id="cartBadge">0</span>
+        </a>
+    </div>
+
+    <div class="nav-items" id="navMenu">
+        <a href="home.html" class="nav-item">Home</a>
+        <span class="nav-item" style="cursor: default; background: var(--bg-cream);">Orders</span>
+        <a href="profile.html" class="nav-item">👤 Profile</a>
+        <span class="nav-item" onclick="logout()">Logout</span>
+    </div>
+
+    <div class="container">
+        <div class="header-section">
+            <h2>My Orders</h2>
+            <div class="live-indicator">
+                <span class="live-dot"></span>
+                Live Updates
+            </div>
+        </div>
+        <div id="ordersList" class="orders-list"></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+        import { getDatabase, ref, query, orderByChild, equalTo, onValue, off, get, set, push, update } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI",
+            authDomain: "hungrybites-c7930.firebaseapp.com",
+            projectId: "hungrybites-c7930",
+            storageBucket: "hungrybites-c7930.firebasestorage.app",
+            messagingSenderId: "346758544945",
+            appId: "1:346758544945:web:4bcad30016540d18e79f10",
+            measurementId: "G-B5GP5SYMRC",
+            databaseURL: "https://hungrybites-c7930-default-rtdb.firebaseio.com"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        let ordersListener = null;
+        let previousOrders = {};
+        let currentUser = null;
+        let itemReviews = {};
+        let userDisplayName = '';
+
+        let cart = JSON.parse(localStorage.getItem('midnightPlazaCart') || '[]');
+        updateCartBadge();
+
+        function updateCartBadge() {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const badge = document.getElementById('cartBadge');
+            badge.textContent = totalItems;
+            badge.style.display = totalItems > 0 ? 'flex' : 'none';
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                
+                try {
+                    const userDetailsRef = ref(db, `tiutbc/users/${user.uid}/allDetails`);
+                    const userSnapshot = await get(userDetailsRef);
+                    
+                    if (userSnapshot.exists()) {
+                        const userData = userSnapshot.val();
+                        userDisplayName = userData.name || user.email || 'User';
+                    } else {
+                        userDisplayName = user.displayName || user.email || 'User';
+                    }
+                    
+                    console.log('User display name:', userDisplayName);
+                } catch (error) {
+                    console.error('Error fetching user details:', error);
+                    userDisplayName = user.displayName || user.email || 'User';
+                }
+                
+                setupRealtimeOrders(user.uid);
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+
+        function setupRealtimeOrders(userId) {
+            const ordersList = document.getElementById('ordersList');
+            ordersList.innerHTML = '<div class="loading"><div class="spinner"></div>Setting up live updates...</div>';
+
+            const ordersRef = ref(db, 'orders');
+            const ordersQuery = query(ordersRef, orderByChild('userId'), equalTo(userId));
+
+            if (ordersListener) {
+                off(ordersListener);
+            }
+
+            ordersListener = onValue(ordersQuery, (snapshot) => {
+                if (!snapshot.exists()) {
+                    ordersList.innerHTML = `
+                        <div class="empty-orders">
+                            <div class="empty-orders-icon">📦</div>
+                            <h3>No orders yet</h3>
+                            <p>Start ordering some delicious food!</p>
+                            <a href="home.html" class="order-now-btn">Order Now</a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const orders = [];
+                const currentOrders = {};
+                
+                snapshot.forEach((childSnapshot) => {
+                    const orderData = {
+                        id: childSnapshot.key,
+                        ...childSnapshot.val()
+                    };
+                    orders.push(orderData);
+                    currentOrders[orderData.id] = orderData;
+                });
+
+                orders.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+                const updatedOrderIds = new Set();
+                Object.keys(currentOrders).forEach(orderId => {
+                    if (previousOrders[orderId] && 
+                        previousOrders[orderId].status !== currentOrders[orderId].status) {
+                        updatedOrderIds.add(orderId);
+                        showNotification(currentOrders[orderId]);
+                    }
+                });
+
+                previousOrders = currentOrders;
+                renderOrders(orders, updatedOrderIds);
+            }, (error) => {
+                console.error('Error setting up real-time updates:', error);
+                ordersList.innerHTML = `
+                    <div class="empty-orders">
+                        <div class="empty-orders-icon">❌</div>
+                        <h3>Error loading orders</h3>
+                        <p>Please refresh the page</p>
+                    </div>
+                `;
+            });
+        }
+
+        async function renderOrders(orders, updatedOrderIds) {
+            const ordersList = document.getElementById('ordersList');
+            
+            let ordersHTML = '';
+            for (let index = 0; index < orders.length; index++) {
+                const order = orders[index];
+                const orderDate = order.createdAt 
+                    ? new Date(order.createdAt).toLocaleString('en-IN', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    })
+                    : 'N/A';
+                
+                const isUpdated = updatedOrderIds.has(order.id);
+                const statusClass = order.status.toLowerCase().replace(/\s+/g, '');
+                
+                const reviewSection = order.status === 'delivered' ? await generateReviewSection(order) : '';
+                
+                ordersHTML += `
+                    <div class="order-card ${isUpdated ? 'updated' : ''}" data-order-id="${order.id}">
+                        <div class="order-header">
+                            <div>
+                                <div class="order-number">#${orders.length - index}</div>
+                                <div class="order-id">Order ID: ${order.id.substring(0, 8)}</div>
+                                <div class="order-date">${orderDate}</div>
+                            </div>
+                            <div class="order-status status-${statusClass}">
+                                ${getStatusEmoji(order.status)} ${formatStatus(order.status)}
+                            </div>
+                        </div>
+                        <div class="order-items">
+                            ${order.items.map(item => `
+                                <div class="order-item">
+                                    <div class="item-details">
+                                        <div class="item-emoji">${item.emoji || '🍔'}</div>
+                                        <div class="item-info">
+                                            <div class="item-name">${escapeHtml(item.name)}</div>
+                                            <div class="item-quantity">Qty: ${item.quantity}</div>
+                                        </div>
+                                    </div>
+                                    <div class="item-price">₹${(item.price * item.quantity).toFixed(2)}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="order-total">
+                            <span class="total-label">Total:</span>
+                            <span class="total-amount">₹${parseFloat(order.total).toFixed(2)}</span>
+                        </div>
+                        ${getStatusTimeline(order.status)}
+                        ${reviewSection}
+                    </div>
+                `;
+            }
+
+            ordersList.innerHTML = ordersHTML;
+
+            setTimeout(() => {
+                document.querySelectorAll('.order-card.updated').forEach(card => {
+                    card.classList.remove('updated');
+                });
+            }, 1000);
+        }
+
+        async function generateReviewSection(order) {
+            const hasReviewed = await checkIfReviewed(order.id);
+            
+            if (hasReviewed) {
+                const reviews = await getOrderReviews(order.id);
+                return `
+                    <div class="review-submitted">
+                        <div class="review-submitted-header">
+                            ✅ Thank you for your review!
+                        </div>
+                        <div class="review-submitted-text">
+                            Your feedback helps us improve our service.
+                        </div>
+                    </div>
+                    ${reviews.length > 0 ? `
+                        <div class="existing-reviews">
+                            ${reviews.map(r => `
+                                <div class="existing-review-item">
+                                    <div><strong>${escapeHtml(r.itemName)}</strong></div>
+                                    <div class="review-stars-display">${'⭐'.repeat(r.rating)}</div>
+                                    ${r.comment ? `<div class="review-comment">"${escapeHtml(r.comment)}"</div>` : ''}
+                                    <div class="review-date">${new Date(r.timestamp).toLocaleDateString()}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                `;
+            }
+
+            return `
+                <div class="review-section" id="review-${order.id}">
+                    <div class="review-header">
+                        ⭐ Rate Your Order
+                    </div>
+                    <div class="review-prompt">
+                        Help us serve you better by rating each item!
+                    </div>
+                    <div class="items-to-review">
+                        ${order.items.map((item, idx) => `
+                            <div class="review-item-card">
+                                <div class="review-item-header">
+                                    <span class="review-item-emoji">${item.emoji || '🍔'}</span>
+                                    <span class="review-item-name">${escapeHtml(item.name)}</span>
+                                </div>
+                                <div class="star-rating" data-item-index="${idx}" data-current-rating="0">
+                                    ${[1, 2, 3, 4, 5].map(star => `
+                                        <span class="star empty" data-rating="${star}" 
+                                              onmouseover="previewRating('${order.id}', ${idx}, ${star})"
+                                              onmouseout="resetPreview('${order.id}', ${idx})"
+                                              onclick="setRating('${order.id}', ${idx}, ${star})"></span>
+                                    `).join('')}
+                                    <span class="rating-label" id="rating-label-${order.id}-${idx}"></span>
+                                </div>
+                                <textarea 
+                                    class="review-textarea" 
+                                    placeholder="Share your thoughts about this item (optional)..."
+                                    id="comment-${order.id}-${idx}"
+                                ></textarea>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button class="submit-review-btn" onclick="submitReviews('${order.id}', ${order.items.length})">
+                        Submit Reviews
+                    </button>
+                </div>
+            `;
+        }
+
+        async function checkIfReviewed(orderId) {
+            try {
+                const reviewRef = ref(db, `orderReviews/${orderId}`);
+                const snapshot = await get(reviewRef);
+                return snapshot.exists();
+            } catch (error) {
+                console.error('Error checking reviews:', error);
+                return false;
+            }
+        }
+
+        async function getOrderReviews(orderId) {
+            try {
+                const reviewRef = ref(db, `orderReviews/${orderId}`);
+                const snapshot = await get(reviewRef);
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    return Object.values(data);
+                }
+                return [];
+            } catch (error) {
+                console.error('Error getting reviews:', error);
+                return [];
+            }
+        }
+
+        window.previewRating = function(orderId, itemIndex, rating) {
+            const container = document.querySelector(`[data-item-index="${itemIndex}"]`);
+            const currentRating = parseInt(container.getAttribute('data-current-rating')) || 0;
+            
+            if (currentRating === 0) {
+                const stars = container.querySelectorAll('.star');
+                stars.forEach((star, idx) => {
+                    if (idx < rating) {
+                        star.classList.remove('empty');
+                        star.classList.add('hover-preview');
+                    } else {
+                        star.classList.add('empty');
+                        star.classList.remove('hover-preview');
+                    }
+                });
+                
+                updateRatingLabel(orderId, itemIndex, rating);
+            }
+        };
+
+        window.resetPreview = function(orderId, itemIndex) {
+            const container = document.querySelector(`[data-item-index="${itemIndex}"]`);
+            const currentRating = parseInt(container.getAttribute('data-current-rating')) || 0;
+            
+            if (currentRating === 0) {
+                const stars = container.querySelectorAll('.star');
+                stars.forEach(star => {
+                    star.classList.remove('hover-preview');
+                    star.classList.add('empty');
+                });
+                updateRatingLabel(orderId, itemIndex, 0);
+            }
+        };
+
+        window.setRating = function(orderId, itemIndex, rating) {
+            const container = document.querySelector(`[data-item-index="${itemIndex}"]`);
+            const stars = container.querySelectorAll('.star');
+            
+            container.setAttribute('data-current-rating', rating);
+            
+            stars.forEach((star, idx) => {
+                star.classList.remove('hover-preview');
+                if (idx < rating) {
+                    star.classList.remove('empty');
+                    star.classList.add('filled');
+                } else {
+                    star.classList.remove('filled');
+                    star.classList.add('empty');
+                }
+            });
+            
+            if (!itemReviews[orderId]) {
+                itemReviews[orderId] = {};
+            }
+            itemReviews[orderId][itemIndex] = rating;
+            
+            updateRatingLabel(orderId, itemIndex, rating);
+        };
+
+        function updateRatingLabel(orderId, itemIndex, rating) {
+            const label = document.getElementById(`rating-label-${orderId}-${itemIndex}`);
+            if (!label) return;
+            
+            const labels = {
+                0: '',
+                1: 'Bad',
+                2: 'Poor',
+                3: 'Average',
+                4: 'Good',
+                5: 'Excellent'
+            };
+            
+            const classes = {
+                0: '',
+                1: 'bad',
+                2: 'poor',
+                3: 'average',
+                4: 'good',
+                5: 'excellent'
+            };
+            
+            label.textContent = labels[rating];
+            label.className = 'rating-label ' + classes[rating];
+        }
+
+        window.submitReviews = async function(orderId, itemCount) {
+            if (!currentUser) {
+                alert('Please login to submit reviews');
+                return;
+            }
+
+            const order = previousOrders[orderId];
+            if (!order) {
+                alert('Order not found');
+                return;
+            }
+
+            const reviews = itemReviews[orderId] || {};
+            const reviewCount = Object.keys(reviews).length;
+
+            if (reviewCount === 0) {
+                alert('Please rate at least one item before submitting');
+                return;
+            }
+
+            const button = event.target;
+            button.disabled = true;
+            button.textContent = 'Submitting...';
+
+            try {
+                const userName = userDisplayName || 'User';
+                console.log('Submitting reviews with username:', userName);
+
+                const timestamp = Date.now();
+
+                for (let i = 0; i < order.items.length; i++) {
+                    const item = order.items[i];
+                    const rating = reviews[i];
+                    
+                    if (rating) {
+                        const comment = document.getElementById(`comment-${orderId}-${i}`)?.value.trim() || '';
+                        
+                        let category = 'General';
+                        const itemName = item.name;
+                        
+                        try {
+                            const foodItemsSnapshot = await get(ref(db, 'foodItems'));
+                            if (foodItemsSnapshot.exists()) {
+                                const allCategories = foodItemsSnapshot.val();
+                                
+                                outerLoop:
+                                for (const catName in allCategories) {
+                                    const catData = allCategories[catName];
+                                    for (const itemId in catData) {
+                                        if (itemId !== 'emoji' && catData[itemId].name === itemName) {
+                                            category = catName;
+                                            break outerLoop;
+                                        }
+                                    }
+                                }
+                            }
+                        } catch (err) {
+                            console.log('Category lookup failed, using General:', err);
+                        }
+                        
+                        const reviewData = {
+                            userName: userName,
+                            rating: rating,
+                            comment: comment,
+                            timestamp: timestamp,
+                            itemName: itemName,
+                            category: category
+                        };
+
+                        await set(ref(db, `orderReviews/${orderId}/${i}`), reviewData);
+
+                        const categoryRef = ref(db, `reviews/${category}/${itemName}`);
+                        const categorySnapshot = await get(categoryRef);
+                        
+                        let totalRating = rating;
+                        let reviewsCount = 1;
+                        let userReviews = {};
+                        
+                        if (categorySnapshot.exists()) {
+                            const data = categorySnapshot.val();
+                            totalRating = (data.totalRating || 0) + rating;
+                            reviewsCount = (data.reviewsCount || 0) + 1;
+                            userReviews = data.userReviews || {};
+                        }
+                        
+                        const sanitizedUserName = userName.replace(/[.#$[\]]/g, '_');
+                        userReviews[sanitizedUserName] = {
+                            rating: rating,
+                            comment: comment,
+                            timestamp: timestamp,
+                            orderId: orderId
+                        };
+
+                        const averageRating = totalRating / reviewsCount;
+
+                        await update(categoryRef, {
+                            averageRating: parseFloat(averageRating.toFixed(2)),
+                            totalRating: totalRating,
+                            reviewsCount: reviewsCount,
+                            userReviews: userReviews,
+                            lastUpdated: timestamp
+                        });
+                    }
+                }
+
+                itemReviews[orderId] = {};
+
+                const reviewSection = document.getElementById(`review-${orderId}`);
+                if (reviewSection) {
+                    reviewSection.innerHTML = `
+                        <div class="review-submitted">
+                            <div class="review-submitted-header">
+                                ✅ Thank you for your review!
+                            </div>
+                            <div class="review-submitted-text">
+                                Your feedback helps us improve our service.
+                            </div>
+                        </div>
+                    `;
+                }
+
+                console.log('Reviews submitted successfully!');
+                alert('Thank you for your reviews! 🎉');
+            } catch (error) {
+                console.error('Error submitting reviews:', error);
+                alert('Failed to submit reviews: ' + error.message);
+                button.disabled = false;
+                button.textContent = 'Submit Reviews';
+            }
+        };
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function getStatusEmoji(status) {
+            const statusMap = {
+                'pending': '⏳',
+                'confirmed': '✅',
+                'preparing': '👨‍🍳',
+                'cooking': '👨‍🍳',
+                'packing': '📦',
+                'out-for-delivery': '🚚',
+                'outfordelivery': '🚚',
+                'delivered': '✔️',
+                'cancelled': '❌',
+                'rejected': '❌'
+            };
+            return statusMap[status.toLowerCase().replace(/\s+/g, '')] || '📋';
+        }
+
+        function formatStatus(status) {
+            return status
+                .split(/[-_\s]/)
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+        }
+
+        function getStatusTimeline(currentStatus) {
+            return '';
+        }
+
+        function showNotification(order) {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification('Order Status Updated', {
+                    body: `Order #${order.id.substring(0, 8)} is now ${formatStatus(order.status)}`,
+                    icon: '🍔',
+                    badge: '🍔'
+                });
+            }
+        }
+
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+
+        window.logout = async function() {
+            if (confirm('Are you sure you want to logout?')) {
+                try {
+                    if (ordersListener) {
+                        off(ordersListener);
+                    }
+                    await signOut(auth);
+                    localStorage.removeItem('midnightPlazaCart');
+                    window.location.href = 'index.html';
+                } catch (error) {
+                    console.error('Error logging out:', error);
+                    alert('Error logging out. Please try again.');
+                }
+            }
+        };
+
+        window.toggleMenu = function() {
+            const hamburger = document.querySelector('.hamburger');
+            const navMenu = document.getElementById('navMenu');
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+        };
+
+        document.addEventListener('click', function(event) {
+            const hamburger = document.querySelector('.hamburger');
+            const navMenu = document.getElementById('navMenu');
+            const navLeft = document.querySelector('.nav-left');
+            
+            if (!navLeft.contains(event.target) && !navMenu.contains(event.target)) {
+                hamburger.classList.remove('active');
+                navMenu.classList.remove('active');
+            }
+        });
+
+        window.addEventListener('beforeunload', () => {
+            if (ordersListener) {
+                off(ordersListener);
+            }
+        });
+    </script>
+</body>
+</html>

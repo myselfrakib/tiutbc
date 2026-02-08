@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>TIU The Biriyani Canteen - Home</title>
+    <style>
+        :root {
+            --primary: #ff6b35;
+            --primary-dark: #e85d2e;
+            --bg-cream: #fff8f0;
+            --secondary: #f7931e;
+            --brown: #6b4423;
+            --success-green: #60b246;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-cream);
+            color: #333;
+        }
+
+        .navbar {
+            background: white;
+            padding: 0.75rem 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
+            font-weight: bold;
+            color: var(--primary);
+            cursor: pointer;
+        }
+
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            cursor: pointer;
+            padding: 0.5rem;
+            touch-action: manipulation;
+        }
+
+        .hamburger span {
+            width: 22px;
+            height: 2.5px;
+            background: var(--brown);
+            border-radius: 3px;
+            transition: all 0.3s;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(7px, 7px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
+        }
+
+        .nav-items {
+            display: none;
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            padding: 0.5rem;
+            flex-direction: column;
+            gap: 0;
+            z-index: 999;
+        }
+
+        .nav-items.active {
+            display: flex;
+        }
+
+        .nav-item {
+            cursor: pointer;
+            padding: 0.9rem;
+            border-radius: 8px;
+            transition: background 0.3s;
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            font-size: 0.95rem;
+            position: relative;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            touch-action: manipulation;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-cream);
+        }
+
+        .cart-item {
+            cursor: pointer;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            transition: background 0.3s;
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            font-size: clamp(0.85rem, 2vw, 0.95rem);
+            position: relative;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            touch-action: manipulation;
+        }
+
+        .cart-item:hover {
+            background: var(--bg-cream);
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            min-width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 0 4px;
+        }
+
+        .sliding-toast-container {
+            position: fixed;
+            bottom: 7rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 400px;
+            z-index: 2000;
+            perspective: 1000px;
+        }
+
+        .sliding-toast {
+            position: absolute;
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            cursor: pointer;
+            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.6s;
+            touch-action: manipulation;
+        }
+
+        .toast-delivery {
+            background: linear-gradient(135deg, var(--success-green) 0%, #4a9635 100%);
+            color: white;
+            transform: translateX(0) rotateY(0deg);
+            opacity: 1;
+            z-index: 2;
+        }
+
+        .toast-delivery.slide-out {
+            transform: translateX(-150%) rotateY(-90deg);
+            opacity: 0;
+        }
+
+        .toast-call {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+            transform: translateX(150%) rotateY(90deg);
+            opacity: 0;
+            z-index: 1;
+        }
+
+        .toast-call.slide-in {
+            transform: translateX(0) rotateY(0deg);
+            opacity: 1;
+            z-index: 2;
+        }
+
+        .toast-delivery.slide-back {
+            transform: translateX(0) rotateY(0deg);
+            opacity: 1;
+            z-index: 2;
+        }
+
+        .toast-call.slide-out-right {
+            transform: translateX(150%) rotateY(90deg);
+            opacity: 0;
+            z-index: 1;
+        }
+
+        .toast-content {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex: 1;
+        }
+
+        .toast-icon {
+            font-size: 2rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .toast-text {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .toast-subtitle {
+            font-size: 0.85rem;
+            opacity: 0.95;
+        }
+
+        .toast-action {
+            background: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            transition: transform 0.2s;
+        }
+
+        .toast-delivery .toast-action {
+            color: var(--success-green);
+        }
+
+        .toast-call .toast-action {
+            color: #ff6b6b;
+        }
+
+        .toast-action:active {
+            transform: scale(0.95);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem 0.75rem 8rem 0.75rem;
+        }
+
+        .category-section {
+            margin-bottom: 3rem;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .category-emoji {
+            font-size: clamp(2rem, 5vw, 2.5rem);
+        }
+
+        .category-info {
+            flex: 1;
+        }
+
+        .category-title {
+            font-size: clamp(1.4rem, 4vw, 1.8rem);
+            color: var(--brown);
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .category-count {
+            color: #666;
+            font-size: clamp(0.85rem, 2vw, 0.95rem);
+            font-weight: 500;
+        }
+
+        .food-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+            gap: 1.25rem;
+        }
+
+        .food-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .food-image {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(3rem, 8vw, 4rem);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .food-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .food-image-emoji {
+            font-size: clamp(3rem, 8vw, 4rem);
+        }
+
+        .food-details {
+            padding: 1rem;
+        }
+
+        .food-name {
+            font-size: clamp(0.95rem, 3vw, 1.05rem);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .food-description {
+            color: #666;
+            font-size: clamp(0.8rem, 2vw, 0.85rem);
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .food-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .food-price {
+            font-size: clamp(1rem, 4vw, 1.15rem);
+            font-weight: bold;
+            color: var(--brown);
+        }
+
+        .add-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 0.85rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+            min-height: 44px;
+            touch-action: manipulation;
+            white-space: nowrap;
+        }
+
+        .add-btn:active {
+            transform: scale(0.95);
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: var(--primary);
+            border-radius: 6px;
+            padding: 0.4rem 0.6rem;
+            min-height: 44px;
+        }
+
+        .quantity-btn {
+            background: white;
+            color: var(--primary);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            touch-action: manipulation;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quantity-btn:active {
+            transform: scale(0.9);
+        }
+
+        .quantity-display {
+            color: white;
+            font-weight: 600;
+            min-width: 25px;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem 1rem;
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            color: #666;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #666;
+        }
+
+        .empty-state-icon {
+            font-size: clamp(3rem, 10vw, 4rem);
+            margin-bottom: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .hamburger {
+                display: none;
+            }
+
+            .nav-items {
+                display: flex !important;
+                position: static;
+                flex-direction: row;
+                padding: 0;
+                box-shadow: none;
+                gap: 0.75rem;
+            }
+
+            .nav-item {
+                border-bottom: none;
+                padding: 0.4rem 0.6rem;
+                min-height: 40px;
+            }
+
+            .food-card:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            }
+
+            .add-btn:hover {
+                background: var(--secondary);
+                transform: scale(1.05);
+            }
+
+            .sliding-toast-container {
+                right: 2rem;
+                left: auto;
+                transform: none;
+                max-width: 420px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="nav-left">
+            <div class="hamburger" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="logo">🍔 TIU The Biriyani Canteen</div>
+        </div>
+        <a href="checkout.html" class="cart-item">
+            Cart 🛒
+            <span class="cart-badge" id="cartBadge">0</span>
+        </a>
+    </div>
+
+    <div class="nav-items" id="navMenu">
+        <span class="nav-item" style="cursor: default; background: var(--bg-cream);">🏠 Home</span>
+        <a href="orders.html" class="nav-item">📦 Orders</a>
+        <a href="profile.html" class="nav-item">👤 Profile</a>
+        <span class="nav-item" onclick="logout()">🚪 Logout</span>
+    </div>
+
+    <div class="container" id="mainContainer">
+        <div class="loading">
+            <div class="spinner"></div>
+            Loading menu...
+        </div>
+    </div>
+
+    <div class="sliding-toast-container" id="slidingToastContainer">
+        <div class="sliding-toast toast-delivery" id="toastDelivery" onclick="goToCheckout()">
+            <div class="toast-content">
+                <div class="toast-icon">🚚</div>
+                <div class="toast-text">
+                    <div class="toast-title">FREE Delivery!</div>
+                    <div class="toast-subtitle">Orders above ₹200</div>
+                </div>
+            </div>
+            <div class="toast-action">Order Now</div>
+        </div>
+        
+        <div class="sliding-toast toast-call" id="toastCall" onclick="callToOrder()">
+            <div class="toast-content">
+                <div class="toast-icon">📞</div>
+                <div class="toast-text">
+                    <div class="toast-title">Call to Order</div>
+                    <div class="toast-subtitle">98837 80399</div>
+                </div>
+            </div>
+            <div class="toast-action">Call Now</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI",
+            authDomain: "hungrybites-c7930.firebaseapp.com",
+            projectId: "hungrybites-c7930",
+            storageBucket: "hungrybites-c7930.firebasestorage.app",
+            messagingSenderId: "346758544945",
+            appId: "1:346758544945:web:4bcad30016540d18e79f10",
+            measurementId: "G-B5GP5SYMRC",
+            databaseURL: "https://hungrybites-c7930-default-rtdb.firebaseio.com"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        let cart = [];
+        let allFoodItems = {};
+        let currentUser = null;
+        let toastInterval;
+        
+        const CATEGORY_ORDER = [
+            { key: 'Maagie', display: 'Maggi' },
+            { key: 'Pasta', display: 'Pasta' },
+            { key: 'Sandwich', display: 'Sandwich' },
+            { key: 'Chai', display: 'Chai' },
+            { key: 'Packet Items', display: 'Packet Items' },
+            { key: 'Beverages', display: 'Beverages' },
+            { key: 'Cigarette', display: 'Cigarette' }
+        ];
+        
+        loadCart();
+        updateCartBadge();
+        startToastRotation();
+
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            loadFoodItems();
+            if (user) {
+                syncCartFromDB(user.uid);
+            }
+        });
+
+        function startToastRotation() {
+            const deliveryToast = document.getElementById('toastDelivery');
+            const callToast = document.getElementById('toastCall');
+            let showingDelivery = true;
+
+            toastInterval = setInterval(() => {
+                if (showingDelivery) {
+                    deliveryToast.classList.add('slide-out');
+                    deliveryToast.classList.remove('slide-back');
+                    callToast.classList.add('slide-in');
+                    callToast.classList.remove('slide-out-right');
+                } else {
+                    callToast.classList.add('slide-out-right');
+                    callToast.classList.remove('slide-in');
+                    deliveryToast.classList.add('slide-back');
+                    deliveryToast.classList.remove('slide-out');
+                }
+                showingDelivery = !showingDelivery;
+            }, 4000);
+        }
+
+        window.goToCheckout = function() {
+            window.location.href = 'checkout.html';
+        };
+
+        window.callToOrder = function() {
+            window.location.href = 'tel:9883780399';
+        };
+
+        function syncCartFromDB(userId) {
+            const userCartRef = ref(db, `carts/${userId}`);
+            onValue(userCartRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    const dbCart = snapshot.val();
+                    const newCart = Object.keys(dbCart).map(itemId => ({
+                        id: itemId,
+                        ...dbCart[itemId]
+                    }));
+                    
+                    if (JSON.stringify(cart) !== JSON.stringify(newCart)) {
+                        cart = newCart;
+                        saveCart();
+                        updateCartBadge();
+                        renderAllCategories();
+                    }
+                } else {
+                    if (cart.length > 0) {
+                        syncCartToDB();
+                    }
+                }
+            });
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function normalizeCategory(categoryName) {
+            if (!categoryName) return 'Other';
+            const normalized = categoryName.toLowerCase().trim();
+            const mapping = {
+                'maagie': 'Maagie',
+                'maggi': 'Maagie',
+                'pasta': 'Pasta',
+                'sandwich': 'Sandwich',
+                'chai': 'Chai',
+                'packet items': 'Packet Items',
+                'beverages': 'Beverages',
+                'cigarette': 'Cigarette',
+                'ciggerette': 'Cigarette'
+            };
+            return mapping[normalized] || categoryName;
+        }
+
+        async function loadFoodItems() {
+            const container = document.getElementById('mainContainer');
+            container.innerHTML = '<div class="loading"><div class="spinner"></div>Loading menu...</div>';
+
+            try {
+                const foodItemsRef = ref(db, 'foodItems');
+                
+                onValue(foodItemsRef, (snapshot) => {
+                    if (!snapshot.exists()) {
+                        container.innerHTML = `
+                            <div class="empty-state">
+                                <div class="empty-state-icon">🍽️</div>
+                                <h3>No items available yet</h3>
+                                <p>Check back soon for delicious food!</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    allFoodItems = snapshot.val();
+                    renderAllCategories();
+                });
+            } catch (error) {
+                console.error('Error loading food items:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">❌</div>
+                        <h3>Error loading menu</h3>
+                        <p>Please try again later</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderAllCategories() {
+            const container = document.getElementById('mainContainer');
+            let html = '';
+            let totalItems = 0;
+
+            const categorizedItems = {};
+            
+            Object.keys(allFoodItems).forEach(categoryName => {
+                const category = allFoodItems[categoryName];
+                const normalizedCat = normalizeCategory(categoryName);
+                
+                if (!categorizedItems[normalizedCat]) {
+                    categorizedItems[normalizedCat] = {
+                        emoji: category.emoji || '🍽️',
+                        items: []
+                    };
+                }
+                
+                Object.keys(category).forEach(itemId => {
+                    if (itemId === 'emoji') return;
+                    
+                    const item = category[itemId];
+                    if (item.isActive !== false) {
+                        categorizedItems[normalizedCat].items.push({
+                            id: itemId,
+                            ...item,
+                            originalCategory: categoryName
+                        });
+                        totalItems++;
+                    }
+                });
+            });
+
+            if (totalItems === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <h3>No items available</h3>
+                        <p>Check back soon!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            CATEGORY_ORDER.forEach(catConfig => {
+                const categoryData = categorizedItems[catConfig.key];
+                
+                if (categoryData && categoryData.items.length > 0) {
+                    html += `
+                        <div class="category-section">
+                            <div class="category-header">
+                                <div class="category-emoji">${categoryData.emoji}</div>
+                                <div class="category-info">
+                                    <h2 class="category-title">${escapeHtml(catConfig.display)}</h2>
+                                    <div class="category-count">${categoryData.items.length} item${categoryData.items.length !== 1 ? 's' : ''}</div>
+                                </div>
+                            </div>
+                            <div class="food-grid">
+                                ${categoryData.items.map(item => createFoodCard(item.id, item, item.originalCategory)).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            Object.keys(categorizedItems).forEach(catName => {
+                const isInOrder = CATEGORY_ORDER.some(c => c.key === catName);
+                if (!isInOrder && categorizedItems[catName].items.length > 0) {
+                    const categoryData = categorizedItems[catName];
+                    html += `
+                        <div class="category-section">
+                            <div class="category-header">
+                                <div class="category-emoji">${categoryData.emoji}</div>
+                                <div class="category-info">
+                                    <h2 class="category-title">${escapeHtml(catName)}</h2>
+                                    <div class="category-count">${categoryData.items.length} item${categoryData.items.length !== 1 ? 's' : ''}</div>
+                                </div>
+                            </div>
+                            <div class="food-grid">
+                                ${categoryData.items.map(item => createFoodCard(item.id, item, item.originalCategory)).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            container.innerHTML = html;
+        }
+
+        function createFoodCard(itemId, item, categoryName) {
+            const cartItem = cart.find(c => c.id === itemId);
+            const quantity = cartItem ? cartItem.quantity : 0;
+            
+            const safeCategory = categoryName || 'Other';
+            const safeName = item.name || 'Unnamed Item';
+            const safePrice = item.price || 0;
+            const safeEmoji = item.emoji || '🍔';
+            
+            const imageHTML = item.imageurl 
+                ? `<img src="${escapeHtml(item.imageurl)}" alt="${escapeHtml(safeName)}" onerror="this.style.display='none'; this.parentElement.querySelector('.food-image-emoji').style.display='flex';">
+                   <div class="food-image-emoji" style="display: none; position: absolute;">${safeEmoji}</div>`
+                : `<div class="food-image-emoji">${safeEmoji}</div>`;
+            
+            let buttonHTML;
+            if (quantity > 0) {
+                buttonHTML = `<div class="quantity-control">
+                       <button class="quantity-btn" onclick="decreaseQuantity('${escapeHtml(itemId)}')">−</button>
+                       <span class="quantity-display">${quantity}</span>
+                       <button class="quantity-btn" onclick="increaseQuantity('${escapeHtml(itemId)}')">+</button>
+                   </div>`;
+            } else {
+                buttonHTML = `<button class="add-btn" onclick="addToCart('${escapeHtml(itemId)}', '${escapeHtml(safeName)}', ${safePrice}, '${safeEmoji}', '${escapeHtml(safeCategory)}')">Add +</button>`;
+            }
+            
+            return `
+                <div class="food-card" data-food-id="${escapeHtml(itemId)}" data-name="${escapeHtml(safeName)}" data-price="${safePrice}" data-emoji="${safeEmoji}" data-category="${escapeHtml(safeCategory)}">
+                    <div class="food-image">${imageHTML}</div>
+                    <div class="food-details">
+                        <div class="food-name">${escapeHtml(safeName)}</div>
+                        <div class="food-description">${escapeHtml(item.description || 'Delicious food item')}</div>
+                        <div class="food-footer">
+                            <div class="food-price">₹${parseFloat(safePrice).toFixed(2)}</div>
+                            ${buttonHTML}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function syncCartToDB() {
+            if (!currentUser) return;
+            
+            const userCartRef = ref(db, `carts/${currentUser.uid}`);
+            
+            if (cart.length === 0) {
+                remove(userCartRef);
+                return;
+            }
+            
+            const cartData = {};
+            const timestamp = Date.now();
+            
+            cart.forEach(item => {
+                cartData[item.id] = {
+                    name: item.name || 'Unnamed Item',
+                    price: item.price || 0,
+                    emoji: item.emoji || '🍔',
+                    category: item.category || 'Other',
+                    quantity: item.quantity || 1,
+                    timestamp: item.timestamp || timestamp,
+                    lastUpdated: timestamp
+                };
+            });
+            
+            set(userCartRef, cartData).catch(error => {
+                console.error('Error syncing cart to DB:', error);
+            });
+        }
+
+        window.addToCart = function(id, name, price, emoji, category) {
+            const existingItem = cart.find(item => item.id === id);
+            const timestamp = Date.now();
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+                existingItem.lastUpdated = timestamp;
+            } else {
+                cart.push({
+                    id: id,
+                    name: name || 'Unnamed Item',
+                    price: price || 0,
+                    emoji: emoji || '🍔',
+                    category: category || 'Other',
+                    quantity: 1,
+                    timestamp: timestamp,
+                    lastUpdated: timestamp
+                });
+            }
+
+            saveCart();
+            syncCartToDB();
+            updateCartBadge();
+            updateButtonUI(id, existingItem ? existingItem.quantity : 1);
+        };
+
+        window.increaseQuantity = function(id) {
+            const item = cart.find(item => item.id === id);
+            if (item) {
+                item.quantity += 1;
+                item.lastUpdated = Date.now();
+                saveCart();
+                syncCartToDB();
+                updateCartBadge();
+                updateButtonUI(id, item.quantity);
+            }
+        };
+
+        window.decreaseQuantity = function(id) {
+            const item = cart.find(item => item.id === id);
+            if (item) {
+                if (item.quantity > 1) {
+                    item.quantity -= 1;
+                    item.lastUpdated = Date.now();
+                    saveCart();
+                    syncCartToDB();
+                    updateCartBadge();
+                    updateButtonUI(id, item.quantity);
+                } else {
+                    cart = cart.filter(item => item.id !== id);
+                    saveCart();
+                    syncCartToDB();
+                    updateCartBadge();
+                    updateButtonUI(id, 0);
+                }
+            }
+        };
+
+        function updateButtonUI(id, quantity) {
+            const card = document.querySelector(`[data-food-id="${CSS.escape(id)}"]`);
+            if (!card) return;
+
+            const footer = card.querySelector('.food-footer');
+            const price = card.querySelector('.food-price');
+            
+            if (quantity > 0) {
+                const quantityControl = `
+                    <div class="quantity-control">
+                        <button class="quantity-btn" onclick="decreaseQuantity('${escapeHtml(id)}')">−</button>
+                        <span class="quantity-display">${quantity}</span>
+                        <button class="quantity-btn" onclick="increaseQuantity('${escapeHtml(id)}')">+</button>
+                    </div>
+                `;
+                footer.innerHTML = price.outerHTML + quantityControl;
+            } else {
+                const name = card.dataset.name;
+                const priceVal = card.dataset.price;
+                const emoji = card.dataset.emoji;
+                const category = card.dataset.category;
+                const addBtn = `<button class="add-btn" onclick="addToCart('${escapeHtml(id)}', '${escapeHtml(name)}', ${priceVal}, '${emoji}', '${escapeHtml(category)}')">Add +</button>`;
+                footer.innerHTML = price.outerHTML + addBtn;
+            }
+        }
+
+        function saveCart() {
+            try {
+                localStorage.setItem('midnightPlazaCart', JSON.stringify(cart));
+            } catch (error) {
+                console.error('Error saving cart:', error);
+            }
+        }
+
+        function loadCart() {
+            try {
+                const savedCart = localStorage.getItem('midnightPlazaCart');
+                if (savedCart) {
+                    cart = JSON.parse(savedCart);
+                }
+            } catch (error) {
+                console.error('Error loading cart:', error);
+                cart = [];
+            }
+        }
+
+        function updateCartBadge() {
+            const badge = document.getElementById('cartBadge');
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            badge.textContent = totalItems;
+            
+            if (totalItems > 0) {
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        window.toggleMenu = function() {
+            const hamburger = document.querySelector('.hamburger');
+            const navMenu = document.getElementById('navMenu');
+            
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+        };
+
+        window.logout = function() {
+            if (confirm('Are you sure you want to logout?')) {
+                signOut(auth).then(() => {
+                    localStorage.removeItem('midnightPlazaCart');
+                    cart = [];
+                    clearInterval(toastInterval);
+                    window.location.href = 'index.html';
+                }).catch((error) => {
+                    console.error('Logout error:', error);
+                    alert('Error logging out. Please try again.');
+                });
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <title>TIU The Biriyani Canteen - Checkout</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+        :root {
+            --primary: #ff6b35;
+            --primary-dark: #e85d2e;
+            --bg-cream: #fff8f0;
+            --secondary: #f7931e;
+            --brown: #6b4423;
+            --success-green: #60b246;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-cream); color: #333; padding-bottom: 2rem; }
+        .navbar { background: white; padding: 0.75rem 1rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; }
+        .nav-left { display: flex; align-items: center; gap: 1rem; }
+        .hamburger { display: flex; flex-direction: column; gap: 4px; cursor: pointer; padding: 0.5rem; }
+        .hamburger span { width: 22px; height: 2.5px; background: var(--brown); border-radius: 3px; transition: all 0.3s; }
+        .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(7px, 7px); }
+        .hamburger.active span:nth-child(2) { opacity: 0; }
+        .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(6px, -6px); }
+        .logo { font-size: clamp(1.2rem, 4vw, 1.5rem); font-weight: bold; color: var(--primary); cursor: pointer; }
+        .nav-items { display: none; position: fixed; top: 60px; left: 0; right: 0; background: white; box-shadow: 0 4px 20px rgba(0,0,0,0.1); padding: 0.5rem; flex-direction: column; gap: 0; z-index: 999; }
+        .nav-items.active { display: flex; }
+        .nav-item { cursor: pointer; padding: 0.9rem; border-radius: 8px; transition: background 0.3s; text-decoration: none; color: #333; font-weight: 500; font-size: 0.95rem; border-bottom: 1px solid #f0f0f0; }
+        .nav-item:hover { background: var(--bg-cream); }
+        .container { max-width: 900px; margin: 1rem auto; padding: 0 0.75rem; }
+        .cart-container, .section-container { background: white; padding: 1rem; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); margin-bottom: 1rem; }
+        h2 { margin-bottom: 1rem; color: var(--primary); font-size: clamp(1.3rem, 4vw, 1.6rem); }
+        .cart-item { display: flex; flex-direction: column; gap: 0.75rem; padding: 0.9rem; border-bottom: 1px solid #eee; }
+        .cart-item:last-child { border-bottom: none; }
+        .cart-item-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; }
+        .cart-item-details { flex: 1; min-width: 0; }
+        .cart-item-name { font-size: clamp(0.95rem, 3vw, 1.05rem); font-weight: 600; margin-bottom: 0.2rem; word-wrap: break-word; }
+        .cart-item-price { color: var(--brown); font-weight: 600; font-size: clamp(0.85rem, 2.5vw, 0.95rem); }
+        .cart-item-actions { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
+        .cart-item-quantity { display: flex; align-items: center; gap: 0.6rem; }
+        .quantity-btn { background: var(--primary); color: white; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 1.1rem; font-weight: bold; transition: all 0.3s; display: flex; align-items: center; justify-content: center; }
+        .quantity-btn:active { transform: scale(0.9); }
+        .quantity-display { font-size: 1rem; font-weight: 600; min-width: 25px; text-align: center; }
+        .cart-item-total { font-size: clamp(1rem, 3vw, 1.15rem); font-weight: bold; color: #333; }
+        .remove-btn { background: #dc3545; color: white; border: none; padding: 0.5rem 0.85rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.3s; }
+        .remove-btn:active { transform: scale(0.95); }
+        .cart-summary { margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #eee; }
+        .summary-row { display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-size: clamp(0.9rem, 2.5vw, 1rem); }
+        .summary-row.subtotal { color: #666; }
+        .summary-row.delivery { color: #666; }
+        .summary-row.delivery.free { color: var(--success-green); font-weight: 600; }
+        .summary-row.delivery.free .delivery-value { text-decoration: line-through; color: #999; margin-right: 0.5rem; }
+        .cart-total { display: flex; justify-content: space-between; font-size: clamp(1.3rem, 4vw, 1.5rem); font-weight: bold; color: var(--brown); margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #eee; }
+        .section-title { font-size: clamp(1.1rem, 3vw, 1.3rem); font-weight: 600; color: #333; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .address-display-card { border: 2px solid var(--secondary); border-radius: 10px; padding: 0.9rem; background: #f0f9ff; }
+        .address-display-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; }
+        .address-display-name { font-weight: 600; font-size: 1rem; color: #333; }
+        .change-address-btn { background: var(--primary); color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: all 0.3s; }
+        .change-address-btn:active { transform: scale(0.95); }
+        .address-display-phone { color: #666; font-size: 0.85rem; margin-bottom: 0.5rem; }
+        .address-display-text { color: #555; line-height: 1.5; font-size: 0.9rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.4rem; font-weight: 600; color: #333; font-size: clamp(0.85rem, 2.5vw, 0.95rem); }
+        .form-group input, .form-group textarea { width: 100%; padding: 0.75rem; border: 2px solid #e0e0e0; border-radius: 8px; font-size: clamp(0.85rem, 2.5vw, 0.95rem); font-family: inherit; transition: border-color 0.3s; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); }
+        .form-group input.auto-filled { border-color: var(--success-green); background-color: #f0fff4; }
+        .form-group textarea { resize: vertical; min-height: 70px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+        @media (max-width: 480px) { .form-row { grid-template-columns: 1fr; } }
+        #map { width: 100%; height: 350px; border-radius: 8px; margin-bottom: 1rem; border: 2px solid #e0e0e0; }
+        .map-instruction { background: #fffbf0; border-left: 4px solid var(--primary); padding: 0.75rem; margin-bottom: 1rem; border-radius: 4px; font-size: 0.85rem; color: #666; }
+        .location-btn { background: var(--secondary); color: white; border: none; padding: 0.6rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem; transition: all 0.3s; display: flex; align-items: center; gap: 0.5rem; }
+        .location-btn:active { transform: scale(0.95); }
+        .location-btn:disabled { background: #ccc; cursor: not-allowed; }
+        .location-status { font-size: 0.8rem; color: #666; margin-top: 0.3rem; }
+        .address-card { border: 2px solid #e0e0e0; border-radius: 10px; padding: 1rem; margin-bottom: 0.75rem; cursor: pointer; transition: all 0.3s; position: relative; }
+        .address-card:hover { border-color: var(--primary); background: #fffbf0; }
+        .address-card.selected { border-color: var(--primary); background: #fffbf0; box-shadow: 0 4px 12px rgba(253, 201, 33, 0.2); }
+        .address-card.selected::before { content: '✓'; position: absolute; top: 10px; right: 10px; background: var(--primary); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem; }
+        .address-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.6rem; padding-right: 30px; }
+        .address-name { font-weight: 600; font-size: 1rem; color: #333; }
+        .address-phone { color: #666; font-size: 0.85rem; margin-top: 0.2rem; }
+        .address-details { color: #666; line-height: 1.5; font-size: 0.85rem; }
+        .address-actions { display: flex; gap: 0.6rem; margin-top: 0.75rem; flex-wrap: wrap; }
+        .btn-small { padding: 0.4rem 0.8rem; font-size: 0.8rem; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .btn-set-default { background: var(--secondary); color: white; }
+        .btn-set-default:active { transform: scale(0.95); }
+        .btn-delete { background: #dc3545; color: white; }
+        .btn-delete:active { transform: scale(0.95); }
+        .default-badge { background: var(--secondary); color: white; padding: 0.2rem 0.6rem; border-radius: 5px; font-size: 0.75rem; font-weight: 600; }
+        .payment-option { display: flex; align-items: center; padding: 1rem; border: 2px solid #eee; border-radius: 10px; margin-bottom: 0.75rem; cursor: pointer; transition: all 0.3s; }
+        .payment-option:hover, .payment-option.selected { border-color: var(--primary); background: #fffbf0; }
+        .payment-option input[type="radio"] { width: 18px; height: 18px; margin-right: 0.9rem; cursor: pointer; accent-color: var(--primary); }
+        .payment-details { flex: 1; }
+        .payment-title { font-size: clamp(0.95rem, 3vw, 1.05rem); font-weight: 600; margin-bottom: 0.2rem; }
+        .payment-description { color: #666; font-size: clamp(0.8rem, 2vw, 0.85rem); }
+        .btn { width: 100%; padding: 1rem; background: var(--brown); color: white; border: none; border-radius: 10px; font-size: clamp(1rem, 3vw, 1.1rem); font-weight: 600; cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden; }
+        .btn:active { transform: scale(0.98); box-shadow: inset 0 3px 8px rgba(0,0,0,0.2); }
+        .btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+        .btn.processing { background: #5989b3; pointer-events: none; }
+        .btn.processing::after { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); animation: shimmer 1.5s infinite; }
+        @keyframes shimmer { 0% { left: -100%; } 100% { left: 100%; } }
+        .btn-secondary { width: 100%; padding: 0.9rem; background: white; color: var(--primary); border: 2px solid var(--primary); border-radius: 10px; font-size: clamp(0.95rem, 3vw, 1.05rem); font-weight: 600; cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden; }
+        .btn-secondary:active { transform: scale(0.98); background: var(--bg-cream); box-shadow: inset 0 3px 8px rgba(253,201,33,0.2); }
+        .empty-cart { text-align: center; padding: 2.5rem 1rem; }
+        .empty-cart-icon { font-size: clamp(3rem, 10vw, 4rem); margin-bottom: 0.75rem; }
+        .empty-cart h3 { color: #666; margin-bottom: 0.75rem; font-size: clamp(1.1rem, 3vw, 1.3rem); }
+        .continue-shopping { display: inline-flex; margin-top: 0.75rem; padding: 0.7rem 1.5rem; background: var(--primary); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; transition: all 0.3s; align-items: center; }
+        .continue-shopping:active { transform: scale(0.95); }
+        .success-message, .error-message { padding: 0.9rem; border-radius: 8px; margin-bottom: 1rem; text-align: center; font-weight: 600; display: none; font-size: 0.9rem; }
+        .success-message { background: #d4edda; color: #155724; }
+        .error-message { background: #f8d7da; color: #721c24; }
+        .loader { display: none; text-align: center; padding: 0.75rem; }
+        .spinner { border: 3px solid #f3f3f3; border-top: 3px solid var(--primary); border-radius: 50%; width: 28px; height: 28px; animation: spin 1s linear infinite; margin: 0 auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 1.5rem 2rem; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); z-index: 10000; display: none; text-align: center; min-width: 280px; max-width: 90%; animation: toastSlideIn 0.3s ease-out; }
+        .toast.show { display: block; }
+        .toast-success { border-left: 5px solid var(--secondary); }
+        .toast-error { border-left: 5px solid #dc3545; }
+        .toast-icon { font-size: 3rem; margin-bottom: 0.75rem; }
+        .toast-message { font-size: 1.1rem; font-weight: 600; color: #333; margin-bottom: 0.5rem; }
+        .toast-submessage { font-size: 0.9rem; color: #666; }
+        @keyframes toastSlideIn { from { transform: translate(-50%, -60%); opacity: 0; } to { transform: translate(-50%, -50%); opacity: 1; } }
+        .toast-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 9999; display: none; }
+        .toast-overlay.show { display: block; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; animation: fadeIn 0.3s; }
+        .modal-overlay.active { display: flex; align-items: center; justify-content: center; padding: 1rem; }
+        .modal-content { background: white; border-radius: 12px; padding: 1.25rem; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+        .modal-title { font-size: 1.3rem; font-weight: 600; color: #333; }
+        .close-modal { background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #666; line-height: 1; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
+        .coord-display { background: #f0f9ff; border: 2px solid var(--secondary); border-radius: 8px; padding: 0.75rem; margin-top: 0.75rem; font-size: 0.85rem; color: #666; text-align: center; }
+        .coord-display.warning { background: #fff3cd; border-color: #ffc107; color: #856404; }
+        .coord-display.error { background: #f8d7da; border-color: #dc3545; color: #721c24; font-weight: 600; }
+        .addresses-list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 2px solid #f0f0f0; }
+        .addresses-list-title { font-size: 1.1rem; font-weight: 600; color: #333; }
+        .empty-addresses { text-align: center; padding: 2rem 1rem; color: #666; }
+        .empty-addresses-icon { font-size: 3rem; margin-bottom: 0.5rem; }
+        .sync-indicator { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #90ee90; margin-right: 0.5rem; animation: pulse 2s infinite; }
+        .sync-indicator.syncing { background: #ffc107; animation: pulse 1s infinite; }
+        .sync-indicator.error { background: #dc3545; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        @media (min-width: 768px) {
+            .cart-item { flex-direction: row; align-items: center; }
+            .quantity-btn:hover { background: var(--secondary); transform: scale(1.1); }
+            .remove-btn:hover { background: #c82333; }
+            .btn:hover:not(:disabled) { background: #5989b3; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(103, 152, 192, 0.4); }
+            .btn:active:not(:disabled) { transform: translateY(0); box-shadow: inset 0 3px 8px rgba(0,0,0,0.2); }
+            .btn-secondary:hover { background: var(--bg-cream); border-color: var(--secondary); color: var(--secondary); transform: translateY(-2px); }
+            .btn-secondary:active { transform: translateY(0); }
+            .hamburger { display: none; }
+            .nav-items { display: flex !important; position: static; flex-direction: row; padding: 0; box-shadow: none; gap: 0.75rem; }
+            .nav-item { border-bottom: none; padding: 0.4rem 0.6rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="nav-left">
+            <div class="hamburger" onclick="APP.toggleMenu()">
+                <span></span><span></span><span></span>
+            </div>
+            <div class="logo" onclick="window.location.href='home.html'">TIU The Biriyani Canteen</div>
+        </div>
+    </div>
+
+    <div class="nav-items" id="navMenu">
+        <a href="home.html" class="nav-item">Home</a>
+        <a href="orders.html" class="nav-item">Orders</a>
+        <a href="checkout.html" class="nav-item">Cart</a>
+        <span class="nav-item" onclick="APP.logout()" style="cursor:pointer;">Logout</span>
+    </div>
+
+    <div class="container">
+        <div class="success-message" id="successMessage"></div>
+        <div class="error-message" id="errorMessage"></div>
+
+        <div class="toast-overlay" id="toastOverlay"></div>
+        <div class="toast" id="toast">
+            <div class="toast-icon" id="toastIcon"></div>
+            <div class="toast-message" id="toastMessage"></div>
+            <div class="toast-submessage" id="toastSubMessage"></div>
+        </div>
+
+        <div class="cart-container">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                <h2 style="margin: 0;">Your Cart</h2>
+                <span class="sync-indicator" id="syncIndicator" title="Cart sync status"></span>
+            </div>
+            <div id="cartContent"></div>
+        </div>
+
+        <div id="checkoutSections" style="display: none;">
+            <div class="section-container">
+                <div class="section-title">📍 Delivery Address</div>
+                <div id="addressDisplayArea"></div>
+            </div>
+
+            <div class="section-container">
+                <div class="section-title">💳 Payment Method</div>
+                <div class="payment-option" id="payment-cod" onclick="APP.selectPayment('cod')">
+                    <input type="radio" name="payment" id="cod" value="cod">
+                    <div class="payment-details">
+                        <div class="payment-title">Cash on Delivery</div>
+                        <div class="payment-description">Pay when order arrives</div>
+                    </div>
+                </div>
+                <div class="payment-option" id="payment-online" onclick="APP.selectPayment('online')">
+                    <input type="radio" name="payment" id="online" value="online">
+                    <div class="payment-details">
+                        <div class="payment-title">Online Payment</div>
+                        <div class="payment-description">Razorpay (UPI, Card, Net Banking)</div>
+                    </div>
+                </div>
+                <div class="loader" id="loader">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 0.75rem; color: #666; font-size: 0.9rem;">Processing...</p>
+                </div>
+                <button class="btn" id="placeOrderBtn" onclick="APP.handlePlaceOrder()" disabled>Select Payment Method</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="addressModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">📍 Delivery Address</div>
+                <button class="close-modal" onclick="APP.closeAddressModal()">&times;</button>
+            </div>
+
+            <div id="savedAddressesList" style="display: none;">
+                <div class="addresses-list-header">
+                    <div class="addresses-list-title">Saved Addresses</div>
+                </div>
+                <div id="addressCards"></div>
+                <button type="button" class="btn-secondary" onclick="APP.showAddressForm()" style="margin-top: 0.75rem;">+ Add New Address</button>
+            </div>
+
+            <div id="addressFormContainer" style="display:none;">
+                <div class="map-instruction">
+                    <strong>⚠️ Location Required:</strong> You must set your exact delivery location on the map. Click "Use My Location" or drag the red marker to your address.
+                </div>
+                <button type="button" class="location-btn" id="locationBtn" onclick="APP.getLocation()">
+                    📍 Use My Location
+                </button>
+                <div class="location-status" id="locationStatus"></div>
+                <div id="map"></div>
+                <div class="coord-display error" id="coordDisplay">
+                    ❌ Location not set - Click "Use My Location" or drag the marker
+                </div>
+                <form id="addressForm" onsubmit="event.preventDefault();">
+                    <div class="form-group">
+                        <label for="fullName">Full Name *</label>
+                        <input type="text" id="fullName" required placeholder="Your full name">
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number *</label>
+                        <input type="tel" id="phone" required placeholder="10 digit number" pattern="[0-9]{10}">
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Address *</label>
+                        <textarea id="address" required placeholder="House No., Street, Area" rows="2"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="city">City *</label>
+                            <input type="text" id="city" required placeholder="City">
+                        </div>
+                        <div class="form-group">
+                            <label for="pincode">Pincode *</label>
+                            <input type="text" id="pincode" required placeholder="6 digits" pattern="[0-9]{6}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="landmark">Landmark</label>
+                        <input type="text" id="landmark" placeholder="Optional">
+                    </div>
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 500;">
+                            <input type="checkbox" id="saveAddress" checked style="width: auto;">
+                            <span>Save for future orders</span>
+                        </label>
+                    </div>
+                    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                        <button type="button" class="btn" id="deliverHereBtn" onclick="APP.saveAndSelectAddress()" style="flex: 1; min-width: 150px;" disabled>
+                            <span id="deliverHereBtnText">Set Location First</span>
+                        </button>
+                        <button type="button" class="btn-secondary" onclick="APP.showSavedAddresses()" id="backToSavedBtn" style="display: none; flex: 1; min-width: 150px;">Back</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+        import { getDatabase, ref, push, set, get, remove, update, onValue } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI",
+            authDomain: "hungrybites-c7930.firebaseapp.com",
+            projectId: "hungrybites-c7930",
+            storageBucket: "hungrybites-c7930.firebasestorage.app",
+            messagingSenderId: "346758544945",
+            appId: "1:346758544945:web:4bcad30016540d18e79f10",
+            measurementId: "G-B5GP5SYMRC",
+            databaseURL: "https://hungrybites-c7930-default-rtdb.firebaseio.com"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        // Global app state
+        const APP = {
+            cart: [],
+            currentUser: null,
+            selectedPayment: null,
+            deliveryAddress: null,
+            savedAddresses: [],
+            selectedAddressId: null,
+            map: null,
+            marker: null,
+            finalPinLocation: null,
+            googleMapsLoaded: false,
+            cartSyncListener: null,
+            userTotalOrders: 0,
+            locationDetected: false,
+            validLocationSet: false,
+            RAZORPAY_KEY: 'rzp_test_your_key_here',
+            FREE_DELIVERY_THRESHOLD: 200,
+            DELIVERY_FEE: 40,
+            FIRST_TWO_ORDERS_FREE: 1,
+            SERVICEABLE_PINCODES: {
+                '742101': true, '742102': true, '742103': true, '742107': true,
+                '742149': true, '742187': true
+            },
+
+            // Initialize app
+            init() {
+                this.loadCart();
+                this.loadGoogleMaps();
+                this.setupAuthListener();
+                this.setupEventListeners();
+            },
+
+            // Setup event listeners
+            setupEventListeners() {
+                document.getElementById('addressModal').addEventListener('click', (e) => {
+                    if (e.target.id === 'addressModal') this.closeAddressModal();
+                });
+            },
+
+            // Auth listener
+            setupAuthListener() {
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        this.currentUser = user;
+                        await this.initializeUserOrderStats();
+                        this.userTotalOrders = await this.getUserTotalOrdersCount();
+                        this.syncCartFromDB(user.uid);
+                        await this.loadSavedAddresses();
+                        this.selectPayment('cod');
+                        this.renderCart();
+                    } else {
+                        window.location.href = 'index.html';
+                    }
+                });
+            },
+
+            // Load Google Maps
+            loadGoogleMaps() {
+                if (window.google?.maps) {
+                    this.initMap();
+                    return;
+                }
+                const script = document.createElement('script');
+                script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI&callback=APP.initMap';
+                script.async = true;
+                script.defer = true;
+                document.head.appendChild(script);
+            },
+
+            // Initialize map
+            initMap() {
+                const defaultLocation = { lat: 22.9734, lng: 78.6569 };
+                this.map = new google.maps.Map(document.getElementById('map'), {
+                    center: defaultLocation,
+                    zoom: 5,
+                    mapTypeControl: false,
+                    streetViewControl: false,
+                    fullscreenControl: false
+                });
+
+                this.marker = new google.maps.Marker({
+                    position: defaultLocation,
+                    map: this.map,
+                    draggable: true,
+                    animation: google.maps.Animation.DROP
+                });
+
+                this.finalPinLocation = null;
+                this.validLocationSet = false;
+                this.updateCoordinatesDisplay();
+                this.updateDeliverButton();
+
+                this.map.addListener('click', (e) => {
+                    this.setMarkerPosition(e.latLng, false);
+                });
+
+                this.marker.addListener('dragend', (e) => {
+                    this.setMarkerPosition(e.latLng, false);
+                    this.showSuccess('Pin location updated');
+                });
+
+                this.marker.addListener('drag', (e) => {
+                    this.finalPinLocation = { lat: e.latLng.lat(), lng: e.latLng.lng() };
+                    this.validLocationSet = true;
+                    this.updateCoordinatesDisplay();
+                    this.updateDeliverButton();
+                });
+
+                this.googleMapsLoaded = true;
+                console.log('Google Maps initialized');
+            },
+
+            // Set marker position and auto-fill form fields
+            setMarkerPosition(latLng, isInitialDetection = false) {
+                this.finalPinLocation = { lat: latLng.lat(), lng: latLng.lng() };
+                this.validLocationSet = true;
+                this.marker.setPosition(latLng);
+                this.map.panTo(latLng);
+                this.updateCoordinatesDisplay();
+                this.updateDeliverButton();
+
+                new google.maps.Geocoder().geocode({ location: latLng }, (results, status) => {
+                    if (status === 'OK' && results[0]) {
+                        this.populateAddressFields(results[0], isInitialDetection);
+                    }
+                });
+            },
+
+            // Auto-fill address fields from geocoding
+            populateAddressFields(result, isInitialDetection) {
+                const comps = result.address_components;
+                const addrFields = {};
+
+                comps.forEach(comp => {
+                    const types = comp.types;
+                    if (types.includes('locality')) addrFields.city = comp.long_name;
+                    if (types.includes('postal_code')) addrFields.pin = comp.long_name;
+                    if (types.includes('sublocality')) addrFields.area = comp.long_name;
+                    if (types.includes('sublocality_level_1')) addrFields.subArea = comp.long_name;
+                    if (types.includes('route')) addrFields.street = comp.long_name;
+                    if (types.includes('administrative_area_level_1')) addrFields.state = comp.long_name;
+                    if (types.includes('country')) addrFields.country = comp.long_name;
+                });
+
+                const updateField = (id, value, highlightIfNew = false) => {
+                    const el = document.getElementById(id);
+                    if (el && value) {
+                        const oldVal = el.value;
+                        el.value = value;
+                        if (highlightIfNew && !oldVal) {
+                            el.classList.add('auto-filled');
+                            setTimeout(() => el.classList.remove('auto-filled'), 3000);
+                        }
+                    }
+                };
+
+                // Build complete address
+                const addressParts = [addrFields.street, addrFields.area, addrFields.subArea].filter(Boolean);
+                const fullAddress = addressParts.join(', ');
+
+                updateField('address', fullAddress, !isInitialDetection);
+                updateField('city', addrFields.city, !isInitialDetection);
+                updateField('pincode', addrFields.pin, !isInitialDetection);
+
+                if (!isInitialDetection) {
+                    this.showSuccess('Address auto-filled from location');
+                }
+            },
+
+            updateCoordinatesDisplay() {
+                const coordDisplay = document.getElementById('coordDisplay');
+                const currentCoords = document.getElementById('currentCoords');
+                
+                if (this.finalPinLocation && this.validLocationSet) {
+                    coordDisplay.className = 'coord-display';
+                    coordDisplay.innerHTML = `✓ Location Set: <strong>${this.finalPinLocation.lat.toFixed(6)}, ${this.finalPinLocation.lng.toFixed(6)}</strong>`;
+                } else {
+                    coordDisplay.className = 'coord-display error';
+                    coordDisplay.innerHTML = '❌ Location not set - Click "Use My Location" or drag the marker';
+                }
+            },
+
+            updateDeliverButton() {
+                const btn = document.getElementById('deliverHereBtn');
+                const btnText = document.getElementById('deliverHereBtnText');
+                
+                if (this.validLocationSet && this.finalPinLocation) {
+                    btn.disabled = false;
+                    btnText.textContent = 'Deliver Here';
+                } else {
+                    btn.disabled = true;
+                    btnText.textContent = 'Set Location First';
+                }
+            },
+
+            // Get user location with enhanced feedback
+            getLocation() {
+                const btn = document.getElementById('locationBtn');
+                const status = document.getElementById('locationStatus');
+                btn.disabled = true;
+                btn.innerHTML = '<span>⏳ Detecting...</span>';
+                status.textContent = 'Getting your location...';
+                this.locationDetected = false;
+
+                const onSuccess = (lat, lng) => {
+                    if (this.locationDetected) return;
+                    this.locationDetected = true;
+                    this.validLocationSet = true;
+                    const latLng = new google.maps.LatLng(lat, lng);
+                    this.map.setCenter(latLng);
+                    this.map.setZoom(15);
+                    this.setMarkerPosition(latLng, true);
+                    btn.innerHTML = '<span>✓ Location Detected</span>';
+                    btn.disabled = false;
+                    status.textContent = '✓ Location detected successfully - You can now save address';
+                    status.style.color = '#60b246';
+                    this.updateDeliverButton();
+                };
+
+                const onError = (msg) => {
+                    if (this.locationDetected) return;
+                    btn.innerHTML = '<span>📍 Use My Location</span>';
+                    btn.disabled = false;
+                    status.textContent = msg + ' - You must drag the marker to your location';
+                    status.style.color = '#ff6b6b';
+                    this.validLocationSet = false;
+                    this.finalPinLocation = null;
+                    this.updateCoordinatesDisplay();
+                    this.updateDeliverButton();
+                };
+
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (pos) => onSuccess(pos.coords.latitude, pos.coords.longitude),
+                        (err) => {
+                            let msg = 'Location permission denied';
+                            if (err.code === 1) msg = 'Location permission denied';
+                            if (err.code === 3) msg = 'Location request timed out';
+                            onError(msg);
+                        },
+                        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                    );
+                } else {
+                    onError('Geolocation unavailable');
+                }
+            },
+
+            // Cart operations
+            loadCart() {
+                try {
+                    const saved = localStorage.getItem('midnightPlazaCart');
+                    this.cart = saved ? JSON.parse(saved) : [];
+                } catch (e) {
+                    this.cart = [];
+                }
+            },
+
+            saveCart() {
+                try {
+                    localStorage.setItem('midnightPlazaCart', JSON.stringify(this.cart));
+                } catch (e) {
+                    console.error('Error saving cart:', e);
+                }
+            },
+
+            updateQuantity(index, change) {
+                this.cart[index].quantity += change;
+                if (this.cart[index].quantity <= 0) this.cart.splice(index, 1);
+                this.saveCart();
+                if (this.currentUser) this.syncCartToDB(this.currentUser.uid);
+                this.renderCart();
+            },
+
+            removeItem(index) {
+                if (confirm('Remove this item?')) {
+                    this.cart.splice(index, 1);
+                    this.saveCart();
+                    if (this.currentUser) this.syncCartToDB(this.currentUser.uid);
+                    this.renderCart();
+                }
+            },
+
+            calculateDeliveryFee(subtotal) {
+                if (this.userTotalOrders < this.FIRST_TWO_ORDERS_FREE) return 0;
+                return subtotal >= this.FREE_DELIVERY_THRESHOLD ? 0 : this.DELIVERY_FEE;
+            },
+
+            renderCart() {
+                const content = document.getElementById('cartContent');
+                const sections = document.getElementById('checkoutSections');
+
+                if (!this.cart.length) {
+                    content.innerHTML = `
+                        <div class="empty-cart">
+                            <div class="empty-cart-icon">🛒</div>
+                            <h3>Your cart is empty</h3>
+                            <p>Add delicious items to get started!</p>
+                            <a href="home.html" class="continue-shopping">Browse Menu</a>
+                        </div>`;
+                    sections.style.display = 'none';
+                    return;
+                }
+
+                sections.style.display = 'block';
+                const subtotal = this.cart.reduce((s, i) => s + i.price * i.quantity, 0);
+                const deliveryFee = this.calculateDeliveryFee(subtotal);
+                const total = subtotal + deliveryFee;
+
+                const isFirstOrders = this.userTotalOrders < this.FIRST_TWO_ORDERS_FREE;
+                const isFreeByThreshold = subtotal >= this.FREE_DELIVERY_THRESHOLD;
+
+                const cartHTML = this.cart.map((item, i) => `
+                    <div class="cart-item">
+                        <div class="cart-item-header">
+                            <div class="cart-item-details">
+                                <div class="cart-item-name">${item.emoji || ''} ${item.name}</div>
+                                <div class="cart-item-price">₹${item.price}</div>
+                            </div>
+                            <div class="cart-item-total">₹${item.price * item.quantity}</div>
+                        </div>
+                        <div class="cart-item-actions">
+                            <div class="cart-item-quantity">
+                                <button class="quantity-btn" onclick="APP.updateQuantity(${i}, -1)">−</button>
+                                <div class="quantity-display">${item.quantity}</div>
+                                <button class="quantity-btn" onclick="APP.updateQuantity(${i}, 1)">+</button>
+                            </div>
+                            <button class="remove-btn" onclick="APP.removeItem(${i})">Remove</button>
+                        </div>
+                    </div>
+                `).join('');
+
+                const deliveryFeeClass = deliveryFee === 0 ? 'summary-row delivery free' : 'summary-row delivery';
+                let deliveryText = '';
+                if (isFirstOrders) {
+                    deliveryText = `<span>Delivery Fee</span><span><span class="delivery-value">₹${this.DELIVERY_FEE}</span> <strong>FREE</strong></span>`;
+                } else if (isFreeByThreshold) {
+                    deliveryText = `<span>Delivery Fee</span><span><span class="delivery-value">₹${this.DELIVERY_FEE}</span> <strong>FREE</strong></span>`;
+                } else {
+                    deliveryText = `<span>Delivery Fee</span><span>₹${deliveryFee}</span>`;
+                }
+
+                content.innerHTML = cartHTML + `
+                    <div class="cart-summary">
+                        <div class="summary-row subtotal"><span>Subtotal</span><span>₹${subtotal}</span></div>
+                        <div class="${deliveryFeeClass}">${deliveryText}</div>
+                        <div class="cart-total"><span>Total</span><span>₹${total}</span></div>
+                    </div>`;
+            },
+
+            // Sync cart
+            syncCartFromDB(userId) {
+                if (this.cartSyncListener) this.cartSyncListener();
+                const userCartRef = ref(db, `carts/${userId}`);
+                this.cartSyncListener = onValue(userCartRef, (snapshot) => {
+                    if (snapshot.exists()) {
+                        const dbCart = Object.keys(snapshot.val()).map(itemId => ({
+                            id: itemId,
+                            ...snapshot.val()[itemId]
+                        }));
+                        if (JSON.stringify(this.cart) !== JSON.stringify(dbCart)) {
+                            this.cart = dbCart;
+                            this.saveCart();
+                            this.renderCart();
+                        }
+                    }
+                });
+            },
+
+            syncCartToDB(userId) {
+                const userCartRef = ref(db, `carts/${userId}`);
+                if (this.cart.length === 0) {
+                    remove(userCartRef).catch(e => console.error('Cart removal error:', e));
+                    return;
+                }
+                const cartData = {};
+                this.cart.forEach(item => {
+                    cartData[item.id] = { name: item.name, price: item.price, emoji: item.emoji, quantity: item.quantity };
+                });
+                set(userCartRef, cartData).catch(e => console.error('Cart sync error:', e));
+            },
+
+            // Address operations
+            async loadSavedAddresses() {
+                if (!this.currentUser) return;
+                try {
+                    const snap = await get(ref(db, `tiutbc/users/${this.currentUser.uid}/addresses`));
+                    this.savedAddresses = [];
+                    if (snap.exists()) {
+                        snap.forEach(child => {
+                            this.savedAddresses.push({ id: child.key, ...child.val() });
+                        });
+                        this.savedAddresses.sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
+                        if (this.savedAddresses.length > 0) {
+                            const defaultAddr = this.savedAddresses.find(a => a.isDefault) || this.savedAddresses[0];
+                            this.selectedAddressId = defaultAddr.id;
+                            this.deliveryAddress = defaultAddr;
+                        }
+                    }
+                    this.renderAddressDisplay();
+                } catch (e) {
+                    console.error('Load addresses error:', e);
+                }
+            },
+
+            renderAddressDisplay() {
+                const area = document.getElementById('addressDisplayArea');
+                if (!this.deliveryAddress) {
+                    area.innerHTML = `
+                        <div style="background: #fff3cd; border: 2px solid #ffc107; border-radius: 10px; padding: 1rem; margin-bottom: 1rem; text-align: center; color: #856404;">
+                            <div style="font-weight: 600; margin-bottom: 0.5rem;">⚠️ Delivery Address Required</div>
+                            <div style="font-size: 0.9rem; margin-bottom: 0.75rem;">Please add your delivery address with location to continue</div>
+                            <button class="btn-secondary" onclick="APP.showAddressModal()" style="margin-top: 0.5rem;">+ Add Delivery Address</button>
+                        </div>`;
+                    this.updatePlaceOrderButtonState();
+                    if (this.savedAddresses.length === 0 && this.googleMapsLoaded) {
+                        setTimeout(() => this.showAddressModal(), 1500);
+                    }
+                    return;
+                }
+
+                const coords = this.deliveryAddress.coordinates ?
+                    `<div style="margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--secondary);font-size:0.8rem;color:#666;">📍 ${this.deliveryAddress.coordinates.lat.toFixed(6)}, ${this.deliveryAddress.coordinates.lng.toFixed(6)}</div>` : '';
+
+                area.innerHTML = `
+                    <div class="address-display-card">
+                        <div class="address-display-header">
+                            <div>
+                                <div class="address-display-name">${this.deliveryAddress.fullName}</div>
+                                <div class="address-display-phone">${this.deliveryAddress.phone}</div>
+                            </div>
+                            <button class="change-address-btn" onclick="APP.showAddressModal()">Change</button>
+                        </div>
+                        <div class="address-display-text">
+                            ${this.deliveryAddress.streetAddress || this.deliveryAddress.address || ''}<br>
+                            ${this.deliveryAddress.city || ''}, ${this.deliveryAddress.pincode || ''}
+                            ${this.deliveryAddress.landmark ? `<br>Landmark: ${this.deliveryAddress.landmark}` : ''}
+                        </div>${coords}
+                    </div>`;
+                this.updatePlaceOrderButtonState();
+            },
+
+            renderSavedAddresses() {
+                const list = document.getElementById('savedAddressesList');
+                const form = document.getElementById('addressFormContainer');
+                const cards = document.getElementById('addressCards');
+
+                if (!this.savedAddresses.length) {
+                    list.style.display = 'none';
+                    form.style.display = 'block';
+                    document.getElementById('backToSavedBtn').style.display = 'none';
+                    return;
+                }
+
+                list.style.display = 'block';
+                form.style.display = 'none';
+
+                cards.innerHTML = this.savedAddresses.map((a) => {
+                    const selectedClass = this.selectedAddressId === a.id ? 'selected' : '';
+                    const coordsDisplay = a.coordinates ? 
+                        `<div style="font-size: 0.75rem; color: #888; margin-top: 0.3rem;">📍 ${a.coordinates.lat.toFixed(4)}, ${a.coordinates.lng.toFixed(4)}</div>` : '';
+                    return `
+                        <div class="address-card ${selectedClass}" onclick="APP.selectSavedAddress('${a.id}')">
+                            <div class="address-card-header">
+                                <div>
+                                    <div class="address-name">${a.fullName}</div>
+                                    <div class="address-phone">${a.phone}</div>
+                                </div>
+                                ${a.isDefault ? '<span class="default-badge">Default</span>' : ''}
+                            </div>
+                            <div class="address-details">
+                                ${a.streetAddress || a.address || ''}<br>
+                                ${a.city || ''}, ${a.pincode || ''}
+                                ${a.landmark ? `<br>Landmark: ${a.landmark}` : ''}
+                                ${coordsDisplay}
+                            </div>
+                            <div class="address-actions">
+                                ${!a.isDefault ? `<button class="btn-small btn-set-default" onclick="event.stopPropagation(); APP.setDefaultAddress('${a.id}')">Set as Default</button>` : ''}
+                                <button class="btn-small btn-delete" onclick="event.stopPropagation(); APP.deleteAddress('${a.id}')">Delete</button>
+                            </div>
+                        </div>`;
+                }).join('');
+            },
+
+            selectSavedAddress(id) {
+                const found = this.savedAddresses.find(a => a.id === id);
+                if (!found) return;
+                
+                // Check if address has valid coordinates
+                if (!found.coordinates || !found.coordinates.lat || !found.coordinates.lng) {
+                    this.showToast('error', 'Invalid Address', 'This address does not have location data. Please add a new address with valid location.');
+                    return;
+                }
+                
+                this.selectedAddressId = id;
+                this.deliveryAddress = found;
+                this.renderAddressDisplay();
+                setTimeout(() => this.closeAddressModal(), 300);
+            },
+
+            async setDefaultAddress(id) {
+                if (!this.currentUser) return;
+                try {
+                    const updates = {};
+                    this.savedAddresses.forEach(addr => {
+                        updates[`tiutbc/users/${this.currentUser.uid}/addresses/${addr.id}/isDefault`] = (addr.id === id);
+                    });
+                    await update(ref(db), updates);
+                    this.savedAddresses.forEach(addr => {
+                        addr.isDefault = (addr.id === id);
+                    });
+                    this.savedAddresses.sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
+                    this.renderSavedAddresses();
+                    this.showSuccess('Default address updated');
+                } catch (e) {
+                    console.error('Set default error:', e);
+                    this.showError('Failed to set default');
+                }
+            },
+
+            async deleteAddress(id) {
+                if (!confirm('Delete this address?')) return;
+                try {
+                    await remove(ref(db, `tiutbc/users/${this.currentUser.uid}/addresses/${id}`));
+                    this.savedAddresses = this.savedAddresses.filter(a => a.id !== id);
+                    if (this.selectedAddressId === id) {
+                        this.selectedAddressId = null;
+                        this.deliveryAddress = null;
+                        if (this.savedAddresses.length) {
+                            const defaultAddr = this.savedAddresses.find(a => a.isDefault) || this.savedAddresses[0];
+                            this.selectedAddressId = defaultAddr.id;
+                            this.deliveryAddress = defaultAddr;
+                        }
+                    }
+                    this.renderSavedAddresses();
+                    this.renderAddressDisplay();
+                    this.showSuccess('Address deleted');
+                } catch (e) {
+                    console.error('Delete error:', e);
+                    this.showError('Failed to delete');
+                }
+            },
+
+            showAddressModal() {
+                const modal = document.getElementById('addressModal');
+                modal.classList.add('active');
+                if (this.savedAddresses.length > 0) {
+                    this.showSavedAddresses();
+                } else {
+                    this.showAddressForm();
+                }
+                setTimeout(() => {
+                    if (this.map) {
+                        google.maps.event.trigger(this.map, 'resize');
+                        if (document.getElementById('addressFormContainer').style.display !== 'none') {
+                            const defaultLocation = { lat: 22.9734, lng: 78.6569 };
+                            this.finalPinLocation = null;
+                            this.validLocationSet = false;
+                            this.map.setCenter(defaultLocation);
+                            this.map.setZoom(5);
+                            this.marker.setPosition(defaultLocation);
+                            this.updateCoordinatesDisplay();
+                            this.updateDeliverButton();
+                            this.locationDetected = false;
+                            
+                            // Auto-trigger location detection
+                            setTimeout(() => this.getLocation(), 500);
+                        }
+                    }
+                }, 300);
+            },
+
+            closeAddressModal() {
+                document.getElementById('addressModal').classList.remove('active');
+            },
+
+            showAddressForm() {
+                document.getElementById('savedAddressesList').style.display = 'none';
+                document.getElementById('addressFormContainer').style.display = 'block';
+                document.getElementById('backToSavedBtn').style.display = this.savedAddresses.length ? 'block' : 'none';
+                document.getElementById('addressForm').reset();
+                document.getElementById('saveAddress').checked = true;
+                
+                const defaultLocation = { lat: 22.9734, lng: 78.6569 };
+                this.finalPinLocation = null;
+                this.validLocationSet = false;
+                
+                setTimeout(() => {
+                    if (this.map) {
+                        google.maps.event.trigger(this.map, 'resize');
+                        this.map.setCenter(defaultLocation);
+                        this.map.setZoom(5);
+                        this.marker.setPosition(defaultLocation);
+                        this.updateCoordinatesDisplay();
+                        this.updateDeliverButton();
+                        this.locationDetected = false;
+                        
+                        // Auto-trigger location detection
+                        setTimeout(() => this.getLocation(), 500);
+                    }
+                }, 100);
+            },
+
+            showSavedAddresses() {
+                document.getElementById('savedAddressesList').style.display = 'block';
+                document.getElementById('addressFormContainer').style.display = 'none';
+                this.renderSavedAddresses();
+            },
+
+            async saveAndSelectAddress() {
+                // CRITICAL: Check if valid location is set
+                if (!this.validLocationSet || !this.finalPinLocation) {
+                    return this.showToast('error', 'Location Required', 'You must set your delivery location on the map. Click "Use My Location" or drag the red marker to your address.');
+                }
+
+                const name = document.getElementById('fullName').value.trim();
+                const phone = document.getElementById('phone').value.trim();
+                const addr = document.getElementById('address').value.trim();
+                const city = document.getElementById('city').value.trim();
+                const pin = document.getElementById('pincode').value.trim();
+                const landmark = document.getElementById('landmark').value.trim();
+                const save = document.getElementById('saveAddress').checked;
+
+                if (!name || !phone || !addr || !city || !pin) return this.showError('Fill all required fields');
+                if (!/^[0-9]{10}$/.test(phone)) return this.showError('Enter valid 10-digit phone');
+                if (!/^[0-9]{6}$/.test(pin)) return this.showError('Enter valid 6-digit pincode');
+
+                // Double-check coordinates before proceeding
+                if (!this.finalPinLocation || !this.finalPinLocation.lat || !this.finalPinLocation.lng) {
+                    return this.showToast('error', 'Invalid Location', 'Location data is missing. Please set your location on the map again.');
+                }
+
+                // Check if pincode is serviceable
+                const isServiceable = this.SERVICEABLE_PINCODES[pin] === true;
+                if (!isServiceable) {
+                    return this.showToast('error', 'Out of Service Area', `We don't deliver to pincode ${pin} yet. Please enter another pincode.`);
+                }
+
+                const btn = document.getElementById('deliverHereBtn');
+                const btnText = document.getElementById('deliverHereBtnText');
+                btn.disabled = true;
+                btn.classList.add('processing');
+                btnText.textContent = 'Checking...';
+
+                try {
+                    this.deliveryAddress = {
+                        fullName: name,
+                        phone,
+                        streetAddress: addr,
+                        city,
+                        pincode: pin,
+                        landmark,
+                        coordinates: { ...this.finalPinLocation },
+                        serviceable: true
+                    };
+
+                    if (save && this.currentUser) {
+                        btnText.textContent = 'Saving...';
+                        const newRef = push(ref(db, `tiutbc/users/${this.currentUser.uid}/addresses`));
+                        const isFirstAddress = this.savedAddresses.length === 0;
+                        await set(newRef, { ...this.deliveryAddress, createdAt: Date.now(), isDefault: isFirstAddress });
+                        this.savedAddresses.push({ id: newRef.key, ...this.deliveryAddress, isDefault: isFirstAddress });
+                        this.selectedAddressId = newRef.key;
+                        btnText.textContent = 'Saved!';
+                        btn.style.background = '#60b246';
+                        setTimeout(() => {
+                            this.showSuccess('Address saved successfully with location');
+                            this.renderAddressDisplay();
+                            this.closeAddressModal();
+                            btn.disabled = false;
+                            btn.classList.remove('processing');
+                            btn.style.background = '';
+                            btnText.textContent = 'Deliver Here';
+                            this.renderSavedAddresses();
+                        }, 800);
+                    } else {
+                        btnText.textContent = 'Selected!';
+                        btn.style.background = '#60b246';
+                        setTimeout(() => {
+                            this.renderAddressDisplay();
+                            this.closeAddressModal();
+                            btn.disabled = false;
+                            btn.classList.remove('processing');
+                            btn.style.background = '';
+                            btnText.textContent = 'Deliver Here';
+                        }, 600);
+                    }
+                } catch (e) {
+                    console.error('Error saving address:', e);
+                    this.showError('Failed to save address');
+                    btn.disabled = false;
+                    btn.classList.remove('processing');
+                    btnText.textContent = 'Deliver Here';
+                }
+            },
+
+            // Payment operations
+            selectPayment(method) {
+                this.selectedPayment = method;
+                document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+                const radio = document.getElementById(method);
+                if (radio) radio.checked = true;
+                const opt = document.getElementById(`payment-${method}`);
+                if (opt) opt.classList.add('selected');
+                this.updatePlaceOrderButtonState();
+            },
+
+            updatePlaceOrderButtonState() {
+                const btn = document.getElementById('placeOrderBtn');
+                const enabled = !!this.deliveryAddress && !!this.selectedPayment;
+                btn.disabled = !enabled;
+                if (this.selectedPayment === 'cod') btn.textContent = 'Place Order (COD)';
+                else if (this.selectedPayment === 'online') btn.textContent = 'Pay Now';
+                else btn.textContent = 'Select Payment Method';
+            },
+
+            async handlePlaceOrder() {
+                if (!this.deliveryAddress) {
+                    this.showError('Add delivery address');
+                    this.showAddressModal();
+                    return;
+                }
+                
+                // Validate that delivery address has coordinates
+                if (!this.deliveryAddress.coordinates || !this.deliveryAddress.coordinates.lat || !this.deliveryAddress.coordinates.lng) {
+                    this.showToast('error', 'Invalid Address', 'Your selected address does not have location data. Please select a different address or add a new one with valid location.');
+                    return;
+                }
+                
+                if (!this.selectedPayment) return this.showError('Select payment method');
+
+                const snap = await get(ref(db, 'storeStatus'));
+                if (!snap.exists() || !snap.val().isOpen) {
+                    return this.showToast('error', 'Store Closed', 'Not taking orders now. Try again later.');
+                }
+
+                this.selectedPayment === 'cod' ? this.placeOrder('cod', null) : this.initiateRazorpay();
+            },
+
+            initiateRazorpay() {
+                const subtotal = this.cart.reduce((s, i) => s + i.price * i.quantity, 0);
+                const deliveryFee = this.calculateDeliveryFee(subtotal);
+                const total = subtotal + deliveryFee;
+
+                new Razorpay({
+                    key: this.RAZORPAY_KEY,
+                    amount: total * 100,
+                    currency: 'INR',
+                    name: 'TIU The Biriyani Canteen',
+                    description: 'Food Order',
+                    handler: (res) => this.placeOrder('online', res.razorpay_payment_id),
+                    prefill: { name: this.deliveryAddress.fullName, email: this.currentUser.email, contact: this.deliveryAddress.phone },
+                    theme: { color: '#fdc921' },
+                    modal: { ondismiss: () => this.showError('Payment cancelled') }
+                }).open();
+            },
+
+            async placeOrder(method, paymentId) {
+                if (!this.currentUser || !this.cart.length) return this.showError('Unable to place order');
+
+                const loader = document.getElementById('loader');
+                const btn = document.getElementById('placeOrderBtn');
+                loader.style.display = 'block';
+                btn.disabled = true;
+
+                const subtotal = this.cart.reduce((s, i) => s + i.price * i.quantity, 0);
+                const deliveryFee = this.calculateDeliveryFee(subtotal);
+                const total = subtotal + deliveryFee;
+
+                const isFirstOrder = this.userTotalOrders === 0;
+                const isFreeByThreshold = subtotal >= this.FREE_DELIVERY_THRESHOLD;
+
+                try {
+                    const newOrderRef = push(ref(db, 'orders'));
+                    await set(newOrderRef, {
+                        userId: this.currentUser.uid,
+                        userEmail: this.currentUser.email,
+                        items: this.cart,
+                        subtotal, deliveryFee, total,
+                        freeDelivery: deliveryFee === 0,
+                        freeDeliveryReason: isFirstOrder ? 'first_order' : (isFreeByThreshold ? 'threshold' : null),
+                        deliveryAddress: {
+                            address: this.deliveryAddress.streetAddress || this.deliveryAddress.address,
+                            fullName: this.deliveryAddress.fullName,
+                            phone: this.deliveryAddress.phone,
+                            city: this.deliveryAddress.city,
+                            pincode: this.deliveryAddress.pincode,
+                            landmark: this.deliveryAddress.landmark || '',
+                            coordinates: this.deliveryAddress.coordinates
+                        },
+                        paymentMethod: method,
+                        paymentStatus: method === 'online' ? 'paid' : 'pending',
+                        ...(paymentId && { paymentId }),
+                        status: 'pending',
+                        createdAt: Date.now()
+                    });
+
+                    const totalOrdersRef = ref(db, `tiutbc/users/${this.currentUser.uid}/orderStats/totalOrders`);
+                    const totalOrdersSnap = await get(totalOrdersRef);
+                    const currentTotal = totalOrdersSnap.exists() ? totalOrdersSnap.val() : 0;
+                    await set(totalOrdersRef, currentTotal + 1);
+
+                    this.showToast('success', 'Order Successful!', 'Redirecting to My Orders...');
+                    localStorage.removeItem('midnightPlazaCart');
+                    this.cart = [];
+                    if (this.currentUser) {
+                        await remove(ref(db, `carts/${this.currentUser.uid}`)).catch(e => console.log('Cart cleanup:', e));
+                    }
+                    setTimeout(() => window.location.href = 'orders.html', 2500);
+                } catch (e) {
+                    console.error('Order error:', e);
+                    this.showError('Failed to place order');
+                    loader.style.display = 'none';
+                    btn.disabled = false;
+                }
+            },
+
+            // User order stats
+            async initializeUserOrderStats() {
+                if (!this.currentUser) return;
+                try {
+                    const statsRef = ref(db, `tiutbc/users/${this.currentUser.uid}/orderStats`);
+                    const snapshot = await get(statsRef);
+                    if (!snapshot.exists()) {
+                        await set(statsRef, { completedOrders: 0, totalOrders: 0, createdAt: Date.now() });
+                    }
+                } catch (e) {
+                    console.error('Error initializing order stats:', e);
+                }
+            },
+
+            async getUserTotalOrdersCount() {
+                if (!this.currentUser) return 0;
+                try {
+                    const statsRef = ref(db, `tiutbc/users/${this.currentUser.uid}/orderStats/totalOrders`);
+                    const snapshot = await get(statsRef);
+                    return snapshot.exists() ? snapshot.val() || 0 : 0;
+                } catch (e) {
+                    console.error('Error getting total order count:', e);
+                    return 0;
+                }
+            },
+
+            // UI helpers
+            showToast(type, msg, sub) {
+                const toast = document.getElementById('toast');
+                const overlay = document.getElementById('toastOverlay');
+                toast.className = `toast show toast-${type}`;
+                overlay.classList.add('show');
+                document.getElementById('toastIcon').textContent = type === 'success' ? '✓' : '✕';
+                document.getElementById('toastMessage').textContent = msg;
+                document.getElementById('toastSubMessage').textContent = sub;
+                if (type === 'error') {
+                    setTimeout(() => {
+                        toast.classList.remove('show');
+                        overlay.classList.remove('show');
+                    }, 4000);
+                }
+            },
+
+            showSuccess(msg) {
+                const el = document.getElementById('successMessage');
+                el.textContent = msg;
+                el.style.display = 'block';
+                setTimeout(() => el.style.display = 'none', 3000);
+            },
+
+            showError(msg) {
+                const el = document.getElementById('errorMessage');
+                el.textContent = msg;
+                el.style.display = 'block';
+                setTimeout(() => el.style.display = 'none', 3000);
+            },
+
+            toggleMenu() {
+                document.querySelector('.hamburger').classList.toggle('active');
+                document.getElementById('navMenu').classList.toggle('active');
+            },
+
+            async logout() {
+                if (confirm('Logout?')) {
+                    try {
+                        if (this.cartSyncListener) this.cartSyncListener();
+                        await signOut(auth);
+                        localStorage.removeItem('midnightPlazaCart');
+                        window.location.href = 'index.html';
+                    } catch (e) {
+                        console.error('Logout error:', e);
+                    }
+                }
+            }
+        };
+
+        // Initialize app when document is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            APP.init();
+        });
+
+        // Expose APP to global scope for inline onclick handlers
+        window.APP = APP;
+    </script>
+</body>
+</html>
+
