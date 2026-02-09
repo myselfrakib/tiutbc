@@ -2729,7 +2729,7 @@ const mapUrl = coords ?
 
         // ========== FOOD ITEMS ==========
         function loadFoodItems() {
-            const foodRef = dbRef(db, 'foodItems');
+            const foodRef = dbRef(db, 'tiutbc/foodItems');
             const callback = snapshot => displayFoodItems(snapshot.val() || {});
             onValue(foodRef, callback);
             dbListeners.push({ ref: foodRef, callback });
@@ -3108,6 +3108,3 @@ const mapUrl = coords ?
     </script>
 </body>
 </html>
-
-
-
