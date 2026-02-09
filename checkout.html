@@ -479,7 +479,7 @@
             async loadSavedRooms() {
                 if (!this.currentUser) return;
                 try {
-                    const snap = await get(ref(db, `tiutbc/users/${this.currentUser.uid}/rooms`));
+                    const snap = await get(ref(db, `tiutbc/users/${this.currentUser.uid}/addresses`));
                     this.savedRooms = [];
                     if (snap.exists()) {
                         snap.forEach(child => {
@@ -677,7 +677,7 @@
                     };
 
                     if (save && this.currentUser) {
-                        const newRef = push(ref(db, `tiutbc/users/${this.currentUser.uid}/rooms`));
+                        const newRef = push(ref(db, `tiutbc/users/${this.currentUser.uid}/addresses`));
                         const isFirstRoom = this.savedRooms.length === 0;
                         await set(newRef, { ...this.deliveryRoom, createdAt: Date.now(), isDefault: isFirstRoom });
                         this.savedRooms.push({ id: newRef.key, ...this.deliveryRoom, isDefault: isFirstRoom });
