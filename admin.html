@@ -2016,7 +2016,7 @@
 
         // ========== USERS ==========
         function loadUsers() {
-            const usersRef = dbRef(db, 'users');
+            const usersRef = dbRef(db, 'tiutbc/users');
             const callback = snapshot => {
                 allUsers = {};
                 const data = snapshot.val() || {};
@@ -2145,7 +2145,7 @@
 
         // ========== CARTS ==========
         function loadCarts() {
-            const cartsRef = dbRef(db, 'carts');
+            const cartsRef = dbRef(db, 'tiutbc/carts');
             const callback = snapshot => { 
                 allCarts = snapshot.val() || {}; 
                 displayCarts(); 
@@ -2300,7 +2300,7 @@
 
         // ========== ORDERS ==========
         function loadOrders() {
-            const ordersRef = dbRef(db, 'orders');
+            const ordersRef = dbRef(db, 'tiutbc/orders');
             const callback = snapshot => { 
                 allOrders = snapshot.val() || {}; 
                 displayOrders(); 
@@ -2486,7 +2486,7 @@ const mapUrl = coords ?
 
         // ========== REVIEWS ==========
         function loadReviews() {
-            const reviewsRef = dbRef(db, 'reviews');
+            const reviewsRef = dbRef(db, 'tiutbc/reviews');
             const callback = snapshot => {
                 allReviews = snapshot.val() || {};
                 displayReviews();
@@ -2663,10 +2663,11 @@ const mapUrl = coords ?
 
         // ========== STORE CONTROL ==========
         function loadStoreStatus() {
-            const storeRef = dbRef(db, 'storeStatus');
+            const storeRef = dbRef(db, 'tiutbc/storeStatus');
             const callback = snapshot => {
-                const status = snapshot.val() || { isOpen: false };
-                updateStoreUI(status.isOpen);
+                const status = snapshot.exists() ? snapshot.val() : { isOpen: false };
+                updateStoreUI(!!status.isOpen);
+
             };
             onValue(storeRef, callback);
             dbListeners.push({ ref: storeRef, callback });
