@@ -53,36 +53,28 @@
         .summary-row.delivery.free .delivery-value { text-decoration: line-through; color: #999; margin-right: 0.5rem; }
         .cart-total { display: flex; justify-content: space-between; font-size: clamp(1.3rem, 4vw, 1.5rem); font-weight: bold; color: var(--brown); margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #eee; }
         .section-title { font-size: clamp(1.1rem, 3vw, 1.3rem); font-weight: 600; color: #333; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
-        .address-display-card { border: 2px solid var(--secondary); border-radius: 10px; padding: 0.9rem; background: #f0f9ff; }
-        .address-display-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; }
-        .address-display-name { font-weight: 600; font-size: 1rem; color: #333; }
-        .change-address-btn { background: var(--primary); color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: all 0.3s; }
-        .change-address-btn:active { transform: scale(0.95); }
-        .address-display-phone { color: #666; font-size: 0.85rem; margin-bottom: 0.5rem; }
-        .address-display-text { color: #555; line-height: 1.5; font-size: 0.9rem; }
+        .room-display-card { border: 2px solid var(--secondary); border-radius: 10px; padding: 0.9rem; background: #f0f9ff; }
+        .room-display-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; }
+        .room-display-name { font-weight: 600; font-size: 1rem; color: #333; }
+        .change-room-btn { background: var(--primary); color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: all 0.3s; }
+        .change-room-btn:active { transform: scale(0.95); }
+        .room-display-phone { color: #666; font-size: 0.85rem; margin-bottom: 0.5rem; }
+        .room-display-text { color: #555; line-height: 1.5; font-size: 0.9rem; }
         .form-group { margin-bottom: 1rem; }
         .form-group label { display: block; margin-bottom: 0.4rem; font-weight: 600; color: #333; font-size: clamp(0.85rem, 2.5vw, 0.95rem); }
-        .form-group input, .form-group textarea { width: 100%; padding: 0.75rem; border: 2px solid #e0e0e0; border-radius: 8px; font-size: clamp(0.85rem, 2.5vw, 0.95rem); font-family: inherit; transition: border-color 0.3s; }
-        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); }
-        .form-group input.auto-filled { border-color: var(--success-green); background-color: #f0fff4; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.75rem; border: 2px solid #e0e0e0; border-radius: 8px; font-size: clamp(0.85rem, 2.5vw, 0.95rem); font-family: inherit; transition: border-color 0.3s; }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--primary); }
         .form-group textarea { resize: vertical; min-height: 70px; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
-        @media (max-width: 480px) { .form-row { grid-template-columns: 1fr; } }
-        #map { width: 100%; height: 350px; border-radius: 8px; margin-bottom: 1rem; border: 2px solid #e0e0e0; }
-        .map-instruction { background: #fffbf0; border-left: 4px solid var(--primary); padding: 0.75rem; margin-bottom: 1rem; border-radius: 4px; font-size: 0.85rem; color: #666; }
-        .location-btn { background: var(--secondary); color: white; border: none; padding: 0.6rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem; transition: all 0.3s; display: flex; align-items: center; gap: 0.5rem; }
-        .location-btn:active { transform: scale(0.95); }
-        .location-btn:disabled { background: #ccc; cursor: not-allowed; }
-        .location-status { font-size: 0.8rem; color: #666; margin-top: 0.3rem; }
-        .address-card { border: 2px solid #e0e0e0; border-radius: 10px; padding: 1rem; margin-bottom: 0.75rem; cursor: pointer; transition: all 0.3s; position: relative; }
-        .address-card:hover { border-color: var(--primary); background: #fffbf0; }
-        .address-card.selected { border-color: var(--primary); background: #fffbf0; box-shadow: 0 4px 12px rgba(253, 201, 33, 0.2); }
-        .address-card.selected::before { content: '✓'; position: absolute; top: 10px; right: 10px; background: var(--primary); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem; }
-        .address-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.6rem; padding-right: 30px; }
-        .address-name { font-weight: 600; font-size: 1rem; color: #333; }
-        .address-phone { color: #666; font-size: 0.85rem; margin-top: 0.2rem; }
-        .address-details { color: #666; line-height: 1.5; font-size: 0.85rem; }
-        .address-actions { display: flex; gap: 0.6rem; margin-top: 0.75rem; flex-wrap: wrap; }
+        .info-instruction { background: #e8f4fd; border-left: 4px solid var(--primary); padding: 0.75rem; margin-bottom: 1rem; border-radius: 4px; font-size: 0.85rem; color: #555; }
+        .room-card { border: 2px solid #e0e0e0; border-radius: 10px; padding: 1rem; margin-bottom: 0.75rem; cursor: pointer; transition: all 0.3s; position: relative; }
+        .room-card:hover { border-color: var(--primary); background: #fffbf0; }
+        .room-card.selected { border-color: var(--primary); background: #fffbf0; box-shadow: 0 4px 12px rgba(255, 107, 53, 0.2); }
+        .room-card.selected::before { content: '✓'; position: absolute; top: 10px; right: 10px; background: var(--primary); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem; }
+        .room-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.6rem; padding-right: 30px; }
+        .room-name { font-weight: 600; font-size: 1rem; color: #333; }
+        .room-phone { color: #666; font-size: 0.85rem; margin-top: 0.2rem; }
+        .room-details { color: #666; line-height: 1.5; font-size: 0.85rem; }
+        .room-actions { display: flex; gap: 0.6rem; margin-top: 0.75rem; flex-wrap: wrap; }
         .btn-small { padding: 0.4rem 0.8rem; font-size: 0.8rem; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; transition: all 0.3s; }
         .btn-set-default { background: var(--secondary); color: white; }
         .btn-set-default:active { transform: scale(0.95); }
@@ -101,12 +93,12 @@
         .btn.processing { background: #5989b3; pointer-events: none; }
         .btn.processing::after { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); animation: shimmer 1.5s infinite; }
         @keyframes shimmer { 0% { left: -100%; } 100% { left: 100%; } }
-        .btn-secondary { width: 100%; padding: 0.9rem; background: white; color: var(--primary); border: 2px solid var(--primary); border-radius: 10px; font-size: clamp(0.95rem, 3vw, 1.05rem); font-weight: 600; cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden; }
-        .btn-secondary:active { transform: scale(0.98); background: var(--bg-cream); box-shadow: inset 0 3px 8px rgba(253,201,33,0.2); }
+        .btn-secondary { width: 100%; padding: 0.9rem; background: white; color: var(--primary); border: 2px solid var(--primary); border-radius: 10px; font-size: clamp(0.95rem, 3vw, 1.05rem); font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .btn-secondary:active { transform: scale(0.98); background: var(--bg-cream); }
         .empty-cart { text-align: center; padding: 2.5rem 1rem; }
         .empty-cart-icon { font-size: clamp(3rem, 10vw, 4rem); margin-bottom: 0.75rem; }
         .empty-cart h3 { color: #666; margin-bottom: 0.75rem; font-size: clamp(1.1rem, 3vw, 1.3rem); }
-        .continue-shopping { display: inline-flex; margin-top: 0.75rem; padding: 0.7rem 1.5rem; background: var(--primary); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; transition: all 0.3s; align-items: center; }
+        .continue-shopping { display: inline-flex; margin-top: 0.75rem; padding: 0.7rem 1.5rem; background: var(--primary); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; transition: all 0.3s; }
         .continue-shopping:active { transform: scale(0.95); }
         .success-message, .error-message { padding: 0.9rem; border-radius: 8px; margin-bottom: 1rem; text-align: center; font-weight: 600; display: none; font-size: 0.9rem; }
         .success-message { background: #d4edda; color: #155724; }
@@ -132,23 +124,17 @@
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
         .modal-title { font-size: 1.3rem; font-weight: 600; color: #333; }
         .close-modal { background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #666; line-height: 1; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
-        .coord-display { background: #f0f9ff; border: 2px solid var(--secondary); border-radius: 8px; padding: 0.75rem; margin-top: 0.75rem; font-size: 0.85rem; color: #666; text-align: center; }
-        .coord-display.warning { background: #fff3cd; border-color: #ffc107; color: #856404; }
-        .coord-display.error { background: #f8d7da; border-color: #dc3545; color: #721c24; font-weight: 600; }
-        .addresses-list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 2px solid #f0f0f0; }
-        .addresses-list-title { font-size: 1.1rem; font-weight: 600; color: #333; }
-        .empty-addresses { text-align: center; padding: 2rem 1rem; color: #666; }
-        .empty-addresses-icon { font-size: 3rem; margin-bottom: 0.5rem; }
-        .sync-indicator { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #90ee90; margin-right: 0.5rem; animation: pulse 2s infinite; }
-        .sync-indicator.syncing { background: #ffc107; animation: pulse 1s infinite; }
-        .sync-indicator.error { background: #dc3545; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .rooms-list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 2px solid #f0f0f0; }
+        .rooms-list-title { font-size: 1.1rem; font-weight: 600; color: #333; }
+        .empty-rooms { text-align: center; padding: 2rem 1rem; color: #666; }
+        .empty-rooms-icon { font-size: 3rem; margin-bottom: 0.5rem; }
+        .hint-text { font-size: 0.8rem; color: #888; margin-top: 0.3rem; font-style: italic; }
         @media (min-width: 768px) {
             .cart-item { flex-direction: row; align-items: center; }
             .quantity-btn:hover { background: var(--secondary); transform: scale(1.1); }
             .remove-btn:hover { background: #c82333; }
             .btn:hover:not(:disabled) { background: #5989b3; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(103, 152, 192, 0.4); }
-            .btn:active:not(:disabled) { transform: translateY(0); box-shadow: inset 0 3px 8px rgba(0,0,0,0.2); }
+            .btn:active:not(:disabled) { transform: translateY(0); }
             .btn-secondary:hover { background: var(--bg-cream); border-color: var(--secondary); color: var(--secondary); transform: translateY(-2px); }
             .btn-secondary:active { transform: translateY(0); }
             .hamburger { display: none; }
@@ -163,7 +149,7 @@
             <div class="hamburger" onclick="APP.toggleMenu()">
                 <span></span><span></span><span></span>
             </div>
-            <div class="logo" onclick="window.location.href='home.html'">TIU The Biriyani Canteen</div>
+            <div class="logo" onclick="window.location.href='home.html'">🍛 TIU Biriyani</div>
         </div>
     </div>
 
@@ -186,17 +172,14 @@
         </div>
 
         <div class="cart-container">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
-                <h2 style="margin: 0;">Your Cart</h2>
-                <span class="sync-indicator" id="syncIndicator" title="Cart sync status"></span>
-            </div>
+            <h2>Your Cart</h2>
             <div id="cartContent"></div>
         </div>
 
         <div id="checkoutSections" style="display: none;">
             <div class="section-container">
-                <div class="section-title">📍 Delivery Address</div>
-                <div id="addressDisplayArea"></div>
+                <div class="section-title">🚪 Delivery Location</div>
+                <div id="roomDisplayArea"></div>
             </div>
 
             <div class="section-container">
@@ -224,26 +207,26 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="addressModal">
+    <div class="modal-overlay" id="roomModal">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title">📍 Delivery Address</div>
-                <button class="close-modal" onclick="APP.closeAddressModal()">&times;</button>
+                <div class="modal-title">🚪 Delivery Location</div>
+                <button class="close-modal" onclick="APP.closeRoomModal()">&times;</button>
             </div>
 
-            <div id="savedAddressesList" style="display: none;">
-                <div class="addresses-list-header">
-                    <div class="addresses-list-title">Saved Addresses</div>
+            <div id="savedRoomsList" style="display: none;">
+                <div class="rooms-list-header">
+                    <div class="rooms-list-title">Saved Locations</div>
                 </div>
-                <div id="addressCards"></div>
-                <button type="button" class="btn-secondary" onclick="APP.showAddressForm()" style="margin-top: 0.75rem;">+ Add Delivery Location</button>
+                <div id="roomCards"></div>
+                <button type="button" class="btn-secondary" onclick="APP.showRoomForm()" style="margin-top: 0.75rem;">+ Add New Location</button>
             </div>
 
-            <div id="addressFormContainer" style="display:none;">
-                <div class="map-instruction">
-                    <strong>🏢 Campus Delivery:</strong> Enter your room/hBuilding details for quick delivery within TIU campus.
+            <div id="roomFormContainer" style="display:none;">
+                <div class="info-instruction">
+                    🏢 <strong>Campus Delivery:</strong> Enter your room and building details for quick delivery within TIU campus.
                 </div>
-                <form id="addressForm" onsubmit="event.preventDefault();">
+                <form id="roomForm" onsubmit="event.preventDefault();">
                     <div class="form-group">
                         <label for="fullName">Full Name *</label>
                         <input type="text" id="fullName" required placeholder="Your full name">
@@ -254,36 +237,38 @@
                     </div>
                     <div class="form-group">
                         <label for="roomNumber">Room Number / Location *</label>
-                        <input type="text" id="roomNumber" required placeholder="e.g., Room 305, TIU MAINS BULDING" maxlength="50">
-                        <div class="location-status" style="margin-top: 0.3rem; font-size: 0.8rem; color: #666;">
-                            Enter your room number,Building name..
-                        </div>
+                        <input type="text" id="roomNumber" required placeholder="e.g., Room 305, Lab 2, Cafeteria" maxlength="50">
+                        <div class="hint-text">Enter your room number, lab, or specific location</div>
                     </div>
                     <div class="form-group">
-                        <label for="buildingBlock">Building/Block *</label>
-                        <select id="buildingBlock" required style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 0.95rem;">
+                        <label for="buildingBlock">Building / Block *</label>
+                        <select id="buildingBlock" required>
                             <option value="">Select Building/Block</option>
-                            <option value="UNIVERSITY BUILDING">TIU UNIVERSITY BUILDING</option>
-                            <option value="STUDIO BUILDING ">STUDIO BULDING </option>
-                            <option value="TIU MAINS BUILDING">TIU MAINS BUILDING</option>
+                            <option value="TIU University Building">TIU University Building</option>
+                            <option value="Studio Building">Studio Building</option>
+                            <option value="TIU Mains Building">TIU Mains Building</option>
+                            <option value="Hostel Block A">Hostel Block A</option>
+                            <option value="Hostel Block B">Hostel Block B</option>
+                            <option value="Hostel Block C">Hostel Block C</option>
+                            <option value="Academic Block">Academic Block</option>
                             <option value="Other">Other</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="landmark">Additional Instructions (Optional)</label>
-                        <textarea id="landmark" placeholder="e.g., Near staircase, Ground floor, etc." rows="2" style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 0.95rem; resize: vertical;"></textarea>
+                        <textarea id="landmark" placeholder="e.g., Near staircase, Ground floor, Call when you arrive" rows="2"></textarea>
                     </div>
                     <div class="form-group">
                         <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 500;">
-                            <input type="checkbox" id="saveAddress" checked style="width: auto;">
+                            <input type="checkbox" id="saveRoom" checked style="width: auto;">
                             <span>Save for future orders</span>
                         </label>
                     </div>
                     <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-                        <button type="button" class="btn" id="deliverHereBtn" onclick="APP.saveAndSelectAddress()" style="flex: 1; min-width: 150px;">
-                            <span id="deliverHereBtnText">Deliver Here</span>
+                        <button type="button" class="btn" onclick="APP.saveAndSelectRoom()" style="flex: 1; min-width: 150px;">
+                            Deliver Here
                         </button>
-                        <button type="button" class="btn-secondary" onclick="APP.showSavedAddresses()" id="backToSavedBtn" style="display: none; flex: 1; min-width: 150px;">Back</button>
+                        <button type="button" class="btn-secondary" onclick="APP.showSavedRooms()" id="backToSavedBtn" style="display: none; flex: 1; min-width: 150px;">Back</button>
                     </div>
                 </form>
             </div>
@@ -315,38 +300,27 @@
             cart: [],
             currentUser: null,
             selectedPayment: null,
-            deliveryAddress: null,
-            savedAddresses: [],
-            selectedAddressId: null,
-            map: null,
-            marker: null,
-            finalPinLocation: null,
-            googleMapsLoaded: false,
+            deliveryRoom: null,
+            savedRooms: [],
+            selectedRoomId: null,
             cartSyncListener: null,
             userTotalOrders: 0,
-            locationDetected: false,
-            validLocationSet: false,
             RAZORPAY_KEY: 'rzp_test_your_key_here',
             FREE_DELIVERY_THRESHOLD: 200,
             DELIVERY_FEE: 40,
             FIRST_TWO_ORDERS_FREE: 1,
-            SERVICEABLE_PINCODES: {
-                '742101': true, '742102': true, '742103': true, '742107': true,
-                '742149': true, '742187': true
-            },
 
             // Initialize app
             init() {
                 this.loadCart();
-                this.loadGoogleMaps();
                 this.setupAuthListener();
                 this.setupEventListeners();
             },
 
             // Setup event listeners
             setupEventListeners() {
-                document.getElementById('addressModal').addEventListener('click', (e) => {
-                    if (e.target.id === 'addressModal') this.closeAddressModal();
+                document.getElementById('roomModal').addEventListener('click', (e) => {
+                    if (e.target.id === 'roomModal') this.closeRoomModal();
                 });
             },
 
@@ -358,7 +332,7 @@
                         await this.initializeUserOrderStats();
                         this.userTotalOrders = await this.getUserTotalOrdersCount();
                         this.syncCartFromDB(user.uid);
-                        await this.loadSavedAddresses();
+                        await this.loadSavedRooms();
                         this.selectPayment('cod');
                         this.renderCart();
                     } else {
@@ -367,201 +341,10 @@
                 });
             },
 
-            // Load Google Maps
-            loadGoogleMaps() {
-                if (window.google?.maps) {
-                    this.initMap();
-                    return;
-                }
-                const script = document.createElement('script');
-                script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI&callback=APP.initMap';
-                script.async = true;
-                script.defer = true;
-                document.head.appendChild(script);
-            },
-
-            // Initialize map
-            initMap() {
-                const defaultLocation = { lat: 22.9734, lng: 78.6569 };
-                this.map = new google.maps.Map(document.getElementById('map'), {
-                    center: defaultLocation,
-                    zoom: 5,
-                    mapTypeControl: false,
-                    streetViewControl: false,
-                    fullscreenControl: false
-                });
-
-                this.marker = new google.maps.Marker({
-                    position: defaultLocation,
-                    map: this.map,
-                    draggable: true,
-                    animation: google.maps.Animation.DROP
-                });
-
-                this.finalPinLocation = null;
-                this.validLocationSet = false;
-                this.updateCoordinatesDisplay();
-                this.updateDeliverButton();
-
-                this.map.addListener('click', (e) => {
-                    this.setMarkerPosition(e.latLng, false);
-                });
-
-                this.marker.addListener('dragend', (e) => {
-                    this.setMarkerPosition(e.latLng, false);
-                    this.showSuccess('Pin location updated');
-                });
-
-                this.marker.addListener('drag', (e) => {
-                    this.finalPinLocation = { lat: e.latLng.lat(), lng: e.latLng.lng() };
-                    this.validLocationSet = true;
-                    this.updateCoordinatesDisplay();
-                    this.updateDeliverButton();
-                });
-
-                this.googleMapsLoaded = true;
-                console.log('Google Maps initialized');
-            },
-
-            // Set marker position and auto-fill form fields
-            setMarkerPosition(latLng, isInitialDetection = false) {
-                this.finalPinLocation = { lat: latLng.lat(), lng: latLng.lng() };
-                this.validLocationSet = true;
-                this.marker.setPosition(latLng);
-                this.map.panTo(latLng);
-                this.updateCoordinatesDisplay();
-                this.updateDeliverButton();
-
-                new google.maps.Geocoder().geocode({ location: latLng }, (results, status) => {
-                    if (status === 'OK' && results[0]) {
-                        this.populateAddressFields(results[0], isInitialDetection);
-                    }
-                });
-            },
-
-            // Auto-fill address fields from geocoding
-            populateAddressFields(result, isInitialDetection) {
-                const comps = result.address_components;
-                const addrFields = {};
-
-                comps.forEach(comp => {
-                    const types = comp.types;
-                    if (types.includes('locality')) addrFields.city = comp.long_name;
-                    if (types.includes('postal_code')) addrFields.pin = comp.long_name;
-                    if (types.includes('sublocality')) addrFields.area = comp.long_name;
-                    if (types.includes('sublocality_level_1')) addrFields.subArea = comp.long_name;
-                    if (types.includes('route')) addrFields.street = comp.long_name;
-                    if (types.includes('administrative_area_level_1')) addrFields.state = comp.long_name;
-                    if (types.includes('country')) addrFields.country = comp.long_name;
-                });
-
-                const updateField = (id, value, highlightIfNew = false) => {
-                    const el = document.getElementById(id);
-                    if (el && value) {
-                        const oldVal = el.value;
-                        el.value = value;
-                        if (highlightIfNew && !oldVal) {
-                            el.classList.add('auto-filled');
-                            setTimeout(() => el.classList.remove('auto-filled'), 3000);
-                        }
-                    }
-                };
-
-                // Build complete address
-                const addressParts = [addrFields.street, addrFields.area, addrFields.subArea].filter(Boolean);
-                const fullAddress = addressParts.join(', ');
-
-                updateField('address', fullAddress, !isInitialDetection);
-                updateField('city', addrFields.city, !isInitialDetection);
-                updateField('pincode', addrFields.pin, !isInitialDetection);
-
-                if (!isInitialDetection) {
-                    this.showSuccess('Address auto-filled from location');
-                }
-            },
-
-            updateCoordinatesDisplay() {
-                const coordDisplay = document.getElementById('coordDisplay');
-                const currentCoords = document.getElementById('currentCoords');
-                
-                if (this.finalPinLocation && this.validLocationSet) {
-                    coordDisplay.className = 'coord-display';
-                    coordDisplay.innerHTML = `✓ Location Set: <strong>${this.finalPinLocation.lat.toFixed(6)}, ${this.finalPinLocation.lng.toFixed(6)}</strong>`;
-                } else {
-                    coordDisplay.className = 'coord-display error';
-                    coordDisplay.innerHTML = '❌ Location not set - Click "Use My Location" or drag the marker';
-                }
-            },
-
-            updateDeliverButton() {
-                const btn = document.getElementById('deliverHereBtn');
-                const btnText = document.getElementById('deliverHereBtnText');
-                
-                if (this.validLocationSet && this.finalPinLocation) {
-                    btn.disabled = false;
-                    btnText.textContent = 'Deliver Here';
-                } else {
-                    btn.disabled = true;
-                    btnText.textContent = 'Set Location First';
-                }
-            },
-
-            // Get user location with enhanced feedback
-            getLocation() {
-                const btn = document.getElementById('locationBtn');
-                const status = document.getElementById('locationStatus');
-                btn.disabled = true;
-                btn.innerHTML = '<span>⏳ Detecting...</span>';
-                status.textContent = 'Getting your location...';
-                this.locationDetected = false;
-
-                const onSuccess = (lat, lng) => {
-                    if (this.locationDetected) return;
-                    this.locationDetected = true;
-                    this.validLocationSet = true;
-                    const latLng = new google.maps.LatLng(lat, lng);
-                    this.map.setCenter(latLng);
-                    this.map.setZoom(15);
-                    this.setMarkerPosition(latLng, true);
-                    btn.innerHTML = '<span>✓ Location Detected</span>';
-                    btn.disabled = false;
-                    status.textContent = '✓ Location detected successfully - You can now save address';
-                    status.style.color = '#60b246';
-                    this.updateDeliverButton();
-                };
-
-                const onError = (msg) => {
-                    if (this.locationDetected) return;
-                    btn.innerHTML = '<span>📍 Use My Location</span>';
-                    btn.disabled = false;
-                    status.textContent = msg + ' - You must drag the marker to your location';
-                    status.style.color = '#ff6b6b';
-                    this.validLocationSet = false;
-                    this.finalPinLocation = null;
-                    this.updateCoordinatesDisplay();
-                    this.updateDeliverButton();
-                };
-
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(
-                        (pos) => onSuccess(pos.coords.latitude, pos.coords.longitude),
-                        (err) => {
-                            let msg = 'Location permission denied';
-                            if (err.code === 1) msg = 'Location permission denied';
-                            if (err.code === 3) msg = 'Location request timed out';
-                            onError(msg);
-                        },
-                        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-                    );
-                } else {
-                    onError('Geolocation unavailable');
-                }
-            },
-
             // Cart operations
             loadCart() {
                 try {
-                    const saved = localStorage.getItem('midnightPlazaCart');
+                    const saved = localStorage.getItem('tiuBiriyaniCart');
                     this.cart = saved ? JSON.parse(saved) : [];
                 } catch (e) {
                     this.cart = [];
@@ -570,7 +353,7 @@
 
             saveCart() {
                 try {
-                    localStorage.setItem('midnightPlazaCart', JSON.stringify(this.cart));
+                    localStorage.setItem('tiuBiriyaniCart', JSON.stringify(this.cart));
                 } catch (e) {
                     console.error('Error saving cart:', e);
                 }
@@ -607,7 +390,7 @@
                         <div class="empty-cart">
                             <div class="empty-cart-icon">🛒</div>
                             <h3>Your cart is empty</h3>
-                            <p>Add delicious items to get started!</p>
+                            <p>Add delicious biriyani to get started!</p>
                             <a href="home.html" class="continue-shopping">Browse Menu</a>
                         </div>`;
                     sections.style.display = 'none';
@@ -692,72 +475,69 @@
                 set(userCartRef, cartData).catch(e => console.error('Cart sync error:', e));
             },
 
-            // Address operations
-            async loadSavedAddresses() {
+            // Room operations
+            async loadSavedRooms() {
                 if (!this.currentUser) return;
                 try {
-                    const snap = await get(ref(db, `tiutbc/users/${this.currentUser.uid}/addresses`));
-                    this.savedAddresses = [];
+                    const snap = await get(ref(db, `tiutbc/users/${this.currentUser.uid}/rooms`));
+                    this.savedRooms = [];
                     if (snap.exists()) {
                         snap.forEach(child => {
-                            this.savedAddresses.push({ id: child.key, ...child.val() });
+                            this.savedRooms.push({ id: child.key, ...child.val() });
                         });
-                        this.savedAddresses.sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
-                        if (this.savedAddresses.length > 0) {
-                            const defaultAddr = this.savedAddresses.find(a => a.isDefault) || this.savedAddresses[0];
-                            this.selectedAddressId = defaultAddr.id;
-                            this.deliveryAddress = defaultAddr;
+                        this.savedRooms.sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
+                        if (this.savedRooms.length > 0) {
+                            const defaultRoom = this.savedRooms.find(r => r.isDefault) || this.savedRooms[0];
+                            this.selectedRoomId = defaultRoom.id;
+                            this.deliveryRoom = defaultRoom;
                         }
                     }
-                    this.renderAddressDisplay();
+                    this.renderRoomDisplay();
                 } catch (e) {
-                    console.error('Load addresses error:', e);
+                    console.error('Load rooms error:', e);
                 }
             },
 
-            renderAddressDisplay() {
-                const area = document.getElementById('addressDisplayArea');
-                if (!this.deliveryAddress) {
+            renderRoomDisplay() {
+                const area = document.getElementById('roomDisplayArea');
+                if (!this.deliveryRoom) {
                     area.innerHTML = `
-                        <div style="background: #fff3cd; border: 2px solid #ffc107; border-radius: 10px; padding: 1rem; margin-bottom: 1rem; text-align: center; color: #856404;">
+                        <div style="background: #fff3cd; border: 2px solid #ffc107; border-radius: 10px; padding: 1rem; text-align: center; color: #856404;">
                             <div style="font-weight: 600; margin-bottom: 0.5rem;">⚠️ Delivery Location Required</div>
-                            <div style="font-size: 0.9rem; margin-bottom: 0.75rem;"></div>
-                            <button class="btn-secondary" onclick="APP.showAddressModal()" style="margin-top: 0.5rem;">+ Add Delivery Location</button>
+                            <div style="font-size: 0.9rem; margin-bottom: 0.75rem;">Please add your room/building details</div>
+                            <button class="btn-secondary" onclick="APP.showRoomModal()">+ Add Delivery Location</button>
                         </div>`;
                     this.updatePlaceOrderButtonState();
-                    if (this.savedAddresses.length === 0 && this.googleMapsLoaded) {
-                        setTimeout(() => this.showAddressModal(), 1500);
+                    if (this.savedRooms.length === 0) {
+                        setTimeout(() => this.showRoomModal(), 1500);
                     }
                     return;
                 }
 
-                const coords = this.deliveryAddress.coordinates ?
-                    `<div style="margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--secondary);font-size:0.8rem;color:#666;">📍 ${this.deliveryAddress.coordinates.lat.toFixed(6)}, ${this.deliveryAddress.coordinates.lng.toFixed(6)}</div>` : '';
-
                 area.innerHTML = `
-                    <div class="address-display-card">
-                        <div class="address-display-header">
+                    <div class="room-display-card">
+                        <div class="room-display-header">
                             <div>
-                                <div class="address-display-name">${this.deliveryAddress.fullName}</div>
-                                <div class="address-display-phone">📱 ${this.deliveryAddress.phone}</div>
+                                <div class="room-display-name">${this.deliveryRoom.fullName}</div>
+                                <div class="room-display-phone">📱 ${this.deliveryRoom.phone}</div>
                             </div>
-                            <button class="change-address-btn" onclick="APP.showAddressModal()">Change</button>
+                            <button class="change-room-btn" onclick="APP.showRoomModal()">Change</button>
                         </div>
-                        <div class="address-display-text">
-                            🏢 <strong>${this.deliveryAddress.buildingBlock || this.deliveryAddress.city || 'Building'}</strong><br>
-                            🚪 Room: ${this.deliveryAddress.roomNumber || this.deliveryAddress.streetAddress || this.deliveryAddress.address || 'Not specified'}
-                            ${this.deliveryAddress.landmark ? `<br>📌 ${this.deliveryAddress.landmark}` : ''}
-                        </div>${coords}
+                        <div class="room-display-text">
+                            🏢 <strong>${this.deliveryRoom.buildingBlock}</strong><br>
+                            🚪 Room: ${this.deliveryRoom.roomNumber}
+                            ${this.deliveryRoom.landmark ? `<br>📌 ${this.deliveryRoom.landmark}` : ''}
+                        </div>
                     </div>`;
                 this.updatePlaceOrderButtonState();
             },
 
-            renderSavedAddresses() {
-                const list = document.getElementById('savedAddressesList');
-                const form = document.getElementById('addressFormContainer');
-                const cards = document.getElementById('addressCards');
+            renderSavedRooms() {
+                const list = document.getElementById('savedRoomsList');
+                const form = document.getElementById('roomFormContainer');
+                const cards = document.getElementById('roomCards');
 
-                if (!this.savedAddresses.length) {
+                if (!this.savedRooms.length) {
                     list.style.display = 'none';
                     form.style.display = 'block';
                     document.getElementById('backToSavedBtn').style.display = 'none';
@@ -767,229 +547,149 @@
                 list.style.display = 'block';
                 form.style.display = 'none';
 
-                cards.innerHTML = this.savedAddresses.map((a) => {
-                    const selectedClass = this.selectedAddressId === a.id ? 'selected' : '';
+                cards.innerHTML = this.savedRooms.map((r) => {
+                    const selectedClass = this.selectedRoomId === r.id ? 'selected' : '';
                     return `
-                        <div class="address-card ${selectedClass}" onclick="APP.selectSavedAddress('${a.id}')">
-                            <div class="address-card-header">
+                        <div class="room-card ${selectedClass}" onclick="APP.selectSavedRoom('${r.id}')">
+                            <div class="room-card-header">
                                 <div>
-                                    <div class="address-name">${a.fullName}</div>
-                                    <div class="address-phone">📱 ${a.phone}</div>
+                                    <div class="room-name">${r.fullName}</div>
+                                    <div class="room-phone">📱 ${r.phone}</div>
                                 </div>
-                                ${a.isDefault ? '<span class="default-badge">Default</span>' : ''}
+                                ${r.isDefault ? '<span class="default-badge">Default</span>' : ''}
                             </div>
-                            <div class="address-details">
-                                🏢 <strong>${a.buildingBlock || a.city || 'Building'}</strong><br>
-                                🚪 Room: ${a.roomNumber || a.streetAddress || a.address || 'Not specified'}
-                                ${a.landmark ? `<br>📌 ${a.landmark}` : ''}
+                            <div class="room-details">
+                                🏢 <strong>${r.buildingBlock}</strong><br>
+                                🚪 Room: ${r.roomNumber}
+                                ${r.landmark ? `<br>📌 ${r.landmark}` : ''}
                             </div>
-                            <div class="address-actions">
-                                ${!a.isDefault ? `<button class="btn-small btn-set-default" onclick="event.stopPropagation(); APP.setDefaultAddress('${a.id}')">Set as Default</button>` : ''}
-                                <button class="btn-small btn-delete" onclick="event.stopPropagation(); APP.deleteAddress('${a.id}')">Delete</button>
+                            <div class="room-actions">
+                                ${!r.isDefault ? `<button class="btn-small btn-set-default" onclick="event.stopPropagation(); APP.setDefaultRoom('${r.id}')">Set as Default</button>` : ''}
+                                <button class="btn-small btn-delete" onclick="event.stopPropagation(); APP.deleteRoom('${r.id}')">Delete</button>
                             </div>
                         </div>`;
                 }).join('');
             },
 
-            selectSavedAddress(id) {
-                const found = this.savedAddresses.find(a => a.id === id);
+            selectSavedRoom(id) {
+                const found = this.savedRooms.find(r => r.id === id);
                 if (!found) return;
                 
-                // Check if address has valid coordinates
-                if (!found.coordinates || !found.coordinates.lat || !found.coordinates.lng) {
-                    this.showToast('error', 'Invalid Address', 'This address does not have location data. Please add a new address with valid location.');
-                    return;
-                }
-                
-                this.selectedAddressId = id;
-                this.deliveryAddress = found;
-                this.renderAddressDisplay();
-                setTimeout(() => this.closeAddressModal(), 300);
+                this.selectedRoomId = id;
+                this.deliveryRoom = found;
+                this.renderRoomDisplay();
+                setTimeout(() => this.closeRoomModal(), 300);
             },
 
-            async setDefaultAddress(id) {
+            async setDefaultRoom(id) {
                 if (!this.currentUser) return;
                 try {
                     const updates = {};
-                    this.savedAddresses.forEach(addr => {
-                        updates[`tiutbc/users/${this.currentUser.uid}/addresses/${addr.id}/isDefault`] = (addr.id === id);
+                    this.savedRooms.forEach(room => {
+                        updates[`tiutbc/users/${this.currentUser.uid}/rooms/${room.id}/isDefault`] = (room.id === id);
                     });
                     await update(ref(db), updates);
-                    this.savedAddresses.forEach(addr => {
-                        addr.isDefault = (addr.id === id);
+                    this.savedRooms.forEach(room => {
+                        room.isDefault = (room.id === id);
                     });
-                    this.savedAddresses.sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
-                    this.renderSavedAddresses();
-                    this.showSuccess('Default address updated');
+                    this.savedRooms.sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
+                    this.renderSavedRooms();
+                    this.showSuccess('Default location updated');
                 } catch (e) {
                     console.error('Set default error:', e);
                     this.showError('Failed to set default');
                 }
             },
 
-            async deleteAddress(id) {
-                if (!confirm('Delete this address?')) return;
+            async deleteRoom(id) {
+                if (!confirm('Delete this location?')) return;
                 try {
-                    await remove(ref(db, `tiutbc/users/${this.currentUser.uid}/addresses/${id}`));
-                    this.savedAddresses = this.savedAddresses.filter(a => a.id !== id);
-                    if (this.selectedAddressId === id) {
-                        this.selectedAddressId = null;
-                        this.deliveryAddress = null;
-                        if (this.savedAddresses.length) {
-                            const defaultAddr = this.savedAddresses.find(a => a.isDefault) || this.savedAddresses[0];
-                            this.selectedAddressId = defaultAddr.id;
-                            this.deliveryAddress = defaultAddr;
+                    await remove(ref(db, `tiutbc/users/${this.currentUser.uid}/rooms/${id}`));
+                    this.savedRooms = this.savedRooms.filter(r => r.id !== id);
+                    if (this.selectedRoomId === id) {
+                        this.selectedRoomId = null;
+                        this.deliveryRoom = null;
+                        if (this.savedRooms.length) {
+                            const defaultRoom = this.savedRooms.find(r => r.isDefault) || this.savedRooms[0];
+                            this.selectedRoomId = defaultRoom.id;
+                            this.deliveryRoom = defaultRoom;
                         }
                     }
-                    this.renderSavedAddresses();
-                    this.renderAddressDisplay();
-                    this.showSuccess('Address deleted');
+                    this.renderSavedRooms();
+                    this.renderRoomDisplay();
+                    this.showSuccess('Location deleted');
                 } catch (e) {
                     console.error('Delete error:', e);
                     this.showError('Failed to delete');
                 }
             },
 
-            showAddressModal() {
-                const modal = document.getElementById('addressModal');
+            showRoomModal() {
+                const modal = document.getElementById('roomModal');
                 modal.classList.add('active');
-                if (this.savedAddresses.length > 0) {
-                    this.showSavedAddresses();
+                if (this.savedRooms.length > 0) {
+                    this.showSavedRooms();
                 } else {
-                    this.showAddressForm();
+                    this.showRoomForm();
                 }
-                setTimeout(() => {
-                    if (this.map) {
-                        google.maps.event.trigger(this.map, 'resize');
-                        if (document.getElementById('addressFormContainer').style.display !== 'none') {
-                            const defaultLocation = { lat: 22.9734, lng: 78.6569 };
-                            this.finalPinLocation = null;
-                            this.validLocationSet = false;
-                            this.map.setCenter(defaultLocation);
-                            this.map.setZoom(5);
-                            this.marker.setPosition(defaultLocation);
-                            this.updateCoordinatesDisplay();
-                            this.updateDeliverButton();
-                            this.locationDetected = false;
-                            
-                            // Auto-trigger location detection
-                            setTimeout(() => this.getLocation(), 500);
-                        }
-                    }
-                }, 300);
             },
 
-            closeAddressModal() {
-                document.getElementById('addressModal').classList.remove('active');
+            closeRoomModal() {
+                document.getElementById('roomModal').classList.remove('active');
             },
 
-            showAddressForm() {
-                document.getElementById('savedAddressesList').style.display = 'none';
-                document.getElementById('addressFormContainer').style.display = 'block';
-                document.getElementById('backToSavedBtn').style.display = this.savedAddresses.length ? 'block' : 'none';
-                document.getElementById('addressForm').reset();
-                document.getElementById('saveAddress').checked = true;
-                
-                const defaultLocation = { lat: 22.9734, lng: 78.6569 };
-                this.finalPinLocation = null;
-                this.validLocationSet = false;
-                
-                setTimeout(() => {
-                    if (this.map) {
-                        google.maps.event.trigger(this.map, 'resize');
-                        this.map.setCenter(defaultLocation);
-                        this.map.setZoom(5);
-                        this.marker.setPosition(defaultLocation);
-                        this.updateCoordinatesDisplay();
-                        this.updateDeliverButton();
-                        this.locationDetected = false;
-                        
-                        // Auto-trigger location detection
-                        setTimeout(() => this.getLocation(), 500);
-                    }
-                }, 100);
+            showRoomForm() {
+                document.getElementById('savedRoomsList').style.display = 'none';
+                document.getElementById('roomFormContainer').style.display = 'block';
+                document.getElementById('backToSavedBtn').style.display = this.savedRooms.length ? 'block' : 'none';
+                document.getElementById('roomForm').reset();
+                document.getElementById('saveRoom').checked = true;
             },
 
-            showSavedAddresses() {
-                document.getElementById('savedAddressesList').style.display = 'block';
-                document.getElementById('addressFormContainer').style.display = 'none';
-                this.renderSavedAddresses();
+            showSavedRooms() {
+                document.getElementById('savedRoomsList').style.display = 'block';
+                document.getElementById('roomFormContainer').style.display = 'none';
+                this.renderSavedRooms();
             },
 
-            async saveAndSelectAddress() {
+            async saveAndSelectRoom() {
                 const name = document.getElementById('fullName').value.trim();
                 const phone = document.getElementById('phone').value.trim();
                 const roomNumber = document.getElementById('roomNumber').value.trim();
                 const buildingBlock = document.getElementById('buildingBlock').value.trim();
                 const landmark = document.getElementById('landmark').value.trim();
-                const save = document.getElementById('saveAddress').checked;
+                const save = document.getElementById('saveRoom').checked;
 
                 if (!name || !phone || !roomNumber || !buildingBlock) {
-                    return this.showError('Fill all required fields');
+                    return this.showError('Please fill all required fields');
                 }
                 if (!/^[0-9]{10}$/.test(phone)) {
-                    return this.showError('Enter valid 10-digit phone');
+                    return this.showError('Please enter valid 10-digit phone number');
                 }
 
-                const btn = document.getElementById('deliverHereBtn');
-                const btnText = document.getElementById('deliverHereBtnText');
-                btn.disabled = true;
-                btn.classList.add('processing');
-                btnText.textContent = 'Processing...';
-
                 try {
-                    this.deliveryAddress = {
+                    this.deliveryRoom = {
                         fullName: name,
                         phone,
                         roomNumber,
                         buildingBlock,
-                        landmark,
-                        coordinates: {
-                            lat: 23.9654, // TIU campus coordinates
-                            lng: 88.4245
-                        },
-                        city: 'Kolkata',
-                        pincode: '742101',
-                        serviceable: true
+                        landmark
                     };
 
                     if (save && this.currentUser) {
-                        btnText.textContent = 'Saving...';
-                        const newRef = push(ref(db, `tiutbc/users/${this.currentUser.uid}/addresses`));
-                        const isFirstAddress = this.savedAddresses.length === 0;
-                        await set(newRef, { ...this.deliveryAddress, createdAt: Date.now(), isDefault: isFirstAddress });
-                        this.savedAddresses.push({ id: newRef.key, ...this.deliveryAddress, isDefault: isFirstAddress });
-                        this.selectedAddressId = newRef.key;
-                        btnText.textContent = 'Saved!';
-                        btn.style.background = '#60b246';
-                        setTimeout(() => {
-                            this.showSuccess('Delivery location saved successfully');
-                            this.renderAddressDisplay();
-                            this.closeAddressModal();
-                            btn.disabled = false;
-                            btn.classList.remove('processing');
-                            btn.style.background = '';
-                            btnText.textContent = 'Deliver Here';
-                            this.renderSavedAddresses();
-                        }, 800);
-                    } else {
-                        btnText.textContent = 'Selected!';
-                        btn.style.background = '#60b246';
-                        setTimeout(() => {
-                            this.renderAddressDisplay();
-                            this.closeAddressModal();
-                            btn.disabled = false;
-                            btn.classList.remove('processing');
-                            btn.style.background = '';
-                            btnText.textContent = 'Deliver Here';
-                        }, 600);
+                        const newRef = push(ref(db, `tiutbc/users/${this.currentUser.uid}/rooms`));
+                        const isFirstRoom = this.savedRooms.length === 0;
+                        await set(newRef, { ...this.deliveryRoom, createdAt: Date.now(), isDefault: isFirstRoom });
+                        this.savedRooms.push({ id: newRef.key, ...this.deliveryRoom, isDefault: isFirstRoom });
+                        this.selectedRoomId = newRef.key;
                     }
+                    
+                    this.showSuccess('Delivery location set successfully');
+                    this.renderRoomDisplay();
+                    this.closeRoomModal();
                 } catch (e) {
-                    console.error('Error saving address:', e);
+                    console.error('Error saving room:', e);
                     this.showError('Failed to save location');
-                    btn.disabled = false;
-                    btn.classList.remove('processing');
-                    btnText.textContent = 'Deliver Here';
                 }
             },
 
@@ -1006,7 +706,7 @@
 
             updatePlaceOrderButtonState() {
                 const btn = document.getElementById('placeOrderBtn');
-                const enabled = !!this.deliveryAddress && !!this.selectedPayment;
+                const enabled = !!this.deliveryRoom && !!this.selectedPayment;
                 btn.disabled = !enabled;
                 if (this.selectedPayment === 'cod') btn.textContent = 'Place Order (COD)';
                 else if (this.selectedPayment === 'online') btn.textContent = 'Pay Now';
@@ -1014,23 +714,17 @@
             },
 
             async handlePlaceOrder() {
-                if (!this.deliveryAddress) {
-                    this.showError('Add delivery address');
-                    this.showAddressModal();
+                if (!this.deliveryRoom) {
+                    this.showError('Please add delivery location');
+                    this.showRoomModal();
                     return;
                 }
                 
-                // Validate that delivery address has coordinates
-                if (!this.deliveryAddress.coordinates || !this.deliveryAddress.coordinates.lat || !this.deliveryAddress.coordinates.lng) {
-                    this.showToast('error', 'Invalid Address', 'Your selected address does not have location data. Please select a different address or add a new one with valid location.');
-                    return;
-                }
-                
-                if (!this.selectedPayment) return this.showError('Select payment method');
+                if (!this.selectedPayment) return this.showError('Please select payment method');
 
-                const snap = await get(ref(db, 'tiutbc/storeStatus'));
-                if (!snap.exists() || !snap.val().isOpen) {
-                    return this.showToast('error', 'Store Closed', 'Not taking orders now. Try again later.');
+                const snap = await get(ref(db, 'tiutbc/settings/storeOpen'));
+                if (!snap.exists() || !snap.val()) {
+                    return this.showToast('error', 'Store Closed', 'We are not taking orders right now. Please try again later.');
                 }
 
                 this.selectedPayment === 'cod' ? this.placeOrder('cod', null) : this.initiateRazorpay();
@@ -1048,8 +742,8 @@
                     name: 'TIU The Biriyani Canteen',
                     description: 'Food Order',
                     handler: (res) => this.placeOrder('online', res.razorpay_payment_id),
-                    prefill: { name: this.deliveryAddress.fullName, email: this.currentUser.email, contact: this.deliveryAddress.phone },
-                    theme: { color: '#fdc921' },
+                    prefill: { name: this.deliveryRoom.fullName, email: this.currentUser.email, contact: this.deliveryRoom.phone },
+                    theme: { color: '#ff6b35' },
                     modal: { ondismiss: () => this.showError('Payment cancelled') }
                 }).open();
             },
@@ -1078,14 +772,12 @@
                         subtotal, deliveryFee, total,
                         freeDelivery: deliveryFee === 0,
                         freeDeliveryReason: isFirstOrder ? 'first_order' : (isFreeByThreshold ? 'threshold' : null),
-                        deliveryAddress: {
-                            address: this.deliveryAddress.streetAddress || this.deliveryAddress.address,
-                            fullName: this.deliveryAddress.fullName,
-                            phone: this.deliveryAddress.phone,
-                            city: this.deliveryAddress.city,
-                            pincode: this.deliveryAddress.pincode,
-                            landmark: this.deliveryAddress.landmark || '',
-                            coordinates: this.deliveryAddress.coordinates
+                        deliveryDetails: {
+                            fullName: this.deliveryRoom.fullName,
+                            phone: this.deliveryRoom.phone,
+                            roomNumber: this.deliveryRoom.roomNumber,
+                            buildingBlock: this.deliveryRoom.buildingBlock,
+                            landmark: this.deliveryRoom.landmark || ''
                         },
                         paymentMethod: method,
                         paymentStatus: method === 'online' ? 'paid' : 'pending',
@@ -1099,8 +791,8 @@
                     const currentTotal = totalOrdersSnap.exists() ? totalOrdersSnap.val() : 0;
                     await set(totalOrdersRef, currentTotal + 1);
 
-                    this.showToast('success', 'Order Successful!', 'Redirecting to My Orders...');
-                    localStorage.removeItem('midnightPlazaCart');
+                    this.showToast('success', 'Order Placed Successfully!', 'Redirecting to My Orders...');
+                    localStorage.removeItem('tiuBiriyaniCart');
                     this.cart = [];
                     if (this.currentUser) {
                         await remove(ref(db, `tiutbc/carts/${this.currentUser.uid}`)).catch(e => console.log('Cart cleanup:', e));
@@ -1177,11 +869,11 @@
             },
 
             async logout() {
-                if (confirm('Logout?')) {
+                if (confirm('Are you sure you want to logout?')) {
                     try {
                         if (this.cartSyncListener) this.cartSyncListener();
                         await signOut(auth);
-                        localStorage.removeItem('midnightPlazaCart');
+                        localStorage.removeItem('tiuBiriyaniCart');
                         window.location.href = 'index.html';
                     } catch (e) {
                         console.error('Logout error:', e);
@@ -1190,14 +882,13 @@
             }
         };
 
-        // Initialize app when document is ready
+        // Initialize app
         document.addEventListener('DOMContentLoaded', () => {
             APP.init();
         });
 
-        // Expose APP to global scope for inline onclick handlers
+        // Expose APP to global scope
         window.APP = APP;
     </script>
 </body>
 </html>
-
