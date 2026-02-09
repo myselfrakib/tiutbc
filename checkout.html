@@ -586,7 +586,7 @@
                 try {
                     const updates = {};
                     this.savedRooms.forEach(room => {
-                        updates[`tiutbc/users/${this.currentUser.uid}/rooms/${room.id}/isDefault`] = (room.id === id);
+                        updates[`tiutbc/users/${this.currentUser.uid}/addresses/${room.id}/isDefault`] = (room.id === id);
                     });
                     await update(ref(db), updates);
                     this.savedRooms.forEach(room => {
@@ -604,7 +604,7 @@
             async deleteRoom(id) {
                 if (!confirm('Delete this location?')) return;
                 try {
-                    await remove(ref(db, `tiutbc/users/${this.currentUser.uid}/rooms/${id}`));
+                    await remove(ref(db, `tiutbc/users/${this.currentUser.uid}/addresses/${id}`));
                     this.savedRooms = this.savedRooms.filter(r => r.id !== id);
                     if (this.selectedRoomId === id) {
                         this.selectedRoomId = null;
@@ -722,7 +722,7 @@
                 
                 if (!this.selectedPayment) return this.showError('Please select payment method');
 
-                const snap = await get(ref(db, 'tiutbc/settings/storeOpen'));
+                const snap = await get(ref(db, 'tiutbc/storeStatus/isOpen'));
                 if (!snap.exists() || !snap.val()) {
                     return this.showToast('error', 'Store Closed', 'We are not taking orders right now. Please try again later.');
                 }
