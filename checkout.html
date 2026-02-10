@@ -765,26 +765,36 @@
 
                 try {
                     const newOrderRef = push(ref(db, 'tiutbc/orders'));
-                    await set(newOrderRef, {
-                        userId: this.currentUser.uid,
-                        userEmail: this.currentUser.email,
-                        items: this.cart,
-                        subtotal, deliveryFee, total,
-                        freeDelivery: deliveryFee === 0,
-                        freeDeliveryReason: isFirstOrder ? 'first_order' : (isFreeByThreshold ? 'threshold' : null),
-                        deliveryDetails: {
+                    const orderId = newOrderRef.key;
+                    
+                    // Structure: /tiutbc/orders/{orderId}/userDetails and /tiutbc/orders/{orderId}/orderDetails
+                    const orderData = {
+                        userDetails: {
+                            userId: this.currentUser.uid,
+                            userEmail: this.currentUser.email,
                             fullName: this.deliveryRoom.fullName,
                             phone: this.deliveryRoom.phone,
                             roomNumber: this.deliveryRoom.roomNumber,
                             buildingBlock: this.deliveryRoom.buildingBlock,
                             landmark: this.deliveryRoom.landmark || ''
                         },
-                        paymentMethod: method,
-                        paymentStatus: method === 'online' ? 'paid' : 'pending',
-                        ...(paymentId && { paymentId }),
-                        status: 'pending',
-                        createdAt: Date.now()
-                    });
+                        orderDetails: {
+                            items: this.cart,
+                            subtotal,
+                            deliveryFee,
+                            total,
+                            freeDelivery: deliveryFee === 0,
+                            freeDeliveryReason: isFirstOrder ? 'first_order' : (isFreeByThreshold ? 'threshold' : null),
+                            paymentMethod: method,
+                            paymentStatus: method === 'online' ? 'paid' : 'pending',
+                            ...(paymentId && { paymentId }),
+                            status: 'pending',
+                            createdAt: Date.now(),
+                            orderNumber: orderId.slice(-6).toUpperCase()
+                        }
+                    };
+                    
+                    await set(newOrderRef, orderData);
 
                     const totalOrdersRef = ref(db, `tiutbc/users/${this.currentUser.uid}/orderStats/totalOrders`);
                     const totalOrdersSnap = await get(totalOrdersRef);
