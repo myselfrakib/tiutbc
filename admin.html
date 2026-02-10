@@ -2319,33 +2319,60 @@
                 return; 
             }
             
-            const filtered = keys.filter(id => currentFilter === 'all' || allOrders[id].status === currentFilter);
+            // Handle both old and new structure for filtering
+            const filtered = keys.filter(id => {
+                const order = allOrders[id];
+                const status = order.orderDetails?.status || order.status || 'pending';
+                return currentFilter === 'all' || status === currentFilter;
+            });
             
             if (!filtered.length) { 
                 container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-text">No ${currentFilter} orders</div></div>`; 
                 return; 
             }
             
-            filtered.sort((a, b) => (allOrders[b].createdAt || 0) - (allOrders[a].createdAt || 0));
+            // Sort by createdAt from orderDetails or old structure
+            filtered.sort((a, b) => {
+                const timeA = allOrders[a].orderDetails?.createdAt || allOrders[a].createdAt || 0;
+                const timeB = allOrders[b].orderDetails?.createdAt || allOrders[b].createdAt || 0;
+                return timeB - timeA;
+            });
+            
             container.innerHTML = '';
             filtered.forEach(id => container.appendChild(createOrderCard(allOrders[id], id)));
         }
 
         function createOrderCard(order, orderId) {
             const card = document.createElement('div');
-            card.className = `order-card ${order.status || 'pending'}`;
-            const date = order.createdAt ? new Date(order.createdAt).toLocaleString() : 'N/A';
-            const status = order.status || 'pending';
             
-            const fullAddress = order.deliveryAddress?.address || '';
-            const phone = order.deliveryAddress?.phone || '';
-            const customerName = order.deliveryAddress?.fullName || 'N/A';
+            // Handle both old and new structure for backward compatibility
+            const userDetails = order.userDetails || {};
+            const orderDetails = order.orderDetails || order; // Fallback to old structure
             
-            // Better approach using coordinates
-const coords = order.deliveryAddress?.coordinates;
-const mapUrl = coords ? 
-    `https://www.google.com/maps/search/?api=1&query=${coords.lat},${coords.lng}` : 
-    (fullAddress ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}` : '');
+            const status = orderDetails.status || 'pending';
+            card.className = `order-card ${status}`;
+            
+            const date = orderDetails.createdAt ? new Date(orderDetails.createdAt).toLocaleString() : 'N/A';
+            
+            // Extract user details from new structure
+            const customerName = userDetails.fullName || order.deliveryDetails?.fullName || order.deliveryAddress?.fullName || 'N/A';
+            const phone = userDetails.phone || order.deliveryDetails?.phone || order.deliveryAddress?.phone || '';
+            const roomNumber = userDetails.roomNumber || order.deliveryDetails?.roomNumber || '';
+            const buildingBlock = userDetails.buildingBlock || order.deliveryDetails?.buildingBlock || '';
+            const landmark = userDetails.landmark || order.deliveryDetails?.landmark || '';
+            
+            // Build full address
+            let fullAddress = '';
+            if (roomNumber) fullAddress += `Room ${roomNumber}`;
+            if (buildingBlock) fullAddress += fullAddress ? `, ${buildingBlock}` : buildingBlock;
+            if (landmark) fullAddress += fullAddress ? `, ${landmark}` : landmark;
+            if (!fullAddress) fullAddress = order.deliveryAddress?.address || 'N/A';
+            
+            // Better approach using coordinates (if available in old structure)
+            const coords = order.deliveryAddress?.coordinates;
+            const mapUrl = coords ? 
+                `https://www.google.com/maps/search/?api=1&query=${coords.lat},${coords.lng}` : 
+                (fullAddress && fullAddress !== 'N/A' ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}` : '');
             const callUrl = phone ? `tel:${phone}` : '';
             
             let ctaButtons = '';
@@ -2405,7 +2432,9 @@ const mapUrl = coords ?
                 actions = ctaButtons;
             }
             
-            const items = order.items ? order.items.map(item => `
+            // Handle items from both structures
+            const itemsList = orderDetails.items || order.items || [];
+            const items = itemsList.length ? itemsList.map(item => `
                 <div class="order-item">
                     <div class="item-details">
                         <span class="item-emoji">${item.emoji || '🍽️'}</span>
@@ -2416,17 +2445,21 @@ const mapUrl = coords ?
                 </div>
             `).join('') : '<div>No items</div>';
             
+            const orderNumber = orderDetails.orderNumber || orderId.slice(-6).toUpperCase();
+            
             card.innerHTML = `
                 <div class="order-header">
-                    <div class="order-id">Order #${orderId.slice(-6).toUpperCase()}</div>
+                    <div class="order-id">Order #${orderNumber}</div>
                     <div class="order-status ${status}">${status.replace('-', ' ').toUpperCase()}</div>
                 </div>
                 <div class="customer-info">
                     <div class="customer-name">👤 ${customerName}</div>
                     <div class="customer-details">
+                        <div>📧 ${userDetails.userEmail || order.userEmail || 'N/A'}</div>
                         <div>📞 ${phone || 'N/A'}</div>
-                        <div>📍 ${fullAddress || 'N/A'}</div>
+                        <div>📍 ${fullAddress}</div>
                         <div>🕐 ${date}</div>
+                        ${orderDetails.paymentMethod ? `<div>💳 ${orderDetails.paymentMethod.toUpperCase()} (${orderDetails.paymentStatus || 'N/A'})</div>` : ''}
                     </div>
                 </div>
                 <div class="order-items">
@@ -2436,15 +2469,15 @@ const mapUrl = coords ?
                 <div class="order-totals">
                     <div class="total-row">
                         <span>Subtotal</span>
-                        <span>₹${(order.subtotal || 0).toFixed(2)}</span>
+                        <span>₹${(orderDetails.subtotal || 0).toFixed(2)}</span>
                     </div>
                     <div class="total-row">
-                        <span>Delivery</span>
-                        <span>₹${(order.deliveryFee || 0).toFixed(2)}</span>
+                        <span>Delivery ${orderDetails.freeDelivery ? '(FREE' + (orderDetails.freeDeliveryReason === 'first_order' ? ' - First Order' : orderDetails.freeDeliveryReason === 'threshold' ? ' - Above ₹200' : '') + ')' : ''}</span>
+                        <span>₹${(orderDetails.deliveryFee || 0).toFixed(2)}</span>
                     </div>
                     <div class="total-row grand-total">
                         <span>Total</span>
-                        <span>₹${(order.total || 0).toFixed(2)}</span>
+                        <span>₹${(orderDetails.total || 0).toFixed(2)}</span>
                     </div>
                 </div>
                 ${actions}
@@ -2470,7 +2503,8 @@ const mapUrl = coords ?
                 if (newStatus === 'confirmed') updates.acceptedAt = new Date().toISOString();
                 if (newStatus === 'delivered') updates.deliveredAt = new Date().toISOString();
                 
-                await update(dbRef(db, `tiutbc/orders/${orderId}`), updates);
+                // Update in orderDetails path
+                await update(dbRef(db, `tiutbc/orders/${orderId}/orderDetails`), updates);
                 showNotification(`Order ${newStatus.replace('-', ' ')}`);
             } catch (error) { 
                 showNotification('Error: ' + error.message, true); 
