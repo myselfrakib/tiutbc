@@ -329,7 +329,7 @@
                         await this.loadUserDetails();
                         await this.loadSavedRooms();
                     } else {
-                        window.location.href = 'index.html';
+                        window.location.href = 'login.html';
                     }
                 });
             },
@@ -883,7 +883,7 @@
                     try {
                         await signOut(auth);
                         localStorage.removeItem('midnightPlazaCart');
-                        window.location.href = 'index.html';
+                        window.location.href = 'login.html';
                     } catch (error) {
                         console.error('Logout error:', error);
                         this.showToast('error', 'Failed to logout', '');
