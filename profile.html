@@ -119,14 +119,14 @@
             <div class="hamburger" onclick="APP.toggleMenu()">
                 <span></span><span></span><span></span>
             </div>
-            <div class="logo" onclick="window.location.href='tiutbc-home.html'">TIU The Biriyani Canteen</div>
+            <div class="logo" onclick="window.location.href='home.html'">TIU The Biriyani Canteen</div>
         </div>
     </div>
 
     <div class="nav-items" id="navMenu">
-        <a href="tiutbc-home.html" class="nav-item">Home</a>
-        <a href="tiutbc-orders.html" class="nav-item">Orders</a>
-        <a href="tiutbc-checkout.html" class="nav-item">Cart</a>
+        <a href="home.html" class="nav-item">Home</a>
+        <a href="orders.html" class="nav-item">Orders</a>
+        <a href="checkout.html" class="nav-item">Cart</a>
         <span class="nav-item" style="cursor: default; background: var(--bg-cream);">Profile</span>
         <span class="nav-item" onclick="APP.logout()">Logout</span>
     </div>
@@ -329,7 +329,7 @@
                         await this.loadUserDetails();
                         await this.loadSavedRooms();
                     } else {
-                        window.location.href = 'tiutbc-index.html';
+                        window.location.href = 'index.html';
                     }
                 });
             },
@@ -883,7 +883,7 @@
                     try {
                         await signOut(auth);
                         localStorage.removeItem('midnightPlazaCart');
-                        window.location.href = 'tiutbc-index.html';
+                        window.location.href = 'index.html';
                     } catch (error) {
                         console.error('Logout error:', error);
                         this.showToast('error', 'Failed to logout', '');
