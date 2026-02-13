@@ -1114,7 +1114,7 @@
                 
                 setupRealtimeOrders(user.uid);
             } else {
-                window.location.href = 'index.html';
+                window.location.href = 'login.html';
             }
         });
 
@@ -1693,7 +1693,7 @@
                     }
                     await signOut(auth);
                     localStorage.removeItem('tiuBiriyaniCart');
-                    window.location.href = 'index.html';
+                    window.location.href = 'login.html';
                 } catch (error) {
                     console.error('Error logging out:', error);
                     alert('Error logging out. Please try again.');
