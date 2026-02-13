@@ -120,6 +120,10 @@
             background: var(--bg-cream);
         }
 
+        .nav-item.hidden {
+            display: none;
+        }
+
         .cart-item {
             cursor: pointer;
             padding: 0.5rem 0.75rem;
@@ -166,10 +170,14 @@
             max-width: 400px;
             z-index: 2000;
             perspective: 1000px;
+            display: none; /* Hidden by default */
+        }
+
+        .sliding-toast-container.visible {
+            display: block;
         }
 
         .sliding-toast {
-            position: absolute;
             width: 100%;
             padding: 1rem 1.5rem;
             border-radius: 16px;
@@ -179,47 +187,22 @@
             justify-content: space-between;
             gap: 1rem;
             cursor: pointer;
-            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.6s;
+            transition: transform 0.3s ease, opacity 0.3s ease;
             touch-action: manipulation;
-        }
-
-        .toast-delivery {
             background: linear-gradient(135deg, var(--success-green) 0%, #4a9635 100%);
             color: white;
-            transform: translateX(0) rotateY(0deg);
-            opacity: 1;
-            z-index: 2;
+            animation: slideUp 0.5s ease;
         }
 
-        .toast-delivery.slide-out {
-            transform: translateX(-150%) rotateY(-90deg);
-            opacity: 0;
-        }
-
-        .toast-call {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
-            color: white;
-            transform: translateX(150%) rotateY(90deg);
-            opacity: 0;
-            z-index: 1;
-        }
-
-        .toast-call.slide-in {
-            transform: translateX(0) rotateY(0deg);
-            opacity: 1;
-            z-index: 2;
-        }
-
-        .toast-delivery.slide-back {
-            transform: translateX(0) rotateY(0deg);
-            opacity: 1;
-            z-index: 2;
-        }
-
-        .toast-call.slide-out-right {
-            transform: translateX(150%) rotateY(90deg);
-            opacity: 0;
-            z-index: 1;
+        @keyframes slideUp {
+            from {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
         .toast-content {
@@ -260,20 +243,13 @@
 
         .toast-action {
             background: white;
+            color: var(--success-green);
             padding: 0.6rem 1.2rem;
             border-radius: 10px;
             font-weight: 700;
             font-size: 0.9rem;
             white-space: nowrap;
             transition: transform 0.2s;
-        }
-
-        .toast-delivery .toast-action {
-            color: var(--success-green);
-        }
-
-        .toast-call .toast-action {
-            color: #ff6b6b;
         }
 
         .toast-action:active {
@@ -490,6 +466,113 @@
             margin-bottom: 1rem;
         }
 
+        .login-prompt {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin: 1rem 0;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .login-prompt h3 {
+            margin-bottom: 0.5rem;
+            font-size: clamp(1.1rem, 3vw, 1.3rem);
+        }
+
+        .login-prompt p {
+            margin-bottom: 1rem;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+            opacity: 0.95;
+        }
+
+        .login-btn {
+            background: white;
+            color: var(--primary);
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            min-height: 44px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Toast notification styles */
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 3000;
+            min-width: 280px;
+            animation: slideInRight 0.3s ease;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast-notification.show {
+            display: block;
+        }
+
+        .toast-notification.error {
+            border-left: 4px solid #e74c3c;
+        }
+
+        .toast-notification.success {
+            border-left: 4px solid #27ae60;
+        }
+
+        .toast-notification.info {
+            border-left: 4px solid var(--primary);
+        }
+
+        .toast-notification .toast-message {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #333;
+        }
+
+        .toast-notification .toast-icon {
+            font-size: 1.5rem;
+        }
+
+        .toast-notification .toast-text {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        @media (max-width: 480px) {
+            .toast-notification {
+                right: 10px;
+                left: 10px;
+                min-width: auto;
+            }
+        }
+
         @media (min-width: 768px) {
             .hamburger {
                 display: none;
@@ -547,9 +630,10 @@
 
     <div class="nav-items" id="navMenu">
         <span class="nav-item" style="cursor: default; background: var(--bg-cream);">🏠 Home</span>
-        <a href="orders.html" class="nav-item">📦 Orders</a>
-        <a href="profile.html" class="nav-item">👤 Profile</a>
-        <span class="nav-item" onclick="logout()">🚪 Logout</span>
+        <a href="orders.html" class="nav-item" id="ordersLink">📦 Orders</a>
+        <a href="profile.html" class="nav-item" id="profileLink">👤 Profile</a>
+        <span class="nav-item" id="logoutLink" onclick="logout()">🚪 Logout</span>
+        <a href="login.html" class="nav-item" id="loginLink">🔑 Login</a>
     </div>
 
     <div class="container" id="mainContainer">
@@ -559,34 +643,32 @@
         </div>
     </div>
 
+    <!-- Order Now Toast - Only shows when cart has items -->
     <div class="sliding-toast-container" id="slidingToastContainer">
-        <div class="sliding-toast toast-delivery" id="toastDelivery" onclick="goToCheckout()">
+        <div class="sliding-toast" id="orderToast" onclick="goToCheckout()">
             <div class="toast-content">
                 <div class="toast-icon">🚚</div>
                 <div class="toast-text">
-                    <div class="toast-title">FREE Delivery!</div>
-                    <div class="toast-subtitle">Orders above ₹200</div>
+                    <div class="toast-title">Ready to Order?</div>
+                    <div class="toast-subtitle">FREE Delivery on orders above ₹200</div>
                 </div>
             </div>
             <div class="toast-action">Order Now</div>
         </div>
-        
-        <div class="sliding-toast toast-call" id="toastCall" onclick="callToOrder()">
-            <div class="toast-content">
-                <div class="toast-icon">📞</div>
-                <div class="toast-text">
-                    <div class="toast-title">Call to Order</div>
-                    <div class="toast-subtitle">1234567890</div>
-                </div>
-            </div>
-            <div class="toast-action">Call Now</div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-notification" id="toastNotification">
+        <div class="toast-message">
+            <span class="toast-icon" id="toastIcon"></span>
+            <span class="toast-text" id="toastText"></span>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, onValue, set, remove, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI",
@@ -606,7 +688,8 @@
         let cart = [];
         let allFoodItems = {};
         let currentUser = null;
-        let toastInterval;
+        let isAuthenticated = false;
+        let guestId = null;
         
         const CATEGORY_ORDER = [
             { key: 'Maagie', display: 'Maggi' },
@@ -620,44 +703,186 @@
         
         loadCart();
         updateCartBadge();
-        startToastRotation();
+        updateToastVisibility();
+        initializeGuestId();
 
-        onAuthStateChanged(auth, (user) => {
+        // Generate or retrieve guest ID
+        function initializeGuestId() {
+            const storedGuestId = localStorage.getItem('guestId');
+            if (storedGuestId) {
+                guestId = storedGuestId;
+            } else {
+                // Generate unique guest ID: guest_timestamp_randomString
+                guestId = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                localStorage.setItem('guestId', guestId);
+            }
+            console.log('Guest ID:', guestId);
+        }
+
+        // Migrate guest cart to authenticated user
+        async function migrateGuestCart(userId) {
+            if (!guestId || guestId === userId) return;
+            
+            try {
+                // Read guest cart from Firebase
+                const guestCartRef = ref(db, `tiutbc/carts/${guestId}`);
+                const guestSnapshot = await get(guestCartRef);
+                
+                if (guestSnapshot.exists()) {
+                    const guestCartData = guestSnapshot.val();
+                    
+                    // Read user's existing cart (if any)
+                    const userCartRef = ref(db, `tiutbc/carts/${userId}`);
+                    const userSnapshot = await get(userCartRef);
+                    
+                    let mergedCart = {};
+                    
+                    // Start with user's existing cart
+                    if (userSnapshot.exists()) {
+                        mergedCart = userSnapshot.val();
+                    }
+                    
+                    // Merge guest cart items
+                    Object.keys(guestCartData).forEach(itemId => {
+                        if (mergedCart[itemId]) {
+                            // Item exists in both - add quantities
+                            mergedCart[itemId].quantity += guestCartData[itemId].quantity;
+                            mergedCart[itemId].lastUpdated = Date.now();
+                        } else {
+                            // New item from guest cart
+                            mergedCart[itemId] = guestCartData[itemId];
+                            mergedCart[itemId].lastUpdated = Date.now();
+                        }
+                    });
+                    
+                    // Write merged cart to user's account
+                    await set(userCartRef, mergedCart);
+                    
+                    // Delete guest cart from Firebase
+                    await remove(guestCartRef);
+                    
+                    console.log('Guest cart migrated successfully');
+                    showToast('Your cart has been restored!', 'success');
+                    
+                    // Update local cart from merged data
+                    cart = Object.keys(mergedCart).map(itemId => ({
+                        id: itemId,
+                        ...mergedCart[itemId]
+                    }));
+                    saveCart();
+                    updateCartBadge();
+                    updateToastVisibility();
+                    renderAllCategories();
+                }
+            } catch (error) {
+                console.error('Error migrating guest cart:', error);
+            }
+        }
+
+        // Toast notification function
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toastNotification');
+            const toastText = document.getElementById('toastText');
+            const toastIcon = document.getElementById('toastIcon');
+            
+            // Set icon based on type
+            const icons = {
+                'error': '❌',
+                'success': '✅',
+                'info': 'ℹ️'
+            };
+            
+            toastIcon.textContent = icons[type] || icons['info'];
+            toastText.textContent = message;
+            
+            // Remove previous type classes
+            toast.classList.remove('error', 'success', 'info');
+            toast.classList.add(type);
+            toast.classList.add('show');
+            
+            // Auto hide after 3 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Authentication state observer
+        onAuthStateChanged(auth, async (user) => {
+            const wasGuest = !isAuthenticated;
             currentUser = user;
+            isAuthenticated = !!user;
+            
+            // Update navigation based on auth state
+            updateNavigationUI();
+            
+            // Load food items
             loadFoodItems();
+            
+            // Handle cart syncing and migration
             if (user) {
+                // If user just logged in (was guest before)
+                if (wasGuest && guestId) {
+                    await migrateGuestCart(user.uid);
+                }
+                
+                // Sync cart from user's Firebase account
                 syncCartFromDB(user.uid);
+            } else {
+                // User is guest - sync to guest ID
+                if (cart.length > 0) {
+                    syncCartToDB();
+                }
             }
         });
 
-        function startToastRotation() {
-            const deliveryToast = document.getElementById('toastDelivery');
-            const callToast = document.getElementById('toastCall');
-            let showingDelivery = true;
+        function updateNavigationUI() {
+            const ordersLink = document.getElementById('ordersLink');
+            const profileLink = document.getElementById('profileLink');
+            const logoutLink = document.getElementById('logoutLink');
+            const loginLink = document.getElementById('loginLink');
 
-            toastInterval = setInterval(() => {
-                if (showingDelivery) {
-                    deliveryToast.classList.add('slide-out');
-                    deliveryToast.classList.remove('slide-back');
-                    callToast.classList.add('slide-in');
-                    callToast.classList.remove('slide-out-right');
-                } else {
-                    callToast.classList.add('slide-out-right');
-                    callToast.classList.remove('slide-in');
-                    deliveryToast.classList.add('slide-back');
-                    deliveryToast.classList.remove('slide-out');
-                }
-                showingDelivery = !showingDelivery;
-            }, 4000);
+            if (isAuthenticated) {
+                // Show authenticated user options
+                ordersLink.classList.remove('hidden');
+                profileLink.classList.remove('hidden');
+                logoutLink.classList.remove('hidden');
+                loginLink.classList.add('hidden');
+            } else {
+                // Show guest options
+                ordersLink.classList.add('hidden');
+                profileLink.classList.add('hidden');
+                logoutLink.classList.add('hidden');
+                loginLink.classList.remove('hidden');
+            }
         }
 
         window.goToCheckout = function() {
+            if (!isAuthenticated) {
+                showToast('Please login to place an order', 'error');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1500);
+                return;
+            }
+            
+            if (cart.length === 0) {
+                showToast('Your cart is empty. Add some items first!', 'info');
+                return;
+            }
+            
             window.location.href = 'checkout.html';
         };
 
-        window.callToOrder = function() {
-            window.location.href = 'tel:9883780399';
-        };
+        function updateToastVisibility() {
+            const toastContainer = document.getElementById('slidingToastContainer');
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            
+            if (totalItems > 0) {
+                toastContainer.classList.add('visible');
+            } else {
+                toastContainer.classList.remove('visible');
+            }
+        }
 
         function syncCartFromDB(userId) {
             const userCartRef = ref(db, `tiutbc/carts/${userId}`);
@@ -673,6 +898,7 @@
                         cart = newCart;
                         saveCart();
                         updateCartBadge();
+                        updateToastVisibility();
                         renderAllCategories();
                     }
                 } else {
@@ -746,6 +972,17 @@
             let html = '';
             let totalItems = 0;
 
+            // Show login prompt if not authenticated
+            if (!isAuthenticated) {
+                html += `
+                    <div class="login-prompt">
+                        <h3>👋 Welcome Guest!</h3>
+                        <p>Browse our menu and login to place your order</p>
+                        <a href="login.html" class="login-btn">Login / Sign Up</a>
+                    </div>
+                `;
+            }
+
             const categorizedItems = {};
             
             Object.keys(allFoodItems).forEach(categoryName => {
@@ -775,13 +1012,14 @@
             });
 
             if (totalItems === 0) {
-                container.innerHTML = `
+                html += `
                     <div class="empty-state">
                         <div class="empty-state-icon">📭</div>
                         <h3>No items available</h3>
                         <p>Check back soon!</p>
                     </div>
                 `;
+                container.innerHTML = html;
                 return;
             }
 
@@ -871,12 +1109,15 @@
         }
 
         function syncCartToDB() {
-            if (!currentUser) return;
+            // Use guest ID if not authenticated, otherwise use user ID
+            const userId = currentUser ? currentUser.uid : guestId;
             
-            const userCartRef = ref(db, `tiutbc/carts/${currentUser.uid}`);
+            if (!userId) return;
+            
+            const cartRef = ref(db, `tiutbc/carts/${userId}`);
             
             if (cart.length === 0) {
-                remove(userCartRef);
+                remove(cartRef);
                 return;
             }
             
@@ -895,7 +1136,7 @@
                 };
             });
             
-            set(userCartRef, cartData).catch(error => {
+            set(cartRef, cartData).catch(error => {
                 console.error('Error syncing cart to DB:', error);
             });
         }
@@ -921,8 +1162,9 @@
             }
 
             saveCart();
-            syncCartToDB();
+            syncCartToDB(); // Always sync - will use guest ID if not authenticated
             updateCartBadge();
+            updateToastVisibility();
             updateButtonUI(id, existingItem ? existingItem.quantity : 1);
         };
 
@@ -932,8 +1174,9 @@
                 item.quantity += 1;
                 item.lastUpdated = Date.now();
                 saveCart();
-                syncCartToDB();
+                syncCartToDB(); // Always sync
                 updateCartBadge();
+                updateToastVisibility();
                 updateButtonUI(id, item.quantity);
             }
         };
@@ -945,14 +1188,16 @@
                     item.quantity -= 1;
                     item.lastUpdated = Date.now();
                     saveCart();
-                    syncCartToDB();
+                    syncCartToDB(); // Always sync
                     updateCartBadge();
+                    updateToastVisibility();
                     updateButtonUI(id, item.quantity);
                 } else {
                     cart = cart.filter(item => item.id !== id);
                     saveCart();
-                    syncCartToDB();
+                    syncCartToDB(); // Always sync
                     updateCartBadge();
+                    updateToastVisibility();
                     updateButtonUI(id, 0);
                 }
             }
@@ -1025,15 +1270,18 @@
         };
 
         window.logout = function() {
+            // Show confirmation toast with buttons would be complex, so keeping confirm for logout
             if (confirm('Are you sure you want to logout?')) {
                 signOut(auth).then(() => {
                     localStorage.removeItem('midnightPlazaCart');
                     cart = [];
-                    clearInterval(toastInterval);
-                    window.location.href = 'index.html';
+                    showToast('Logged out successfully', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 1000);
                 }).catch((error) => {
                     console.error('Logout error:', error);
-                    alert('Error logging out. Please try again.');
+                    showToast('Error logging out. Please try again.', 'error');
                 });
             }
         };
