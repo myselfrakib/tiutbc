@@ -336,7 +336,7 @@
                         this.selectPayment('cod');
                         this.renderCart();
                     } else {
-                        window.location.href = 'index.html';
+                        window.location.href = 'login.html';
                     }
                 });
             },
@@ -884,7 +884,7 @@
                         if (this.cartSyncListener) this.cartSyncListener();
                         await signOut(auth);
                         localStorage.removeItem('tiuBiriyaniCart');
-                        window.location.href = 'index.html';
+                        window.location.href = 'login.html';
                     } catch (e) {
                         console.error('Logout error:', e);
                     }
