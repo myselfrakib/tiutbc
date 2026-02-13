@@ -30,21 +30,41 @@
         .nav-item:hover { background: var(--bg-cream); }
         .container { max-width: 900px; margin: 1rem auto; padding: 0 0.75rem; }
         .cart-container, .section-container { background: white; padding: 1rem; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); margin-bottom: 1rem; }
+        
+        /* Cart header with item count and continue shopping */
+        .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem; }
+        .cart-title-area { display: flex; align-items: center; gap: 0.75rem; }
+        .cart-title { color: var(--primary); font-size: clamp(1.3rem, 4vw, 1.6rem); margin: 0; }
+        .item-count-badge { background: var(--secondary); color: white; padding: 0.3rem 0.7rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
+        .continue-shopping-link { background: var(--primary); color: white; padding: 0.5rem 1rem; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: all 0.3s; white-space: nowrap; }
+        .continue-shopping-link:active { transform: scale(0.95); }
+        
         h2 { margin-bottom: 1rem; color: var(--primary); font-size: clamp(1.3rem, 4vw, 1.6rem); }
-        .cart-item { display: flex; flex-direction: column; gap: 0.75rem; padding: 0.9rem; border-bottom: 1px solid #eee; }
+        .cart-item { display: flex; flex-direction: column; gap: 0.75rem; padding: 0.9rem; border-bottom: 1px solid #eee; transition: background 0.2s; }
+        .cart-item:hover { background: #fafafa; }
         .cart-item:last-child { border-bottom: none; }
         .cart-item-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; }
         .cart-item-details { flex: 1; min-width: 0; }
         .cart-item-name { font-size: clamp(0.95rem, 3vw, 1.05rem); font-weight: 600; margin-bottom: 0.2rem; word-wrap: break-word; }
-        .cart-item-price { color: var(--brown); font-weight: 600; font-size: clamp(0.85rem, 2.5vw, 0.95rem); }
+        .cart-item-price { color: #666; font-weight: 500; font-size: clamp(0.85rem, 2.5vw, 0.9rem); }
         .cart-item-actions { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
-        .cart-item-quantity { display: flex; align-items: center; gap: 0.6rem; }
+        .cart-item-quantity { display: flex; align-items: center; gap: 0.6rem; background: #f8f8f8; padding: 0.3rem 0.6rem; border-radius: 8px; }
         .quantity-btn { background: var(--primary); color: white; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 1.1rem; font-weight: bold; transition: all 0.3s; display: flex; align-items: center; justify-content: center; }
         .quantity-btn:active { transform: scale(0.9); }
         .quantity-display { font-size: 1rem; font-weight: 600; min-width: 25px; text-align: center; }
         .cart-item-total { font-size: clamp(1rem, 3vw, 1.15rem); font-weight: bold; color: #333; }
         .remove-btn { background: #dc3545; color: white; border: none; padding: 0.5rem 0.85rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.3s; }
         .remove-btn:active { transform: scale(0.95); }
+        
+        /* Toast notification */
+        .toast-notification { position: fixed; top: 20px; right: 20px; background: white; padding: 1rem 1.5rem; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.2); display: none; z-index: 3000; min-width: 280px; animation: slideInRight 0.3s ease; border-left: 4px solid var(--success-green); }
+        .toast-notification.show { display: block; }
+        .toast-notification.error { border-left-color: #dc3545; }
+        .toast-notification .toast-msg { display: flex; align-items: center; gap: 0.75rem; }
+        .toast-notification .toast-icon { font-size: 1.5rem; }
+        .toast-notification .toast-text { flex: 1; font-weight: 500; color: #333; }
+        @keyframes slideInRight { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        
         .cart-summary { margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #eee; }
         .summary-row { display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-size: clamp(0.9rem, 2.5vw, 1rem); }
         .summary-row.subtotal { color: #666; }
@@ -129,10 +149,14 @@
         .empty-rooms { text-align: center; padding: 2rem 1rem; color: #666; }
         .empty-rooms-icon { font-size: 3rem; margin-bottom: 0.5rem; }
         .hint-text { font-size: 0.8rem; color: #888; margin-top: 0.3rem; font-style: italic; }
+        @media (max-width: 480px) {
+            .toast-notification { right: 10px; left: 10px; }
+        }
         @media (min-width: 768px) {
             .cart-item { flex-direction: row; align-items: center; }
             .quantity-btn:hover { background: var(--secondary); transform: scale(1.1); }
             .remove-btn:hover { background: #c82333; }
+            .continue-shopping-link:hover { background: var(--secondary); transform: translateY(-2px); }
             .btn:hover:not(:disabled) { background: #5989b3; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(103, 152, 192, 0.4); }
             .btn:active:not(:disabled) { transform: translateY(0); }
             .btn-secondary:hover { background: var(--bg-cream); border-color: var(--secondary); color: var(--secondary); transform: translateY(-2px); }
@@ -149,20 +173,28 @@
             <div class="hamburger" onclick="APP.toggleMenu()">
                 <span></span><span></span><span></span>
             </div>
-            <div class="logo" onclick="window.location.href='index.html'">🍛 TIU x The Biriyani Canteen</div>
+            <div class="logo" onclick="window.location.href='home.html'">🍛 TIU x The Biriyani Canteen</div>
         </div>
     </div>
 
     <div class="nav-items" id="navMenu">
-        <a href="index.html" class="nav-item">Home</a>
-        <a href="orders.html" class="nav-item">Orders</a>
-        <a href="checkout.html" class="nav-item">Cart</a>
-        <span class="nav-item" onclick="APP.logout()" style="cursor:pointer;">Logout</span>
+        <a href="home.html" class="nav-item">🏠 Home</a>
+        <a href="orders.html" class="nav-item">📦 Orders</a>
+        <a href="checkout.html" class="nav-item" style="background: var(--bg-cream);">🛒 Cart</a>
+        <span class="nav-item" onclick="APP.logout()" style="cursor:pointer;">🚪 Logout</span>
     </div>
 
     <div class="container">
         <div class="success-message" id="successMessage"></div>
         <div class="error-message" id="errorMessage"></div>
+
+        <!-- Toast notification for cart updates -->
+        <div class="toast-notification" id="toastNotification">
+            <div class="toast-msg">
+                <span class="toast-icon" id="toastNotifIcon"></span>
+                <span class="toast-text" id="toastNotifText"></span>
+            </div>
+        </div>
 
         <div class="toast-overlay" id="toastOverlay"></div>
         <div class="toast" id="toast">
@@ -172,7 +204,13 @@
         </div>
 
         <div class="cart-container">
-            <h2>Your Cart</h2>
+            <div class="cart-header">
+                <div class="cart-title-area">
+                    <h2 class="cart-title">Your Cart</h2>
+                    <span class="item-count-badge" id="itemCountBadge">0 items</span>
+                </div>
+                <a href="home.html" class="continue-shopping-link">+ Add More Items</a>
+            </div>
             <div id="cartContent"></div>
         </div>
 
@@ -344,7 +382,7 @@
             // Cart operations
             loadCart() {
                 try {
-                    const saved = localStorage.getItem('tiuBiriyaniCart');
+                    const saved = localStorage.getItem('midnightPlazaCart');
                     this.cart = saved ? JSON.parse(saved) : [];
                 } catch (e) {
                     this.cart = [];
@@ -353,27 +391,41 @@
 
             saveCart() {
                 try {
-                    localStorage.setItem('tiuBiriyaniCart', JSON.stringify(this.cart));
+                    localStorage.setItem('midnightPlazaCart', JSON.stringify(this.cart));
                 } catch (e) {
                     console.error('Error saving cart:', e);
                 }
             },
 
             updateQuantity(index, change) {
+                const oldQty = this.cart[index].quantity;
                 this.cart[index].quantity += change;
-                if (this.cart[index].quantity <= 0) this.cart.splice(index, 1);
+                
+                if (this.cart[index].quantity <= 0) {
+                    this.removeItem(index);
+                    return;
+                }
+                
                 this.saveCart();
                 if (this.currentUser) this.syncCartToDB(this.currentUser.uid);
                 this.renderCart();
+                
+                // Show toast notification
+                const itemName = this.cart[index].name;
+                if (change > 0) {
+                    this.showQuickToast(`Added 1 more ${itemName}`);
+                } else {
+                    this.showQuickToast(`Reduced quantity of ${itemName}`);
+                }
             },
 
             removeItem(index) {
-                if (confirm('Remove this item?')) {
-                    this.cart.splice(index, 1);
-                    this.saveCart();
-                    if (this.currentUser) this.syncCartToDB(this.currentUser.uid);
-                    this.renderCart();
-                }
+                const itemName = this.cart[index].name;
+                this.cart.splice(index, 1);
+                this.saveCart();
+                if (this.currentUser) this.syncCartToDB(this.currentUser.uid);
+                this.renderCart();
+                this.showQuickToast(`${itemName} removed from cart`, 'error');
             },
 
             calculateDeliveryFee(subtotal) {
@@ -381,9 +433,17 @@
                 return subtotal >= this.FREE_DELIVERY_THRESHOLD ? 0 : this.DELIVERY_FEE;
             },
 
+            updateItemCountBadge() {
+                const badge = document.getElementById('itemCountBadge');
+                const totalItems = this.cart.reduce((sum, item) => sum + item.quantity, 0);
+                badge.textContent = totalItems === 1 ? '1 item' : `${totalItems} items`;
+            },
+
             renderCart() {
                 const content = document.getElementById('cartContent');
                 const sections = document.getElementById('checkoutSections');
+                
+                this.updateItemCountBadge();
 
                 if (!this.cart.length) {
                     content.innerHTML = `
@@ -391,7 +451,7 @@
                             <div class="empty-cart-icon">🛒</div>
                             <h3>Your cart is empty</h3>
                             <p>Add delicious biriyani to get started!</p>
-                            <a href="index.html" class="continue-shopping">Browse Menu</a>
+                            <a href="home.html" class="continue-shopping">Browse Menu</a>
                         </div>`;
                     sections.style.display = 'none';
                     return;
@@ -410,17 +470,17 @@
                         <div class="cart-item-header">
                             <div class="cart-item-details">
                                 <div class="cart-item-name">${item.emoji || ''} ${item.name}</div>
-                                <div class="cart-item-price">₹${item.price}</div>
+                                <div class="cart-item-price">₹${item.price.toFixed(2)} each</div>
                             </div>
-                            <div class="cart-item-total">₹${item.price * item.quantity}</div>
+                            <div class="cart-item-total">₹${(item.price * item.quantity).toFixed(2)}</div>
                         </div>
                         <div class="cart-item-actions">
                             <div class="cart-item-quantity">
-                                <button class="quantity-btn" onclick="APP.updateQuantity(${i}, -1)">−</button>
+                                <button class="quantity-btn" onclick="APP.updateQuantity(${i}, -1)" title="Decrease quantity">−</button>
                                 <div class="quantity-display">${item.quantity}</div>
-                                <button class="quantity-btn" onclick="APP.updateQuantity(${i}, 1)">+</button>
+                                <button class="quantity-btn" onclick="APP.updateQuantity(${i}, 1)" title="Increase quantity">+</button>
                             </div>
-                            <button class="remove-btn" onclick="APP.removeItem(${i})">Remove</button>
+                            <button class="remove-btn" onclick="APP.removeItem(${i})" title="Remove from cart">Remove</button>
                         </div>
                     </div>
                 `).join('');
@@ -428,19 +488,36 @@
                 const deliveryFeeClass = deliveryFee === 0 ? 'summary-row delivery free' : 'summary-row delivery';
                 let deliveryText = '';
                 if (isFirstOrders) {
-                    deliveryText = `<span>Delivery Fee</span><span><span class="delivery-value">₹${this.DELIVERY_FEE}</span> <strong>FREE</strong></span>`;
+                    deliveryText = `<span>Delivery Fee</span><span><span class="delivery-value">₹${this.DELIVERY_FEE}</span> <strong>FREE (First Order!)</strong></span>`;
                 } else if (isFreeByThreshold) {
                     deliveryText = `<span>Delivery Fee</span><span><span class="delivery-value">₹${this.DELIVERY_FEE}</span> <strong>FREE</strong></span>`;
                 } else {
-                    deliveryText = `<span>Delivery Fee</span><span>₹${deliveryFee}</span>`;
+                    deliveryText = `<span>Delivery Fee</span><span>₹${deliveryFee.toFixed(2)}</span>`;
                 }
 
                 content.innerHTML = cartHTML + `
                     <div class="cart-summary">
-                        <div class="summary-row subtotal"><span>Subtotal</span><span>₹${subtotal}</span></div>
+                        <div class="summary-row subtotal"><span>Subtotal</span><span>₹${subtotal.toFixed(2)}</span></div>
                         <div class="${deliveryFeeClass}">${deliveryText}</div>
-                        <div class="cart-total"><span>Total</span><span>₹${total}</span></div>
+                        <div class="cart-total"><span>Total</span><span>₹${total.toFixed(2)}</span></div>
                     </div>`;
+            },
+
+            // Quick toast notification
+            showQuickToast(message, type = 'success') {
+                const toast = document.getElementById('toastNotification');
+                const icon = document.getElementById('toastNotifIcon');
+                const text = document.getElementById('toastNotifText');
+                
+                icon.textContent = type === 'success' ? '✓' : '✕';
+                text.textContent = message;
+                
+                toast.className = 'toast-notification show';
+                if (type === 'error') toast.classList.add('error');
+                
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
             },
 
             // Sync cart
@@ -767,7 +844,6 @@
                     const newOrderRef = push(ref(db, 'tiutbc/orders'));
                     const orderId = newOrderRef.key;
                     
-                    // Structure: /tiutbc/orders/{orderId}/userDetails and /tiutbc/orders/{orderId}/orderDetails
                     const orderData = {
                         userDetails: {
                             userId: this.currentUser.uid,
@@ -802,7 +878,7 @@
                     await set(totalOrdersRef, currentTotal + 1);
 
                     this.showToast('success', 'Order Placed Successfully!', 'Redirecting to My Orders...');
-                    localStorage.removeItem('tiuBiriyaniCart');
+                    localStorage.removeItem('midnightPlazaCart');
                     this.cart = [];
                     if (this.currentUser) {
                         await remove(ref(db, `tiutbc/carts/${this.currentUser.uid}`)).catch(e => console.log('Cart cleanup:', e));
@@ -883,7 +959,7 @@
                     try {
                         if (this.cartSyncListener) this.cartSyncListener();
                         await signOut(auth);
-                        localStorage.removeItem('tiuBiriyaniCart');
+                        localStorage.removeItem('midnightPlazaCart');
                         window.location.href = 'login.html';
                     } catch (e) {
                         console.error('Logout error:', e);
