@@ -11,6 +11,10 @@
             --bg-cream: #fff8f0;
             --secondary: #f7931e;
             --brown: #6b4423;
+            --success: #10b981;
+            --info: #3b82f6;
+            --warning: #f59e0b;
+            --danger: #ef4444;
         }
 
         * {
@@ -24,18 +28,20 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: var(--bg-cream);
             color: #333;
+            min-height: 100vh;
         }
 
         .navbar {
-            background: white;
+            background: linear-gradient(135deg, white 0%, #fafafa 100%);
             padding: 0.75rem 1rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
             position: sticky;
             top: 0;
             z-index: 1000;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            backdrop-filter: blur(10px);
         }
 
         .nav-left {
@@ -47,8 +53,16 @@
         .logo {
             font-size: clamp(1.2rem, 4vw, 1.5rem);
             font-weight: bold;
-            color: var(--primary);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
         }
 
         .hamburger {
@@ -108,7 +122,7 @@
             cursor: pointer;
             padding: 0.9rem;
             border-radius: 8px;
-            transition: background 0.3s;
+            transition: all 0.3s;
             text-decoration: none;
             color: #333;
             font-weight: 500;
@@ -123,13 +137,14 @@
 
         .nav-item:hover {
             background: var(--bg-cream);
+            transform: translateX(5px);
         }
 
         .cart-item {
             cursor: pointer;
             padding: 0.5rem 0.75rem;
             border-radius: 8px;
-            transition: background 0.3s;
+            transition: all 0.3s;
             text-decoration: none;
             color: #333;
             font-weight: 500;
@@ -143,6 +158,7 @@
 
         .cart-item:hover {
             background: var(--bg-cream);
+            transform: translateY(-2px);
         }
 
         .cart-badge {
@@ -160,6 +176,12 @@
             font-size: 0.7rem;
             font-weight: bold;
             padding: 0 4px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
 
         .container {
@@ -172,28 +194,37 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
             flex-wrap: wrap;
             gap: 1rem;
         }
 
         h2 {
-            font-size: clamp(1.5rem, 4vw, 1.8rem);
-            color: var(--primary);
-            font-weight: 600;
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
         }
 
         .live-indicator {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            background: linear-gradient(135deg, var(--secondary) 0%, var(--brown) 100%);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+            padding: 0.6rem 1.2rem;
+            border-radius: 25px;
             font-size: clamp(0.8rem, 2vw, 0.9rem);
             font-weight: 600;
             color: white;
-            box-shadow: 0 2px 10px rgba(103, 152, 192, 0.3);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
         }
 
         .live-dot {
@@ -201,126 +232,174 @@
             height: 8px;
             background: white;
             border-radius: 50%;
-            animation: pulse 2s infinite;
+            animation: blink 1.5s infinite;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
         }
 
-        @keyframes pulse {
+        @keyframes blink {
             0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            50% { opacity: 0.3; }
         }
 
         .orders-list {
             display: flex;
             flex-direction: column;
-            gap: 1.25rem;
+            gap: 1.5rem;
         }
 
         .order-card {
             background: white;
-            border-radius: 12px;
-            padding: 1.2rem;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-            transition: all 0.3s;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
+            border: 2px solid transparent;
+        }
+
+        .order-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+
+        .order-card:hover::before {
+            transform: scaleX(1);
         }
 
         .order-card.updated {
-            animation: highlight 1s ease-in-out;
+            animation: highlight 1.2s ease-in-out;
+            border-color: var(--primary);
         }
 
         @keyframes highlight {
-            0%, 100% { background: white; }
-            50% { background: #fff3cd; }
+            0%, 100% { 
+                background: white; 
+                transform: scale(1);
+            }
+            25% { 
+                background: #fff9e6; 
+                transform: scale(1.02);
+            }
+            75% { 
+                background: #fff9e6;
+            }
         }
 
         .order-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
         }
 
         .order-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid #f0f0f0;
+            margin-bottom: 1.2rem;
+            padding-bottom: 1.2rem;
+            border-bottom: 2px solid #f5f5f5;
             gap: 1rem;
         }
 
         .order-number {
-            font-size: clamp(1.1rem, 3vw, 1.3rem);
-            font-weight: bold;
-            color: var(--primary);
-            margin-bottom: 0.3rem;
+            font-size: clamp(1.2rem, 3vw, 1.4rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.4rem;
         }
 
         .order-id {
-            font-size: clamp(0.75rem, 2vw, 0.8rem);
-            color: #666;
+            font-size: clamp(0.75rem, 2vw, 0.85rem);
+            color: #999;
+            font-weight: 500;
         }
 
         .order-date {
-            color: #888;
-            font-size: clamp(0.75rem, 2vw, 0.8rem);
-            margin-top: 0.2rem;
+            color: #666;
+            font-size: clamp(0.75rem, 2vw, 0.85rem);
+            margin-top: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .order-date::before {
+            content: '🕒';
         }
 
         .order-status {
-            padding: 0.4rem 0.8rem;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: clamp(0.75rem, 2vw, 0.8rem);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: clamp(0.75rem, 2vw, 0.85rem);
             white-space: nowrap;
             transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
         .status-pending {
-            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
-            color: #856404;
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: white;
         }
 
         .status-confirmed {
-            background: linear-gradient(135deg, var(--secondary) 0%, #b3e5fc 100%);
-            color: #0c5460;
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+            color: white;
         }
 
         .status-preparing, .status-cooking {
             background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
-            color: #333;
+            color: white;
         }
 
         .status-packing {
-            background: linear-gradient(135deg, #e8daef 0%, #d7bde2 100%);
-            color: #5b2c6f;
+            background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+            color: white;
         }
 
         .status-out-for-delivery, .status-outfordelivery {
-            background: linear-gradient(135deg, var(--brown) 0%, #5a8db3 100%);
+            background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
             color: white;
         }
 
         .status-delivered {
-            background: linear-gradient(135deg, #d4edda 0%, #a8d9b5 100%);
-            color: #155724;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
         }
 
         .status-cancelled, .status-rejected {
-            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
-            color: #721c24;
+            background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+            color: white;
         }
 
         .order-items {
-            margin-bottom: 1rem;
+            margin-bottom: 1.2rem;
         }
 
         .order-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.6rem 0;
-            border-bottom: 1px solid #f0f0f0;
+            padding: 0.8rem;
+            border-bottom: 1px solid #f5f5f5;
+            transition: background 0.3s;
+            border-radius: 8px;
+        }
+
+        .order-item:hover {
+            background: #fafafa;
         }
 
         .order-item:last-child {
@@ -330,12 +409,13 @@
         .item-details {
             display: flex;
             align-items: center;
-            gap: 0.8rem;
+            gap: 1rem;
             flex: 1;
         }
 
         .item-emoji {
-            font-size: clamp(1.5rem, 4vw, 1.8rem);
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
         }
 
         .item-info {
@@ -346,17 +426,19 @@
 
         .item-name {
             font-weight: 600;
-            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            font-size: clamp(0.95rem, 2.5vw, 1.05rem);
+            color: #333;
         }
 
         .item-quantity {
             color: #666;
-            font-size: clamp(0.8rem, 2vw, 0.85rem);
+            font-size: clamp(0.8rem, 2vw, 0.9rem);
+            margin-top: 0.2rem;
         }
 
         .item-price {
-            font-weight: 600;
-            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            font-weight: 700;
+            font-size: clamp(0.95rem, 2.5vw, 1.05rem);
             color: var(--brown);
             white-space: nowrap;
             margin-left: 0.5rem;
@@ -366,10 +448,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-top: 1rem;
-            border-top: 2px solid #f0f0f0;
-            font-size: clamp(1.1rem, 3vw, 1.2rem);
-            font-weight: bold;
+            padding-top: 1.2rem;
+            border-top: 2px dashed #e5e5e5;
+            font-size: clamp(1.2rem, 3vw, 1.3rem);
+            font-weight: 800;
+            margin-top: 0.5rem;
         }
 
         .total-label {
@@ -378,98 +461,198 @@
 
         .total-amount {
             color: var(--brown);
+            background: linear-gradient(135deg, var(--brown) 0%, #8b5a3c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .loading {
-            text-align: center;
-            padding: 3rem 1rem;
-            font-size: clamp(1rem, 3vw, 1rem);
+        /* Progress Timeline */
+        .status-timeline {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid #f5f5f5;
+        }
+
+        .timeline-header {
+            font-weight: 600;
+            font-size: 0.95rem;
             color: #666;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--primary);
-            border-radius: 50%;
+        .timeline-steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            padding: 1rem 0;
+        }
+
+        .timeline-step {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .timeline-step::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            right: -50%;
+            height: 3px;
+            background: #e5e5e5;
+            z-index: -1;
+        }
+
+        .timeline-step:last-child::before {
+            display: none;
+        }
+
+        .timeline-step.active::before {
+            background: var(--primary);
+        }
+
+        .timeline-icon {
             width: 40px;
             height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
+            border-radius: 50%;
+            background: #e5e5e5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .timeline-step.active .timeline-icon {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+        }
+
+        .timeline-step.completed .timeline-icon {
+            background: var(--success);
+        }
+
+        .timeline-label {
+            font-size: 0.7rem;
+            text-align: center;
+            color: #999;
+            font-weight: 500;
+        }
+
+        .timeline-step.active .timeline-label,
+        .timeline-step.completed .timeline-label {
+            color: #333;
+            font-weight: 600;
+        }
+
+        /* Loading Skeleton */
+        .loading-skeleton {
+            padding: 2rem 0;
+        }
+
+        .skeleton-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .skeleton-line {
+            height: 20px;
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+
+        .skeleton-line.short {
+            width: 60%;
+        }
+
+        .skeleton-line.medium {
+            width: 80%;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
         }
 
         .empty-orders {
             text-align: center;
-            padding: 3rem 1rem;
+            padding: 4rem 1rem;
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
 
         .empty-orders-icon {
-            font-size: clamp(3rem, 10vw, 4rem);
-            margin-bottom: 1rem;
+            font-size: clamp(4rem, 12vw, 5rem);
+            margin-bottom: 1.5rem;
+            animation: float 3s ease-in-out infinite;
         }
 
         .empty-orders h3 {
             color: #666;
             margin-bottom: 1rem;
-            font-size: clamp(1.2rem, 4vw, 1.3rem);
+            font-size: clamp(1.3rem, 4vw, 1.5rem);
+            font-weight: 600;
+        }
+
+        .empty-orders p {
+            color: #999;
+            margin-bottom: 2rem;
         }
 
         .order-now-btn {
             display: inline-block;
-            margin-top: 1rem;
-            padding: 0.8rem 2rem;
-            background: var(--primary);
+            padding: 1rem 2.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
             text-decoration: none;
-            border-radius: 10px;
+            border-radius: 12px;
             font-weight: 600;
             transition: all 0.3s;
-            min-height: 44px;
+            min-height: 50px;
             touch-action: manipulation;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+        }
+
+        .order-now-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4);
         }
 
         .order-now-btn:active {
-            transform: scale(0.95);
+            transform: translateY(-1px);
         }
 
-        .status-timeline {
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid #f0f0f0;
-        }
-
-        .timeline-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 0.5rem;
-            font-size: clamp(0.8rem, 2vw, 0.85rem);
-            color: #666;
-        }
-
-        .timeline-icon {
-            font-size: 1rem;
-        }
-
+        /* Review Section */
         .review-section {
-            margin-top: 1rem;
-            padding: 1rem;
-            background: linear-gradient(135deg, #fff9e6 0%, #fff3cd 100%);
-            border-radius: 10px;
-            border: 2px solid var(--primary);
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-radius: 12px;
+            border: 2px solid var(--secondary);
+            box-shadow: 0 4px 15px rgba(247, 147, 30, 0.2);
         }
 
         .review-header {
             font-weight: 700;
-            font-size: 1rem;
-            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
             color: #333;
             display: flex;
             align-items: center;
@@ -477,70 +660,76 @@
         }
 
         .review-prompt {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: #666;
-            margin-bottom: 0.8rem;
+            margin-bottom: 1rem;
         }
 
         .items-to-review {
             display: flex;
             flex-direction: column;
-            gap: 0.8rem;
-            margin-bottom: 1rem;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         .review-item-card {
             background: white;
-            padding: 0.8rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+        }
+
+        .review-item-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.12);
         }
 
         .review-item-header {
             display: flex;
             align-items: center;
-            gap: 0.6rem;
-            margin-bottom: 0.6rem;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
         }
 
         .review-item-emoji {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
         }
 
         .review-item-name {
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 1rem;
             color: #333;
         }
 
         .star-rating {
             display: flex;
-            gap: 0.4rem;
-            margin-bottom: 0.8rem;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
             align-items: center;
         }
 
         .star {
-            font-size: 2rem;
+            font-size: 2.2rem;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             user-select: none;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+            filter: drop-shadow(0 3px 6px rgba(0,0,0,0.15));
             position: relative;
         }
 
         .star:hover {
-            transform: scale(1.3);
+            transform: scale(1.4) rotate(-10deg);
         }
 
         .star:active {
-            transform: scale(1.1);
+            transform: scale(1.2);
         }
 
         .star.filled {
             color: #ffd700;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-            animation: starFill 0.3s ease-out;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+            animation: starFill 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
         .star.filled::before {
@@ -548,7 +737,7 @@
         }
 
         .star.empty {
-            color: #e0e0e0;
+            color: #d1d5db;
         }
 
         .star.empty::before {
@@ -556,8 +745,8 @@
         }
 
         .star.hover-preview {
-            color: #ffed4e;
-            transform: scale(1.15);
+            color: #fbbf24;
+            transform: scale(1.2) rotate(-5deg);
         }
 
         .star.hover-preview::before {
@@ -566,11 +755,11 @@
 
         @keyframes starFill {
             0% { 
-                transform: scale(0.5) rotate(-15deg); 
-                opacity: 0.5;
+                transform: scale(0.3) rotate(-30deg); 
+                opacity: 0;
             }
             50% { 
-                transform: scale(1.3) rotate(5deg); 
+                transform: scale(1.5) rotate(10deg); 
             }
             100% { 
                 transform: scale(1) rotate(0deg); 
@@ -579,53 +768,57 @@
         }
 
         .rating-label {
-            margin-left: 0.8rem;
-            font-size: 0.9rem;
-            font-weight: 600;
+            margin-left: 1rem;
+            font-size: 1rem;
+            font-weight: 700;
             color: #666;
-            min-width: 80px;
+            min-width: 90px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .rating-label.excellent { color: #27ae60; }
-        .rating-label.good { color: #60b246; }
-        .rating-label.average { color: #f39c12; }
-        .rating-label.poor { color: #e67e22; }
-        .rating-label.bad { color: #e74c3c; }
+        .rating-label.excellent { color: #10b981; }
+        .rating-label.good { color: #60a5fa; }
+        .rating-label.average { color: #fbbf24; }
+        .rating-label.poor { color: #f97316; }
+        .rating-label.bad { color: #ef4444; }
 
         .review-textarea {
             width: 100%;
-            padding: 0.8rem;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
             font-family: inherit;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             resize: vertical;
-            min-height: 80px;
-            transition: border-color 0.3s;
+            min-height: 90px;
+            transition: all 0.3s;
         }
 
         .review-textarea:focus {
             outline: none;
             border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
         }
 
         .submit-review-btn {
             width: 100%;
-            padding: 0.9rem;
+            padding: 1rem;
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             font-weight: 700;
-            font-size: 1rem;
+            font-size: 1.05rem;
             cursor: pointer;
             transition: all 0.3s;
             margin-top: 1rem;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
         }
 
         .submit-review-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(253, 201, 33, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4);
         }
 
         .submit-review-btn:disabled {
@@ -635,40 +828,48 @@
         }
 
         .review-submitted {
-            padding: 1rem;
-            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-            border-radius: 10px;
-            border: 2px solid #28a745;
-            margin-top: 1rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border-radius: 12px;
+            border: 2px solid var(--success);
+            margin-top: 1.5rem;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
         }
 
         .review-submitted-header {
             font-weight: 700;
-            color: #155724;
-            margin-bottom: 0.5rem;
+            color: #065f46;
+            margin-bottom: 0.75rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            font-size: 1.05rem;
         }
 
         .review-submitted-text {
-            color: #155724;
-            font-size: 0.9rem;
+            color: #047857;
+            font-size: 0.95rem;
         }
 
         .existing-reviews {
-            margin-top: 1rem;
-            padding: 1rem;
-            background: #f8f9fa;
-            border-radius: 10px;
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: #f9fafb;
+            border-radius: 12px;
         }
 
         .existing-review-item {
-            padding: 0.8rem;
+            padding: 1rem;
             background: white;
-            border-radius: 8px;
-            margin-bottom: 0.8rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+
+        .existing-review-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
         }
 
         .existing-review-item:last-child {
@@ -677,20 +878,73 @@
 
         .review-stars-display {
             color: #ffd700;
-            font-size: 0.9rem;
-            margin-bottom: 0.3rem;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
         }
 
         .review-comment {
             color: #555;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             font-style: italic;
-            margin-bottom: 0.3rem;
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
         }
 
         .review-date {
-            color: #888;
-            font-size: 0.75rem;
+            color: #999;
+            font-size: 0.8rem;
+        }
+
+        /* Toast Notification */
+        .toast-notification {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            display: none;
+            align-items: center;
+            gap: 1rem;
+            z-index: 10000;
+            max-width: 400px;
+            animation: slideInRight 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .toast-notification.show {
+            display: flex;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast-icon {
+            font-size: 2rem;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: #333;
+        }
+
+        .toast-message {
+            font-size: 0.85rem;
+            color: #666;
         }
 
         @media (min-width: 480px) {
@@ -713,15 +967,6 @@
                 padding: 2.5rem 1.5rem;
             }
 
-            .order-card:hover {
-                transform: translateY(-4px);
-            }
-
-            .order-now-btn:hover {
-                background: var(--secondary);
-                transform: translateY(-2px);
-            }
-
             .hamburger {
                 display: none;
             }
@@ -737,18 +982,35 @@
 
             .nav-item {
                 border-bottom: none;
-                padding: 0.4rem 0.6rem;
+                padding: 0.5rem 0.75rem;
                 min-height: 40px;
             }
 
             .nav-right {
                 gap: 1rem;
             }
+
+            .timeline-steps {
+                padding: 1.5rem 0;
+            }
+
+            .timeline-label {
+                font-size: 0.75rem;
+            }
         }
 
         @media (min-width: 1024px) {
             .nav-items {
                 gap: 1.5rem;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .toast-notification {
+                bottom: 1rem;
+                right: 1rem;
+                left: 1rem;
+                max-width: none;
             }
         }
     </style>
@@ -764,16 +1026,16 @@
             <div class="logo" onclick="window.location.href='home.html'">TIU The Biriyani Canteen</div>
         </div>
         <a href="checkout.html" class="cart-item">
-            Cart
+            🛒 Cart
             <span class="cart-badge" id="cartBadge">0</span>
         </a>
     </div>
 
     <div class="nav-items" id="navMenu">
-        <a href="home.html" class="nav-item">Home</a>
-        <span class="nav-item" style="cursor: default; background: var(--bg-cream);">Orders</span>
+        <a href="home.html" class="nav-item">🏠 Home</a>
+        <span class="nav-item" style="cursor: default; background: var(--bg-cream);">📦 Orders</span>
         <a href="profile.html" class="nav-item">👤 Profile</a>
-        <span class="nav-item" onclick="logout()">Logout</span>
+        <span class="nav-item" onclick="logout()">🚪 Logout</span>
     </div>
 
     <div class="container">
@@ -785,6 +1047,14 @@
             </div>
         </div>
         <div id="ordersList" class="orders-list"></div>
+    </div>
+
+    <div class="toast-notification" id="toastNotification">
+        <div class="toast-icon" id="toastIcon"></div>
+        <div class="toast-content">
+            <div class="toast-title" id="toastTitle"></div>
+            <div class="toast-message" id="toastMessage"></div>
+        </div>
     </div>
 
     <script type="module">
@@ -813,7 +1083,7 @@
         let itemReviews = {};
         let userDisplayName = '';
 
-        let cart = JSON.parse(localStorage.getItem('midnightPlazaCart') || '[]');
+        let cart = JSON.parse(localStorage.getItem('tiuBiriyaniCart') || '[]');
         updateCartBadge();
 
         function updateCartBadge() {
@@ -837,8 +1107,6 @@
                     } else {
                         userDisplayName = user.displayName || user.email || 'User';
                     }
-                    
-                    console.log('User display name:', userDisplayName);
                 } catch (error) {
                     console.error('Error fetching user details:', error);
                     userDisplayName = user.displayName || user.email || 'User';
@@ -852,10 +1120,10 @@
 
         function setupRealtimeOrders(userId) {
             const ordersList = document.getElementById('ordersList');
-            ordersList.innerHTML = '<div class="loading"><div class="spinner"></div>Setting up live updates...</div>';
+            ordersList.innerHTML = getLoadingSkeleton();
 
             const ordersRef = ref(db, 'tiutbc/orders');
-            const ordersQuery = query(ordersRef, orderByChild('userId'), equalTo(userId));
+            const ordersQuery = query(ordersRef, orderByChild('userDetails/userId'), equalTo(userId));
 
             if (ordersListener) {
                 off(ordersListener);
@@ -867,8 +1135,8 @@
                         <div class="empty-orders">
                             <div class="empty-orders-icon">📦</div>
                             <h3>No orders yet</h3>
-                            <p>Start ordering some delicious food!</p>
-                            <a href="home.html" class="order-now-btn">Order Now</a>
+                            <p>Start your culinary journey with delicious biriyani!</p>
+                            <a href="home.html" class="order-now-btn">🍽️ Browse Menu</a>
                         </div>
                     `;
                     return;
@@ -878,12 +1146,18 @@
                 const currentOrders = {};
                 
                 snapshot.forEach((childSnapshot) => {
-                    const orderData = {
+                    const orderData = childSnapshot.val();
+                    const order = {
                         id: childSnapshot.key,
-                        ...childSnapshot.val()
+                        userId: orderData.userDetails?.userId || orderData.userId,
+                        items: orderData.orderDetails?.items || orderData.items,
+                        total: orderData.orderDetails?.total || orderData.total,
+                        status: orderData.orderDetails?.status || orderData.status,
+                        createdAt: orderData.orderDetails?.createdAt || orderData.createdAt,
+                        orderNumber: orderData.orderDetails?.orderNumber || orderData.orderNumber
                     };
-                    orders.push(orderData);
-                    currentOrders[orderData.id] = orderData;
+                    orders.push(order);
+                    currentOrders[order.id] = order;
                 });
 
                 orders.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
@@ -893,7 +1167,7 @@
                     if (previousOrders[orderId] && 
                         previousOrders[orderId].status !== currentOrders[orderId].status) {
                         updatedOrderIds.add(orderId);
-                        showNotification(currentOrders[orderId]);
+                        showToast(currentOrders[orderId]);
                     }
                 });
 
@@ -905,10 +1179,24 @@
                     <div class="empty-orders">
                         <div class="empty-orders-icon">❌</div>
                         <h3>Error loading orders</h3>
-                        <p>Please refresh the page</p>
+                        <p>Please refresh the page to try again</p>
                     </div>
                 `;
             });
+        }
+
+        function getLoadingSkeleton() {
+            return `
+                <div class="loading-skeleton">
+                    ${[1, 2, 3].map(() => `
+                        <div class="skeleton-card">
+                            <div class="skeleton-line short"></div>
+                            <div class="skeleton-line medium"></div>
+                            <div class="skeleton-line"></div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
         }
 
         async function renderOrders(orders, updatedOrderIds) {
@@ -931,13 +1219,14 @@
                 const statusClass = order.status.toLowerCase().replace(/\s+/g, '');
                 
                 const reviewSection = order.status === 'delivered' ? await generateReviewSection(order) : '';
+                const timeline = getStatusTimeline(order.status);
                 
                 ordersHTML += `
                     <div class="order-card ${isUpdated ? 'updated' : ''}" data-order-id="${order.id}">
                         <div class="order-header">
                             <div>
-                                <div class="order-number">#${orders.length - index}</div>
-                                <div class="order-id">Order ID: ${order.id.substring(0, 8)}</div>
+                                <div class="order-number">#${order.orderNumber || (orders.length - index)}</div>
+                                <div class="order-id">Order ID: ${order.id.substring(0, 8).toUpperCase()}</div>
                                 <div class="order-date">${orderDate}</div>
                             </div>
                             <div class="order-status status-${statusClass}">
@@ -948,7 +1237,7 @@
                             ${order.items.map(item => `
                                 <div class="order-item">
                                     <div class="item-details">
-                                        <div class="item-emoji">${item.emoji || '🍔'}</div>
+                                        <div class="item-emoji">${item.emoji || '🍽️'}</div>
                                         <div class="item-info">
                                             <div class="item-name">${escapeHtml(item.name)}</div>
                                             <div class="item-quantity">Qty: ${item.quantity}</div>
@@ -959,10 +1248,10 @@
                             `).join('')}
                         </div>
                         <div class="order-total">
-                            <span class="total-label">Total:</span>
+                            <span class="total-label">Total Amount:</span>
                             <span class="total-amount">₹${parseFloat(order.total).toFixed(2)}</span>
                         </div>
-                        ${getStatusTimeline(order.status)}
+                        ${timeline}
                         ${reviewSection}
                     </div>
                 `;
@@ -974,7 +1263,47 @@
                 document.querySelectorAll('.order-card.updated').forEach(card => {
                     card.classList.remove('updated');
                 });
-            }, 1000);
+            }, 1200);
+        }
+
+        function getStatusTimeline(currentStatus) {
+            const steps = [
+                { key: 'pending', label: 'Placed', icon: '📋' },
+                { key: 'confirmed', label: 'Confirmed', icon: '✅' },
+                { key: 'preparing', label: 'Preparing', icon: '👨‍🍳' },
+                { key: 'out-for-delivery', label: 'On the way', icon: '🚚' },
+                { key: 'delivered', label: 'Delivered', icon: '✔️' }
+            ];
+
+            const statusIndex = steps.findIndex(s => s.key === currentStatus.toLowerCase().replace(/\s+/g, '-'));
+            
+            if (currentStatus.toLowerCase() === 'cancelled' || currentStatus.toLowerCase() === 'rejected') {
+                return '';
+            }
+
+            const stepsHTML = steps.map((step, index) => {
+                const isActive = index === statusIndex;
+                const isCompleted = index < statusIndex;
+                const stepClass = isActive ? 'active' : (isCompleted ? 'completed' : '');
+                
+                return `
+                    <div class="timeline-step ${stepClass}">
+                        <div class="timeline-icon">${step.icon}</div>
+                        <div class="timeline-label">${step.label}</div>
+                    </div>
+                `;
+            }).join('');
+
+            return `
+                <div class="status-timeline">
+                    <div class="timeline-header">
+                        📍 Order Progress
+                    </div>
+                    <div class="timeline-steps">
+                        ${stepsHTML}
+                    </div>
+                </div>
+            `;
         }
 
         async function generateReviewSection(order) {
@@ -988,7 +1317,7 @@
                             ✅ Thank you for your review!
                         </div>
                         <div class="review-submitted-text">
-                            Your feedback helps us improve our service.
+                            Your feedback helps us serve you better.
                         </div>
                     </div>
                     ${reviews.length > 0 ? `
@@ -1012,13 +1341,13 @@
                         ⭐ Rate Your Order
                     </div>
                     <div class="review-prompt">
-                        Help us serve you better by rating each item!
+                        Share your experience to help us improve!
                     </div>
                     <div class="items-to-review">
                         ${order.items.map((item, idx) => `
                             <div class="review-item-card">
                                 <div class="review-item-header">
-                                    <span class="review-item-emoji">${item.emoji || '🍔'}</span>
+                                    <span class="review-item-emoji">${item.emoji || '🍽️'}</span>
                                     <span class="review-item-name">${escapeHtml(item.name)}</span>
                                 </div>
                                 <div class="star-rating" data-item-index="${idx}" data-current-rating="0">
@@ -1039,7 +1368,7 @@
                         `).join('')}
                     </div>
                     <button class="submit-review-btn" onclick="submitReviews('${order.id}', ${order.items.length})">
-                        Submit Reviews
+                        ✨ Submit Reviews
                     </button>
                 </div>
             `;
@@ -1182,8 +1511,6 @@
 
             try {
                 const userName = userDisplayName || 'User';
-                console.log('Submitting reviews with username:', userName);
-
                 const timestamp = Date.now();
 
                 for (let i = 0; i < order.items.length; i++) {
@@ -1277,13 +1604,12 @@
                     `;
                 }
 
-                console.log('Reviews submitted successfully!');
-                alert('Thank you for your reviews! 🎉');
+                showToastNotification('success', 'Review Submitted!', 'Thank you for your feedback 🎉');
             } catch (error) {
                 console.error('Error submitting reviews:', error);
                 alert('Failed to submit reviews: ' + error.message);
                 button.disabled = false;
-                button.textContent = 'Submit Reviews';
+                button.textContent = '✨ Submit Reviews';
             }
         };
 
@@ -1306,7 +1632,7 @@
                 'cancelled': '❌',
                 'rejected': '❌'
             };
-            return statusMap[status.toLowerCase().replace(/\s+/g, '')] || '📋';
+            return statusMap[status.toLowerCase().replace(/\s+/g, '-')] || '📋';
         }
 
         function formatStatus(status) {
@@ -1316,18 +1642,43 @@
                 .join(' ');
         }
 
-        function getStatusTimeline(currentStatus) {
-            return '';
-        }
+        function showToast(order) {
+            const title = `Order ${formatStatus(order.status)}!`;
+            const message = `Order #${order.id.substring(0, 8).toUpperCase()}`;
+            
+            showToastNotification('info', title, message);
 
-        function showNotification(order) {
             if ('Notification' in window && Notification.permission === 'granted') {
-                new Notification('Order Status Updated', {
-                    body: `Order #${order.id.substring(0, 8)} is now ${formatStatus(order.status)}`,
-                    icon: '🍔',
-                    badge: '🍔'
+                new Notification(title, {
+                    body: message,
+                    icon: '🍽️',
+                    badge: '🍽️'
                 });
             }
+        }
+
+        function showToastNotification(type, title, message) {
+            const toast = document.getElementById('toastNotification');
+            const icon = document.getElementById('toastIcon');
+            const titleEl = document.getElementById('toastTitle');
+            const messageEl = document.getElementById('toastMessage');
+
+            const icons = {
+                success: '✅',
+                info: '📢',
+                warning: '⚠️',
+                error: '❌'
+            };
+
+            icon.textContent = icons[type] || icons.info;
+            titleEl.textContent = title;
+            messageEl.textContent = message;
+
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
         }
 
         if ('Notification' in window && Notification.permission === 'default') {
@@ -1341,7 +1692,7 @@
                         off(ordersListener);
                     }
                     await signOut(auth);
-                    localStorage.removeItem('midnightPlazaCart');
+                    localStorage.removeItem('tiuBiriyaniCart');
                     window.location.href = 'index.html';
                 } catch (error) {
                     console.error('Error logging out:', error);
