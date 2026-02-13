@@ -633,7 +633,7 @@
         <a href="orders.html" class="nav-item" id="ordersLink">📦 Orders</a>
         <a href="profile.html" class="nav-item" id="profileLink">👤 Profile</a>
         <span class="nav-item" id="logoutLink" onclick="logout()">🚪 Logout</span>
-        <a href="index.html" class="nav-item" id="loginLink">🔑 Login</a>
+        <a href="login.html" class="nav-item" id="loginLink">🔑 Login</a>
     </div>
 
     <div class="container" id="mainContainer">
@@ -860,7 +860,7 @@
             if (!isAuthenticated) {
                 showToast('Please login to place an order', 'error');
                 setTimeout(() => {
-                    window.location.href = 'index.html';
+                    window.location.href = 'login.html';
                 }, 1500);
                 return;
             }
@@ -978,7 +978,7 @@
                     <div class="login-prompt">
                         <h3>👋 Welcome Guest!</h3>
                         <p>Browse our menu and login to place your order</p>
-                        <a href="index.html" class="login-btn">Login / Sign Up</a>
+                        <a href="login.html" class="login-btn">Login / Sign Up</a>
                     </div>
                 `;
             }
@@ -1277,7 +1277,7 @@
                     cart = [];
                     showToast('Logged out successfully', 'success');
                     setTimeout(() => {
-                        window.location.href = 'index.html';
+                        window.location.href = 'login.html';
                     }, 1000);
                 }).catch((error) => {
                     console.error('Logout error:', error);
