@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>TIU The Biriyani Canteen - Home</title>
+    <title>TIU The Biriyani Canteen</title>
     <style>
         :root {
             --primary: #ff6b35;
@@ -12,6 +12,7 @@
             --secondary: #f7931e;
             --brown: #6b4423;
             --success-green: #60b246;
+            --star-gold: #FFA500;
         }
 
         * {
@@ -22,15 +23,16 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--bg-cream);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f8f8f8;
             color: #333;
         }
 
+        /* Navbar */
         .navbar {
             background: white;
-            padding: 0.75rem 1rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 0.75rem 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             position: sticky;
             top: 0;
             z-index: 1000;
@@ -46,10 +48,13 @@
         }
 
         .logo {
-            font-size: clamp(1.2rem, 4vw, 1.5rem);
-            font-weight: bold;
+            font-size: clamp(1.1rem, 3.5vw, 1.4rem);
+            font-weight: 700;
             color: var(--primary);
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .hamburger {
@@ -58,7 +63,6 @@
             gap: 4px;
             cursor: pointer;
             padding: 0.5rem;
-            touch-action: manipulation;
         }
 
         .hamburger span {
@@ -69,356 +73,281 @@
             transition: all 0.3s;
         }
 
-        .hamburger.active span:nth-child(1) {
-            transform: rotate(45deg) translate(7px, 7px);
-        }
-
-        .hamburger.active span:nth-child(2) {
-            opacity: 0;
-        }
-
-        .hamburger.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(6px, -6px);
-        }
-
-        .nav-items {
-            display: none;
-            position: fixed;
-            top: 60px;
-            left: 0;
-            right: 0;
-            background: white;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            padding: 0.5rem;
-            flex-direction: column;
-            gap: 0;
-            z-index: 999;
-        }
-
-        .nav-items.active {
-            display: flex;
-        }
-
-        .nav-item {
-            cursor: pointer;
-            padding: 0.9rem;
-            border-radius: 8px;
-            transition: background 0.3s;
-            text-decoration: none;
-            color: #333;
-            font-weight: 500;
-            font-size: 0.95rem;
+        .cart-btn {
             position: relative;
-            min-height: 50px;
+            cursor: pointer;
+            padding: 0.6rem 1rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
             display: flex;
             align-items: center;
-            touch-action: manipulation;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .nav-item:hover {
-            background: var(--bg-cream);
-        }
-
-        .nav-item.hidden {
-            display: none;
-        }
-
-        .cart-item {
-            cursor: pointer;
-            padding: 0.5rem 0.75rem;
-            border-radius: 8px;
-            transition: background 0.3s;
-            text-decoration: none;
-            color: #333;
-            font-weight: 500;
-            font-size: clamp(0.85rem, 2vw, 0.95rem);
-            position: relative;
-            min-height: 40px;
-            display: flex;
-            align-items: center;
-            touch-action: manipulation;
-        }
-
-        .cart-item:hover {
-            background: var(--bg-cream);
+            gap: 0.5rem;
+            transition: all 0.3s;
         }
 
         .cart-badge {
             position: absolute;
-            top: -2px;
-            right: -2px;
-            background: var(--primary);
-            color: white;
+            top: -5px;
+            right: -5px;
+            background: white;
+            color: var(--primary);
             border-radius: 50%;
-            min-width: 20px;
-            height: 20px;
+            min-width: 22px;
+            height: 22px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.7rem;
-            font-weight: bold;
-            padding: 0 4px;
-        }
-
-        .sliding-toast-container {
-            position: fixed;
-            bottom: 7rem;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 400px;
-            z-index: 2000;
-            perspective: 1000px;
-            display: none; /* Hidden by default */
-        }
-
-        .sliding-toast-container.visible {
-            display: block;
-        }
-
-        .sliding-toast {
-            width: 100%;
-            padding: 1rem 1.5rem;
-            border-radius: 16px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.25);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-            cursor: pointer;
-            transition: transform 0.3s ease, opacity 0.3s ease;
-            touch-action: manipulation;
-            background: linear-gradient(135deg, var(--success-green) 0%, #4a9635 100%);
-            color: white;
-            animation: slideUp 0.5s ease;
-        }
-
-        @keyframes slideUp {
-            from {
-                transform: translateY(100px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .toast-content {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            flex: 1;
-        }
-
-        .toast-icon {
-            font-size: 2rem;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.1);
-            }
-        }
-
-        .toast-text {
-            flex: 1;
-        }
-
-        .toast-title {
+            font-size: 0.75rem;
             font-weight: 700;
-            font-size: 1.1rem;
-            margin-bottom: 0.2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
-        .toast-subtitle {
-            font-size: 0.85rem;
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem;
+            padding-bottom: 100px;
+        }
+
+        /* Login Banner */
+        .login-banner {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 1.25rem 1.5rem;
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.25);
+        }
+
+        .login-banner-text h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .login-banner-text p {
+            font-size: 0.9rem;
             opacity: 0.95;
         }
 
-        .toast-action {
+        .login-btn {
             background: white;
-            color: var(--success-green);
-            padding: 0.6rem 1.2rem;
-            border-radius: 10px;
+            color: var(--primary);
+            padding: 0.7rem 1.5rem;
+            border-radius: 8px;
             font-weight: 700;
-            font-size: 0.9rem;
+            text-decoration: none;
             white-space: nowrap;
-            transition: transform 0.2s;
+            transition: all 0.3s;
         }
 
-        .toast-action:active {
-            transform: scale(0.95);
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 1.5rem 0.75rem 8rem 0.75rem;
-        }
-
+        /* Category Section */
         .category-section {
-            margin-bottom: 3rem;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            margin-bottom: 2.5rem;
         }
 
         .category-header {
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
             padding-bottom: 0.75rem;
-            border-bottom: 3px solid var(--primary);
+            border-bottom: 2px solid #e0e0e0;
         }
 
         .category-emoji {
-            font-size: clamp(2rem, 5vw, 2.5rem);
-        }
-
-        .category-info {
-            flex: 1;
+            font-size: 2rem;
         }
 
         .category-title {
-            font-size: clamp(1.4rem, 4vw, 1.8rem);
-            color: var(--brown);
+            font-size: 1.5rem;
             font-weight: 700;
-            margin-bottom: 0.25rem;
+            color: #1a1a1a;
         }
 
         .category-count {
             color: #666;
-            font-size: clamp(0.85rem, 2vw, 0.95rem);
+            font-size: 0.9rem;
             font-weight: 500;
         }
 
+        /* Food Grid */
         .food-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
-            gap: 1.25rem;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
         }
 
+        /* Food Card */
         .food-card {
             background: white;
-            border-radius: 12px;
+            border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
 
-        .food-image {
-            width: 100%;
-            height: 180px;
-            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: clamp(3rem, 8vw, 4rem);
-            overflow: hidden;
+        .food-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+
+        .food-image-container {
             position: relative;
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            overflow: hidden;
         }
 
-        .food-image img {
+        .food-image-container img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .food-card:hover .food-image-container img {
+            transform: scale(1.05);
         }
 
         .food-image-emoji {
-            font-size: clamp(3rem, 8vw, 4rem);
+            font-size: 5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
         }
 
-        .food-details {
-            padding: 1rem;
+        .veg-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--success-green);
+            border-radius: 4px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .veg-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success-green);
+        }
+
+        /* Card Content */
+        .food-content {
+            padding: 1.25rem;
         }
 
         .food-name {
-            font-size: clamp(0.95rem, 3vw, 1.05rem);
-            font-weight: 600;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1a1a1a;
             margin-bottom: 0.5rem;
-            color: #333;
+            line-height: 1.3;
         }
 
         .food-description {
             color: #666;
-            font-size: clamp(0.8rem, 2vw, 0.85rem);
-            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            margin-bottom: 0.75rem;
             line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .food-rating {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: var(--success-green);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
         }
 
         .food-footer {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-top: 1rem;
             gap: 1rem;
         }
 
         .food-price {
-            font-size: clamp(1rem, 4vw, 1.15rem);
-            font-weight: bold;
-            color: var(--brown);
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #1a1a1a;
         }
 
+        /* Add Button */
         .add-btn {
             background: var(--primary);
             color: white;
             border: none;
-            padding: 0.5rem 0.85rem;
-            border-radius: 6px;
-            font-weight: 600;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.95rem;
             cursor: pointer;
             transition: all 0.3s;
-            font-size: clamp(0.85rem, 2.5vw, 0.95rem);
-            min-height: 44px;
-            touch-action: manipulation;
-            white-space: nowrap;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .add-btn:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
         }
 
         .add-btn:active {
-            transform: scale(0.95);
+            transform: scale(0.98);
         }
 
+        /* Quantity Control */
         .quantity-control {
             display: flex;
             align-items: center;
-            gap: 0.6rem;
+            gap: 0.75rem;
             background: var(--primary);
-            border-radius: 6px;
-            padding: 0.4rem 0.6rem;
-            min-height: 44px;
+            border-radius: 8px;
+            padding: 0.5rem 0.75rem;
         }
 
         .quantity-btn {
             background: white;
             color: var(--primary);
             border: none;
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
-            font-weight: bold;
+            font-weight: 700;
             font-size: 1.1rem;
             cursor: pointer;
-            transition: all 0.2s;
-            touch-action: manipulation;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.2s;
         }
 
         .quantity-btn:active {
@@ -427,102 +356,110 @@
 
         .quantity-display {
             color: white;
-            font-weight: 600;
-            min-width: 25px;
+            font-weight: 700;
+            min-width: 30px;
             text-align: center;
-            font-size: 1rem;
+            font-size: 1.05rem;
         }
 
-        .loading {
-            text-align: center;
-            padding: 3rem 1rem;
-            font-size: clamp(1rem, 3vw, 1.2rem);
-            color: #666;
-        }
-
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--primary);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 3rem 1rem;
-            color: #666;
-        }
-
-        .empty-state-icon {
-            font-size: clamp(3rem, 10vw, 4rem);
-            margin-bottom: 1rem;
-        }
-
-        .login-prompt {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: white;
-            padding: 1rem 1.5rem;
-            border-radius: 12px;
-            margin: 1rem 0;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-        }
-
-        .login-prompt h3 {
-            margin-bottom: 0.5rem;
-            font-size: clamp(1.1rem, 3vw, 1.3rem);
-        }
-
-        .login-prompt p {
-            margin-bottom: 1rem;
-            font-size: clamp(0.9rem, 2vw, 1rem);
-            opacity: 0.95;
-        }
-
-        .login-btn {
+        /* Bottom Cart Button */
+        .bottom-cart-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
             background: white;
-            color: var(--primary);
-            padding: 0.75rem 1.5rem;
-            border: none;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            display: none;
+            z-index: 1001;
+        }
+
+        .bottom-cart-bar.visible {
+            display: block;
+            animation: slideUpCart 0.3s ease;
+        }
+
+        @keyframes slideUpCart {
+            from {
+                transform: translateY(100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .cart-bar-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .cart-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .cart-items-count {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .cart-total {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #1a1a1a;
+        }
+
+        .view-cart-btn {
+            background: var(--success-green);
+            color: white;
+            padding: 0.9rem 2rem;
             border-radius: 8px;
             font-weight: 700;
             font-size: 1rem;
+            border: none;
             cursor: pointer;
             transition: all 0.3s;
             text-decoration: none;
             display: inline-block;
-            min-height: 44px;
         }
 
-        .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        .view-cart-btn:active {
+            transform: scale(0.98);
         }
 
-        /* Toast notification styles */
-        .toast-notification {
+        /* Toast */
+        .toast {
             position: fixed;
-            top: 20px;
+            top: 80px;
             right: 20px;
             background: white;
             padding: 1rem 1.5rem;
             border-radius: 12px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
             display: none;
             z-index: 3000;
             min-width: 280px;
-            animation: slideInRight 0.3s ease;
+            animation: slideIn 0.3s ease;
+            border-left: 4px solid var(--success-green);
         }
 
-        @keyframes slideInRight {
+        .toast.show {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .toast.error {
+            border-left-color: #e74c3c;
+        }
+
+        @keyframes slideIn {
             from {
                 transform: translateX(400px);
                 opacity: 0;
@@ -533,40 +470,97 @@
             }
         }
 
-        .toast-notification.show {
-            display: block;
+        .loading {
+            text-align: center;
+            padding: 3rem 1rem;
         }
 
-        .toast-notification.error {
-            border-left: 4px solid #e74c3c;
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
         }
 
-        .toast-notification.success {
-            border-left: 4px solid #27ae60;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        .toast-notification.info {
-            border-left: 4px solid var(--primary);
+        /* Mobile Nav */
+        .nav-items {
+            display: none;
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            padding: 0.5rem;
+            flex-direction: column;
+            z-index: 999;
         }
 
-        .toast-notification .toast-message {
+        .nav-items.active {
+            display: flex;
+        }
+
+        .nav-item {
+            padding: 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #333;
+            font-weight: 600;
+            border-bottom: 1px solid #f0f0f0;
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            color: #333;
+            gap: 0.5rem;
         }
 
-        .toast-notification .toast-icon {
-            font-size: 1.5rem;
+        .nav-item:hover {
+            background: #f8f8f8;
         }
 
-        .toast-notification .toast-text {
-            flex: 1;
-            font-weight: 500;
+        .nav-item.hidden {
+            display: none;
         }
 
         @media (max-width: 480px) {
-            .toast-notification {
+            .food-grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 1rem;
+            }
+
+            .food-image-container {
+                height: 140px;
+            }
+
+            .food-content {
+                padding: 0.85rem;
+            }
+
+            .food-name {
+                font-size: 0.95rem;
+            }
+
+            .food-price {
+                font-size: 1.1rem;
+            }
+
+            .add-btn {
+                padding: 0.5rem 0.85rem;
+                font-size: 0.85rem;
+            }
+
+            .login-banner {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .toast {
                 right: 10px;
                 left: 10px;
                 min-width: auto;
@@ -584,30 +578,22 @@
                 flex-direction: row;
                 padding: 0;
                 box-shadow: none;
-                gap: 0.75rem;
+                gap: 0.5rem;
             }
 
             .nav-item {
+                padding: 0.5rem 1rem;
                 border-bottom: none;
-                padding: 0.4rem 0.6rem;
-                min-height: 40px;
             }
 
-            .food-card:hover {
-                transform: translateY(-8px);
-                box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            .food-grid {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             }
+        }
 
-            .add-btn:hover {
-                background: var(--secondary);
-                transform: scale(1.05);
-            }
-
-            .sliding-toast-container {
-                right: 2rem;
-                left: auto;
-                transform: none;
-                max-width: 420px;
+        @media (min-width: 1200px) {
+            .food-grid {
+                grid-template-columns: repeat(4, 1fr);
             }
         }
     </style>
@@ -620,16 +606,18 @@
                 <span></span>
                 <span></span>
             </div>
-            <div class="logo">🥘 TIU X The Biriyani Canteen</div>
+            <div class="logo">
+                🍛 TIU Biriyani Canteen
+            </div>
         </div>
-        <a href="checkout.html" class="cart-item">
-            Cart 🛒
+        <a href="checkout.html" class="cart-btn">
+            <span>🛒 Cart</span>
             <span class="cart-badge" id="cartBadge">0</span>
         </a>
     </div>
 
     <div class="nav-items" id="navMenu">
-        <span class="nav-item" style="cursor: default; background: var(--bg-cream);">🏠 Home</span>
+        <span class="nav-item" style="background: #f8f8f8;">🏠 Home</span>
         <a href="orders.html" class="nav-item" id="ordersLink">📦 Orders</a>
         <a href="profile.html" class="nav-item" id="profileLink">👤 Profile</a>
         <span class="nav-item" id="logoutLink" onclick="logout()">🚪 Logout</span>
@@ -639,30 +627,23 @@
     <div class="container" id="mainContainer">
         <div class="loading">
             <div class="spinner"></div>
-            Loading menu...
+            <p>Loading delicious food...</p>
         </div>
     </div>
 
-    <!-- Order Now Toast - Only shows when cart has items -->
-    <div class="sliding-toast-container" id="slidingToastContainer">
-        <div class="sliding-toast" id="orderToast" onclick="goToCheckout()">
-            <div class="toast-content">
-                <div class="toast-icon">🚚</div>
-                <div class="toast-text">
-                    <div class="toast-title">Ready to Order?</div>
-                    <div class="toast-subtitle">FREE Delivery on orders above ₹200</div>
-                </div>
+    <div class="bottom-cart-bar" id="bottomCartBar">
+        <div class="cart-bar-content">
+            <div class="cart-info">
+                <div class="cart-items-count" id="cartItemsCount">0 items</div>
+                <div class="cart-total" id="cartTotalPrice">₹0</div>
             </div>
-            <div class="toast-action">Order Now</div>
+            <a href="checkout.html" class="view-cart-btn">View Cart →</a>
         </div>
     </div>
 
-    <!-- Toast Notification -->
-    <div class="toast-notification" id="toastNotification">
-        <div class="toast-message">
-            <span class="toast-icon" id="toastIcon"></span>
-            <span class="toast-text" id="toastText"></span>
-        </div>
+    <div class="toast" id="toast">
+        <span id="toastIcon">✅</span>
+        <span id="toastText">Item added to cart!</span>
     </div>
 
     <script type="module">
@@ -692,86 +673,67 @@
         let guestId = null;
         
         const CATEGORY_ORDER = [
-            { key: 'Maagie', display: 'Maggi' },
-            { key: 'Pasta', display: 'Pasta' },
-            { key: 'Sandwich', display: 'Sandwich' },
-            { key: 'Chai', display: 'Chai' },
-            { key: 'Packet Items', display: 'Packet Items' },
-            { key: 'Beverages', display: 'Beverages' },
-            { key: 'Cigarette', display: 'Cigarette' }
+            { key: 'Maagie', display: 'Maggi', emoji: '🍜' },
+            { key: 'Pasta', display: 'Pasta', emoji: '🍝' },
+            { key: 'Sandwich', display: 'Sandwich', emoji: '🥪' },
+            { key: 'Chai', display: 'Chai', emoji: '☕' },
+            { key: 'Packet Items', display: 'Snacks', emoji: '🍿' },
+            { key: 'Beverages', display: 'Beverages', emoji: '🥤' },
+            { key: 'Cigarette', display: 'Cigarette', emoji: '🚬' }
         ];
         
         loadCart();
         updateCartBadge();
-        updateToastVisibility();
         initializeGuestId();
 
-        // Generate or retrieve guest ID
         function initializeGuestId() {
             const storedGuestId = localStorage.getItem('guestId');
             if (storedGuestId) {
                 guestId = storedGuestId;
             } else {
-                // Generate unique guest ID: guest_timestamp_randomString
                 guestId = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
                 localStorage.setItem('guestId', guestId);
             }
-            console.log('Guest ID:', guestId);
         }
 
-        // Migrate guest cart to authenticated user
         async function migrateGuestCart(userId) {
             if (!guestId || guestId === userId) return;
             
             try {
-                // Read guest cart from Firebase
                 const guestCartRef = ref(db, `tiutbc/carts/${guestId}`);
                 const guestSnapshot = await get(guestCartRef);
                 
                 if (guestSnapshot.exists()) {
                     const guestCartData = guestSnapshot.val();
-                    
-                    // Read user's existing cart (if any)
                     const userCartRef = ref(db, `tiutbc/carts/${userId}`);
                     const userSnapshot = await get(userCartRef);
                     
                     let mergedCart = {};
-                    
-                    // Start with user's existing cart
                     if (userSnapshot.exists()) {
                         mergedCart = userSnapshot.val();
                     }
                     
-                    // Merge guest cart items
                     Object.keys(guestCartData).forEach(itemId => {
                         if (mergedCart[itemId]) {
-                            // Item exists in both - add quantities
                             mergedCart[itemId].quantity += guestCartData[itemId].quantity;
                             mergedCart[itemId].lastUpdated = Date.now();
                         } else {
-                            // New item from guest cart
                             mergedCart[itemId] = guestCartData[itemId];
                             mergedCart[itemId].lastUpdated = Date.now();
                         }
                     });
                     
-                    // Write merged cart to user's account
                     await set(userCartRef, mergedCart);
-                    
-                    // Delete guest cart from Firebase
                     await remove(guestCartRef);
                     
-                    console.log('Guest cart migrated successfully');
-                    showToast('Your cart has been restored!', 'success');
+                    showToast('Cart restored successfully!', 'success');
                     
-                    // Update local cart from merged data
                     cart = Object.keys(mergedCart).map(itemId => ({
                         id: itemId,
                         ...mergedCart[itemId]
                     }));
                     saveCart();
                     updateCartBadge();
-                    updateToastVisibility();
                     renderAllCategories();
                 }
             } catch (error) {
@@ -779,56 +741,32 @@
             }
         }
 
-        // Toast notification function
-        function showToast(message, type = 'info') {
-            const toast = document.getElementById('toastNotification');
-            const toastText = document.getElementById('toastText');
-            const toastIcon = document.getElementById('toastIcon');
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toastIcon');
+            const text = document.getElementById('toastText');
             
-            // Set icon based on type
-            const icons = {
-                'error': '❌',
-                'success': '✅',
-                'info': 'ℹ️'
-            };
+            icon.textContent = type === 'success' ? '✅' : '❌';
+            text.textContent = message;
+            toast.className = `toast show ${type}`;
             
-            toastIcon.textContent = icons[type] || icons['info'];
-            toastText.textContent = message;
-            
-            // Remove previous type classes
-            toast.classList.remove('error', 'success', 'info');
-            toast.classList.add(type);
-            toast.classList.add('show');
-            
-            // Auto hide after 3 seconds
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
+            setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
-        // Authentication state observer
         onAuthStateChanged(auth, async (user) => {
             const wasGuest = !isAuthenticated;
             currentUser = user;
             isAuthenticated = !!user;
             
-            // Update navigation based on auth state
             updateNavigationUI();
-            
-            // Load food items
             loadFoodItems();
             
-            // Handle cart syncing and migration
             if (user) {
-                // If user just logged in (was guest before)
                 if (wasGuest && guestId) {
                     await migrateGuestCart(user.uid);
                 }
-                
-                // Sync cart from user's Firebase account
                 syncCartFromDB(user.uid);
             } else {
-                // User is guest - sync to guest ID
                 if (cart.length > 0) {
                     syncCartToDB();
                 }
@@ -842,45 +780,15 @@
             const loginLink = document.getElementById('loginLink');
 
             if (isAuthenticated) {
-                // Show authenticated user options
                 ordersLink.classList.remove('hidden');
                 profileLink.classList.remove('hidden');
                 logoutLink.classList.remove('hidden');
                 loginLink.classList.add('hidden');
             } else {
-                // Show guest options
                 ordersLink.classList.add('hidden');
                 profileLink.classList.add('hidden');
                 logoutLink.classList.add('hidden');
                 loginLink.classList.remove('hidden');
-            }
-        }
-
-        window.goToCheckout = function() {
-            if (!isAuthenticated) {
-                showToast('Please login to place an order', 'error');
-                setTimeout(() => {
-                    window.location.href = 'login.html';
-                }, 1500);
-                return;
-            }
-            
-            if (cart.length === 0) {
-                showToast('Your cart is empty. Add some items first!', 'info');
-                return;
-            }
-            
-            window.location.href = 'checkout.html';
-        };
-
-        function updateToastVisibility() {
-            const toastContainer = document.getElementById('slidingToastContainer');
-            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-            
-            if (totalItems > 0) {
-                toastContainer.classList.add('visible');
-            } else {
-                toastContainer.classList.remove('visible');
             }
         }
 
@@ -898,12 +806,7 @@
                         cart = newCart;
                         saveCart();
                         updateCartBadge();
-                        updateToastVisibility();
                         renderAllCategories();
-                    }
-                } else {
-                    if (cart.length > 0) {
-                        syncCartToDB();
                     }
                 }
             });
@@ -927,28 +830,21 @@
                 'chai': 'Chai',
                 'packet items': 'Packet Items',
                 'beverages': 'Beverages',
-                'cigarette': 'Cigarette',
-                'ciggerette': 'Cigarette'
+                'cigarette': 'Cigarette'
             };
             return mapping[normalized] || categoryName;
         }
 
         async function loadFoodItems() {
             const container = document.getElementById('mainContainer');
-            container.innerHTML = '<div class="loading"><div class="spinner"></div>Loading menu...</div>';
+            container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading delicious food...</p></div>';
 
             try {
                 const foodItemsRef = ref(db, 'tiutbc/foodItems');
                 
                 onValue(foodItemsRef, (snapshot) => {
                     if (!snapshot.exists()) {
-                        container.innerHTML = `
-                            <div class="empty-state">
-                                <div class="empty-state-icon">🍽️</div>
-                                <h3>No items available yet</h3>
-                                <p>Check back soon for delicious food!</p>
-                            </div>
-                        `;
+                        container.innerHTML = '<div class="loading"><p>No items available</p></div>';
                         return;
                     }
 
@@ -957,28 +853,22 @@
                 });
             } catch (error) {
                 console.error('Error loading food items:', error);
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">❌</div>
-                        <h3>Error loading menu</h3>
-                        <p>Please try again later</p>
-                    </div>
-                `;
+                container.innerHTML = '<div class="loading"><p>Error loading menu</p></div>';
             }
         }
 
         function renderAllCategories() {
             const container = document.getElementById('mainContainer');
             let html = '';
-            let totalItems = 0;
 
-            // Show login prompt if not authenticated
             if (!isAuthenticated) {
                 html += `
-                    <div class="login-prompt">
-                        <h3>👋 Welcome Guest!</h3>
-                        <p>Browse our menu and login to place your order</p>
-                        <a href="login.html" class="login-btn">Login / Sign Up</a>
+                    <div class="login-banner">
+                        <div class="login-banner-text">
+                            <h3>👋 Welcome Guest!</h3>
+                            <p>Browse our menu and login to place your order</p>
+                        </div>
+                        <a href="login.html" class="login-btn">Login</a>
                     </div>
                 `;
             }
@@ -1006,22 +896,9 @@
                             ...item,
                             originalCategory: categoryName
                         });
-                        totalItems++;
                     }
                 });
             });
-
-            if (totalItems === 0) {
-                html += `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">📭</div>
-                        <h3>No items available</h3>
-                        <p>Check back soon!</p>
-                    </div>
-                `;
-                container.innerHTML = html;
-                return;
-            }
 
             CATEGORY_ORDER.forEach(catConfig => {
                 const categoryData = categorizedItems[catConfig.key];
@@ -1030,31 +907,10 @@
                     html += `
                         <div class="category-section">
                             <div class="category-header">
-                                <div class="category-emoji">${categoryData.emoji}</div>
-                                <div class="category-info">
+                                <div class="category-emoji">${catConfig.emoji}</div>
+                                <div>
                                     <h2 class="category-title">${escapeHtml(catConfig.display)}</h2>
-                                    <div class="category-count">${categoryData.items.length} item${categoryData.items.length !== 1 ? 's' : ''}</div>
-                                </div>
-                            </div>
-                            <div class="food-grid">
-                                ${categoryData.items.map(item => createFoodCard(item.id, item, item.originalCategory)).join('')}
-                            </div>
-                        </div>
-                    `;
-                }
-            });
-
-            Object.keys(categorizedItems).forEach(catName => {
-                const isInOrder = CATEGORY_ORDER.some(c => c.key === catName);
-                if (!isInOrder && categorizedItems[catName].items.length > 0) {
-                    const categoryData = categorizedItems[catName];
-                    html += `
-                        <div class="category-section">
-                            <div class="category-header">
-                                <div class="category-emoji">${categoryData.emoji}</div>
-                                <div class="category-info">
-                                    <h2 class="category-title">${escapeHtml(catName)}</h2>
-                                    <div class="category-count">${categoryData.items.length} item${categoryData.items.length !== 1 ? 's' : ''}</div>
+                                    <div class="category-count">${categoryData.items.length} items</div>
                                 </div>
                             </div>
                             <div class="food-grid">
@@ -1072,35 +928,35 @@
             const cartItem = cart.find(c => c.id === itemId);
             const quantity = cartItem ? cartItem.quantity : 0;
             
-            const safeCategory = categoryName || 'Other';
             const safeName = item.name || 'Unnamed Item';
             const safePrice = item.price || 0;
             const safeEmoji = item.emoji || '🍔';
             
             const imageHTML = item.imageurl 
-                ? `<img src="${escapeHtml(item.imageurl)}" alt="${escapeHtml(safeName)}" onerror="this.style.display='none'; this.parentElement.querySelector('.food-image-emoji').style.display='flex';">
-                   <div class="food-image-emoji" style="display: none; position: absolute;">${safeEmoji}</div>`
+                ? `<img src="${escapeHtml(item.imageurl)}" alt="${escapeHtml(safeName)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                   <div class="food-image-emoji" style="display: none;">${safeEmoji}</div>`
                 : `<div class="food-image-emoji">${safeEmoji}</div>`;
             
-            let buttonHTML;
-            if (quantity > 0) {
-                buttonHTML = `<div class="quantity-control">
-                       <button class="quantity-btn" onclick="decreaseQuantity('${escapeHtml(itemId)}')">−</button>
+            const buttonHTML = quantity > 0 
+                ? `<div class="quantity-control">
+                       <button class="quantity-btn" onclick="event.stopPropagation(); decreaseQuantity('${escapeHtml(itemId)}')">−</button>
                        <span class="quantity-display">${quantity}</span>
-                       <button class="quantity-btn" onclick="increaseQuantity('${escapeHtml(itemId)}')">+</button>
-                   </div>`;
-            } else {
-                buttonHTML = `<button class="add-btn" onclick="addToCart('${escapeHtml(itemId)}', '${escapeHtml(safeName)}', ${safePrice}, '${safeEmoji}', '${escapeHtml(safeCategory)}')">Add +</button>`;
-            }
+                       <button class="quantity-btn" onclick="event.stopPropagation(); increaseQuantity('${escapeHtml(itemId)}')">+</button>
+                   </div>`
+                : `<button class="add-btn" onclick="event.stopPropagation(); addToCart('${escapeHtml(itemId)}', '${escapeHtml(safeName)}', ${safePrice}, '${safeEmoji}', '${escapeHtml(categoryName)}')">Add</button>`;
             
             return `
-                <div class="food-card" data-food-id="${escapeHtml(itemId)}" data-name="${escapeHtml(safeName)}" data-price="${safePrice}" data-emoji="${safeEmoji}" data-category="${escapeHtml(safeCategory)}">
-                    <div class="food-image">${imageHTML}</div>
-                    <div class="food-details">
+                <div class="food-card" data-food-id="${escapeHtml(itemId)}" data-name="${escapeHtml(safeName)}" data-price="${safePrice}" data-emoji="${safeEmoji}" data-category="${escapeHtml(categoryName)}">
+                    <div class="food-image-container">
+                        ${imageHTML}
+                        <div class="veg-badge"><div class="veg-dot"></div></div>
+                    </div>
+                    <div class="food-content">
                         <div class="food-name">${escapeHtml(safeName)}</div>
-                        <div class="food-description">${escapeHtml(item.description || 'Delicious food item')}</div>
+                        ${item.description ? `<div class="food-description">${escapeHtml(item.description)}</div>` : ''}
+                        <div class="food-rating">★ 4.5</div>
                         <div class="food-footer">
-                            <div class="food-price">₹${parseFloat(safePrice).toFixed(2)}</div>
+                            <div class="food-price">₹${safePrice}</div>
                             ${buttonHTML}
                         </div>
                     </div>
@@ -1109,9 +965,7 @@
         }
 
         function syncCartToDB() {
-            // Use guest ID if not authenticated, otherwise use user ID
             const userId = currentUser ? currentUser.uid : guestId;
-            
             if (!userId) return;
             
             const cartRef = ref(db, `tiutbc/carts/${userId}`);
@@ -1126,18 +980,18 @@
             
             cart.forEach(item => {
                 cartData[item.id] = {
-                    name: item.name || 'Unnamed Item',
-                    price: item.price || 0,
-                    emoji: item.emoji || '🍔',
-                    category: item.category || 'Other',
-                    quantity: item.quantity || 1,
+                    name: item.name,
+                    price: item.price,
+                    emoji: item.emoji,
+                    category: item.category,
+                    quantity: item.quantity,
                     timestamp: item.timestamp || timestamp,
                     lastUpdated: timestamp
                 };
             });
             
             set(cartRef, cartData).catch(error => {
-                console.error('Error syncing cart to DB:', error);
+                console.error('Error syncing cart:', error);
             });
         }
 
@@ -1150,22 +1004,18 @@
                 existingItem.lastUpdated = timestamp;
             } else {
                 cart.push({
-                    id: id,
-                    name: name || 'Unnamed Item',
-                    price: price || 0,
-                    emoji: emoji || '🍔',
-                    category: category || 'Other',
+                    id, name, price, emoji, category,
                     quantity: 1,
-                    timestamp: timestamp,
+                    timestamp,
                     lastUpdated: timestamp
                 });
             }
 
             saveCart();
-            syncCartToDB(); // Always sync - will use guest ID if not authenticated
+            syncCartToDB();
             updateCartBadge();
-            updateToastVisibility();
             updateButtonUI(id, existingItem ? existingItem.quantity : 1);
+            showToast('Item added to cart!', 'success');
         };
 
         window.increaseQuantity = function(id) {
@@ -1174,9 +1024,8 @@
                 item.quantity += 1;
                 item.lastUpdated = Date.now();
                 saveCart();
-                syncCartToDB(); // Always sync
+                syncCartToDB();
                 updateCartBadge();
-                updateToastVisibility();
                 updateButtonUI(id, item.quantity);
             }
         };
@@ -1187,19 +1036,13 @@
                 if (item.quantity > 1) {
                     item.quantity -= 1;
                     item.lastUpdated = Date.now();
-                    saveCart();
-                    syncCartToDB(); // Always sync
-                    updateCartBadge();
-                    updateToastVisibility();
-                    updateButtonUI(id, item.quantity);
                 } else {
                     cart = cart.filter(item => item.id !== id);
-                    saveCart();
-                    syncCartToDB(); // Always sync
-                    updateCartBadge();
-                    updateToastVisibility();
-                    updateButtonUI(id, 0);
                 }
+                saveCart();
+                syncCartToDB();
+                updateCartBadge();
+                updateButtonUI(id, item.quantity > 0 ? item.quantity : 0);
             }
         };
 
@@ -1209,24 +1052,20 @@
 
             const footer = card.querySelector('.food-footer');
             const price = card.querySelector('.food-price');
+            const name = card.dataset.name;
+            const priceVal = card.dataset.price;
+            const emoji = card.dataset.emoji;
+            const category = card.dataset.category;
             
-            if (quantity > 0) {
-                const quantityControl = `
-                    <div class="quantity-control">
-                        <button class="quantity-btn" onclick="decreaseQuantity('${escapeHtml(id)}')">−</button>
-                        <span class="quantity-display">${quantity}</span>
-                        <button class="quantity-btn" onclick="increaseQuantity('${escapeHtml(id)}')">+</button>
-                    </div>
-                `;
-                footer.innerHTML = price.outerHTML + quantityControl;
-            } else {
-                const name = card.dataset.name;
-                const priceVal = card.dataset.price;
-                const emoji = card.dataset.emoji;
-                const category = card.dataset.category;
-                const addBtn = `<button class="add-btn" onclick="addToCart('${escapeHtml(id)}', '${escapeHtml(name)}', ${priceVal}, '${emoji}', '${escapeHtml(category)}')">Add +</button>`;
-                footer.innerHTML = price.outerHTML + addBtn;
-            }
+            const buttonHTML = quantity > 0 
+                ? `<div class="quantity-control">
+                       <button class="quantity-btn" onclick="event.stopPropagation(); decreaseQuantity('${escapeHtml(id)}')">−</button>
+                       <span class="quantity-display">${quantity}</span>
+                       <button class="quantity-btn" onclick="event.stopPropagation(); increaseQuantity('${escapeHtml(id)}')">+</button>
+                   </div>`
+                : `<button class="add-btn" onclick="event.stopPropagation(); addToCart('${escapeHtml(id)}', '${escapeHtml(name)}', ${priceVal}, '${emoji}', '${escapeHtml(category)}')">Add</button>`;
+            
+            footer.innerHTML = price.outerHTML + buttonHTML;
         }
 
         function saveCart() {
@@ -1251,37 +1090,40 @@
 
         function updateCartBadge() {
             const badge = document.getElementById('cartBadge');
+            const bottomBar = document.getElementById('bottomCartBar');
+            const itemsCount = document.getElementById('cartItemsCount');
+            const totalPrice = document.getElementById('cartTotalPrice');
+            
             const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
             badge.textContent = totalItems;
             
             if (totalItems > 0) {
                 badge.style.display = 'flex';
+                bottomBar.classList.add('visible');
+                itemsCount.textContent = `${totalItems} item${totalItems > 1 ? 's' : ''}`;
+                totalPrice.textContent = `₹${total}`;
             } else {
                 badge.style.display = 'none';
+                bottomBar.classList.remove('visible');
             }
         }
 
         window.toggleMenu = function() {
-            const hamburger = document.querySelector('.hamburger');
-            const navMenu = document.getElementById('navMenu');
-            
-            hamburger.classList.toggle('active');
-            navMenu.classList.toggle('active');
+            document.querySelector('.hamburger').classList.toggle('active');
+            document.getElementById('navMenu').classList.toggle('active');
         };
 
         window.logout = function() {
-            // Show confirmation toast with buttons would be complex, so keeping confirm for logout
-            if (confirm('Are you sure you want to logout?')) {
+            if (confirm('Logout?')) {
                 signOut(auth).then(() => {
                     localStorage.removeItem('midnightPlazaCart');
                     cart = [];
-                    showToast('Logged out successfully', 'success');
-                    setTimeout(() => {
-                        window.location.href = 'login.html';
-                    }, 1000);
+                    showToast('Logged out', 'success');
+                    setTimeout(() => window.location.href = 'login.html', 1000);
                 }).catch((error) => {
-                    console.error('Logout error:', error);
-                    showToast('Error logging out. Please try again.', 'error');
+                    showToast('Error logging out', 'error');
                 });
             }
         };
