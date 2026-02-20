@@ -30,7 +30,6 @@
             padding-bottom: 80px;
         }
 
-        /* Header */
         .header {
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
@@ -123,7 +122,6 @@
             50% { opacity: 0.5; }
         }
 
-        /* Stats Cards */
         .stats-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -158,7 +156,6 @@
             font-weight: 500;
         }
 
-        /* Filter Tabs */
         .filter-tabs {
             display: flex;
             gap: 0.5rem;
@@ -206,7 +203,6 @@
             color: var(--primary);
         }
 
-        /* Orders List */
         .orders-container {
             padding: 0 1.5rem 1.5rem;
         }
@@ -218,18 +214,25 @@
             margin-bottom: 1rem;
             box-shadow: 0 2px 12px rgba(0,0,0,0.08);
             border-left: 5px solid var(--info-blue);
+            transition: all 0.3s;
         }
 
-        .order-card.pending {
+        .order-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        }
+
+        .order-card.pending, .order-card.confirmed, .order-card.preparing, .order-card.cooking, .order-card.packing {
             border-left-color: var(--warning-yellow);
         }
 
-        .order-card.picked {
+        .order-card.out-for-delivery, .order-card.outfordelivery {
             border-left-color: var(--info-blue);
         }
 
         .order-card.delivered {
             border-left-color: var(--success-green);
+            opacity: 0.8;
         }
 
         .order-header {
@@ -266,12 +269,17 @@
             letter-spacing: 0.5px;
         }
 
-        .status-pending {
+        .status-pending, .status-confirmed {
             background: #fff3cd;
             color: #856404;
         }
 
-        .status-picked {
+        .status-preparing, .status-cooking, .status-packing {
+            background: #ffe5cc;
+            color: #cc5500;
+        }
+
+        .status-out-for-delivery, .status-outfordelivery {
             background: #cfe2ff;
             color: #084298;
         }
@@ -330,9 +338,6 @@
             font-size: 0.85rem;
             color: #555;
             line-height: 1.4;
-            display: flex;
-            align-items: start;
-            gap: 0.5rem;
         }
 
         .call-btn {
@@ -349,6 +354,7 @@
             font-size: 1.2rem;
             transition: all 0.3s;
             flex-shrink: 0;
+            text-decoration: none;
         }
 
         .call-btn:active {
@@ -466,13 +472,10 @@
         .btn-secondary {
             background: #6c757d;
             color: white;
+            opacity: 0.7;
+            cursor: not-allowed;
         }
 
-        .btn-secondary:active {
-            transform: scale(0.98);
-        }
-
-        /* Empty State */
         .empty-state {
             text-align: center;
             padding: 3rem 1rem;
@@ -495,7 +498,6 @@
             font-size: 0.95rem;
         }
 
-        /* Loading */
         .loading {
             text-align: center;
             padding: 3rem 1rem;
@@ -516,7 +518,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Toast */
         .toast {
             position: fixed;
             top: 80px;
@@ -558,7 +559,6 @@
             }
         }
 
-        /* Unauthorized Screen */
         .unauthorized-screen {
             display: none;
             min-height: 100vh;
@@ -626,15 +626,13 @@
     </style>
 </head>
 <body>
-    <!-- Unauthorized Screen -->
     <div class="unauthorized-screen" id="unauthorizedScreen">
         <div class="unauthorized-icon">🚫</div>
         <h1 class="unauthorized-title">Access Denied</h1>
         <p class="unauthorized-text">You are not authorized to access the delivery partner portal.</p>
-        <a href="login.html" class="back-home-btn">Back to Login</a>
+        <a href="index.html" class="back-home-btn">Back to Home</a>
     </div>
 
-    <!-- Main App -->
     <div id="mainApp" style="display: none;">
         <div class="header">
             <div class="header-top">
@@ -658,23 +656,23 @@
         <div class="stats-container">
             <div class="stat-card">
                 <div class="stat-icon">📦</div>
-                <div class="stat-value" id="statPending">0</div>
-                <div class="stat-label">Pending</div>
+                <div class="stat-value" id="statActive">0</div>
+                <div class="stat-label">Active Orders</div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon">🚚</div>
-                <div class="stat-value" id="statPicked">0</div>
-                <div class="stat-label">Picked Up</div>
+                <div class="stat-value" id="statInTransit">0</div>
+                <div class="stat-label">In Transit</div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon">✅</div>
                 <div class="stat-value" id="statDelivered">0</div>
-                <div class="stat-label">Delivered</div>
+                <div class="stat-label">Delivered Today</div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon">💰</div>
                 <div class="stat-value" id="statEarnings">₹0</div>
-                <div class="stat-label">Today</div>
+                <div class="stat-label">Today's Earnings</div>
             </div>
         </div>
 
@@ -683,13 +681,13 @@
                 All Orders
                 <span class="filter-badge" id="badgeAll">0</span>
             </div>
-            <div class="filter-tab" data-filter="pending" onclick="filterOrders('pending')">
-                Pending
-                <span class="filter-badge" id="badgePending">0</span>
+            <div class="filter-tab" data-filter="active" onclick="filterOrders('active')">
+                Active
+                <span class="filter-badge" id="badgeActive">0</span>
             </div>
-            <div class="filter-tab" data-filter="picked" onclick="filterOrders('picked')">
-                Picked Up
-                <span class="filter-badge" id="badgePicked">0</span>
+            <div class="filter-tab" data-filter="in-transit" onclick="filterOrders('in-transit')">
+                In Transit
+                <span class="filter-badge" id="badgeInTransit">0</span>
             </div>
             <div class="filter-tab" data-filter="delivered" onclick="filterOrders('delivered')">
                 Delivered
@@ -711,9 +709,9 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getDatabase, ref, onValue, update, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+        import { getDatabase, ref, onValue, update, get } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI",
@@ -734,11 +732,14 @@
         let allOrders = [];
         let currentFilter = 'all';
 
-        // Check authentication and delivery agent status
+        // Status categorization
+        const ACTIVE_STATUSES = ['pending', 'confirmed', 'preparing', 'cooking', 'packing'];
+        const IN_TRANSIT_STATUSES = ['out-for-delivery', 'outfordelivery'];
+        const DELIVERED_STATUSES = ['delivered'];
+
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
-                // Check if user is a delivery agent
                 const isAgent = await checkDeliveryAgentStatus(user.uid);
                 if (isAgent) {
                     document.getElementById('mainApp').style.display = 'block';
@@ -750,7 +751,7 @@
                     document.getElementById('unauthorizedScreen').classList.add('active');
                 }
             } else {
-                window.location.href = 'login.html';
+                window.location.href = 'index.html';
             }
         });
 
@@ -781,6 +782,7 @@
                 }
             } catch (error) {
                 console.error('Error loading partner info:', error);
+                document.getElementById('partnerName').textContent = 'Delivery Partner';
             }
         }
 
@@ -819,35 +821,37 @@
         function updateStats() {
             const today = new Date().setHours(0, 0, 0, 0);
             
-            let pending = 0;
-            let picked = 0;
-            let delivered = 0;
+            let activeCount = 0;
+            let inTransitCount = 0;
+            let deliveredCount = 0;
             let earnings = 0;
 
             allOrders.forEach(order => {
-                const status = order.orderDetails?.status || 'pending';
+                const status = (order.orderDetails?.status || 'pending').toLowerCase();
                 const orderDate = new Date(order.orderDetails?.createdAt || 0).setHours(0, 0, 0, 0);
                 
-                if (status === 'pending') pending++;
-                if (status === 'picked') picked++;
-                if (status === 'delivered') {
-                    delivered++;
+                if (ACTIVE_STATUSES.includes(status)) {
+                    activeCount++;
+                } else if (IN_TRANSIT_STATUSES.includes(status)) {
+                    inTransitCount++;
+                } else if (DELIVERED_STATUSES.includes(status)) {
                     if (orderDate === today) {
+                        deliveredCount++;
                         earnings += order.orderDetails?.total || 0;
                     }
                 }
             });
 
-            document.getElementById('statPending').textContent = pending;
-            document.getElementById('statPicked').textContent = picked;
-            document.getElementById('statDelivered').textContent = delivered;
-            document.getElementById('statEarnings').textContent = `₹${earnings}`;
+            document.getElementById('statActive').textContent = activeCount;
+            document.getElementById('statInTransit').textContent = inTransitCount;
+            document.getElementById('statDelivered').textContent = deliveredCount;
+            document.getElementById('statEarnings').textContent = `₹${earnings.toFixed(0)}`;
 
             // Update filter badges
             document.getElementById('badgeAll').textContent = allOrders.length;
-            document.getElementById('badgePending').textContent = pending;
-            document.getElementById('badgePicked').textContent = picked;
-            document.getElementById('badgeDelivered').textContent = delivered;
+            document.getElementById('badgeActive').textContent = activeCount;
+            document.getElementById('badgeInTransit').textContent = inTransitCount;
+            document.getElementById('badgeDelivered').textContent = deliveredCount;
         }
 
         function renderOrders() {
@@ -857,8 +861,16 @@
             
             if (currentFilter !== 'all') {
                 filteredOrders = allOrders.filter(order => {
-                    const status = order.orderDetails?.status || 'pending';
-                    return status === currentFilter;
+                    const status = (order.orderDetails?.status || 'pending').toLowerCase();
+                    
+                    if (currentFilter === 'active') {
+                        return ACTIVE_STATUSES.includes(status);
+                    } else if (currentFilter === 'in-transit') {
+                        return IN_TRANSIT_STATUSES.includes(status);
+                    } else if (currentFilter === 'delivered') {
+                        return DELIVERED_STATUSES.includes(status);
+                    }
+                    return true;
                 });
             }
 
@@ -874,25 +886,32 @@
         function createOrderCard(order) {
             const orderDetails = order.orderDetails || {};
             const userDetails = order.userDetails || {};
-            const status = orderDetails.status || 'pending';
+            const status = (orderDetails.status || 'pending').toLowerCase();
             const orderNumber = orderDetails.orderNumber || order.id.slice(-6).toUpperCase();
             const createdAt = new Date(orderDetails.createdAt || Date.now());
             const timeString = formatTimeAgo(createdAt);
             
-            const statusClass = `status-${status}`;
-            const statusText = status === 'pending' ? 'Pending' : status === 'picked' ? 'Picked Up' : 'Delivered';
+            const statusClass = `status-${status.replace(/\s+/g, '-')}`;
+            const statusText = formatStatus(status);
             
             const customerName = userDetails.fullName || 'Customer';
             const customerPhone = userDetails.phone || 'N/A';
             const customerInitial = customerName.charAt(0).toUpperCase();
             
-            const address = `${userDetails.buildingBlock || ''}, ${userDetails.roomNumber || ''}`;
-            const landmark = userDetails.landmark ? `• ${userDetails.landmark}` : '';
+            const building = userDetails.buildingBlock || '';
+            const room = userDetails.roomNumber || '';
+            const landmark = userDetails.landmark || '';
+            
+            let addressParts = [];
+            if (room) addressParts.push(`Room ${room}`);
+            if (building) addressParts.push(building);
+            if (landmark) addressParts.push(landmark);
+            const address = addressParts.join(', ') || 'Address not provided';
             
             const items = orderDetails.items || [];
             const itemsHTML = items.map(item => `
                 <div class="item-row">
-                    <span class="item-name">${item.emoji || ''} ${item.name}</span>
+                    <span class="item-name">${item.emoji || '🍽️'} ${item.name}</span>
                     <span class="item-qty">×${item.quantity}</span>
                 </div>
             `).join('');
@@ -904,19 +923,23 @@
             const total = orderDetails.total || 0;
 
             let actionButtons = '';
-            if (status === 'pending') {
+            const isActive = ACTIVE_STATUSES.includes(status);
+            const isInTransit = IN_TRANSIT_STATUSES.includes(status);
+            const isDelivered = DELIVERED_STATUSES.includes(status);
+
+            if (isActive) {
                 actionButtons = `
-                    <button class="action-btn btn-primary" onclick="updateOrderStatus('${order.id}', 'picked')">
-                        Pick Up Order
+                    <button class="action-btn btn-primary" onclick="updateOrderStatus('${order.id}', 'out-for-delivery')">
+                        🚚 Start Delivery
                     </button>
                 `;
-            } else if (status === 'picked') {
+            } else if (isInTransit) {
                 actionButtons = `
                     <button class="action-btn btn-success" onclick="updateOrderStatus('${order.id}', 'delivered')">
-                        Mark Delivered
+                        ✓ Mark Delivered
                     </button>
                 `;
-            } else {
+            } else if (isDelivered) {
                 actionButtons = `
                     <button class="action-btn btn-secondary" disabled>
                         ✓ Delivered
@@ -925,7 +948,7 @@
             }
 
             return `
-                <div class="order-card ${status}">
+                <div class="order-card ${status.replace(/\s+/g, '-')}">
                     <div class="order-header">
                         <div class="order-id-section">
                             <div class="order-id">#${orderNumber}</div>
@@ -939,9 +962,7 @@
                         <div class="customer-details">
                             <div class="customer-name">${customerName}</div>
                             <div class="customer-phone">📱 ${customerPhone}</div>
-                            <div class="customer-address">
-                                📍 ${address} ${landmark}
-                            </div>
+                            <div class="customer-address">📍 ${address}</div>
                         </div>
                         <a href="tel:${customerPhone}" class="call-btn">📞</a>
                     </div>
@@ -956,7 +977,7 @@
                             <span>Payment:</span>
                             <span class="${paymentBadgeClass}">${paymentText}</span>
                         </div>
-                        <div class="order-total">₹${total}</div>
+                        <div class="order-total">₹${total.toFixed(0)}</div>
                     </div>
 
                     <div class="order-actions">
@@ -966,13 +987,25 @@
             `;
         }
 
+        function formatStatus(status) {
+            return status
+                .split(/[-_\s]/)
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+        }
+
         function formatTimeAgo(date) {
             const now = new Date();
-            const diff = Math.floor((now - date) / 1000); // seconds
+            const diff = Math.floor((now - date) / 1000);
 
             if (diff < 60) return 'Just now';
             if (diff < 3600) return `${Math.floor(diff / 60)} min ago`;
             if (diff < 86400) return `${Math.floor(diff / 3600)} hr ago`;
+            
+            const days = Math.floor(diff / 86400);
+            if (days === 1) return 'Yesterday';
+            if (days < 7) return `${days} days ago`;
+            
             return date.toLocaleDateString();
         }
 
@@ -980,13 +1013,22 @@
             try {
                 const orderRef = ref(db, `tiutbc/orders/${orderId}/orderDetails`);
                 
-                await update(orderRef, {
+                const updateData = {
                     status: newStatus,
-                    [`${newStatus}At`]: Date.now(),
-                    [`${newStatus}By`]: currentUser.uid
-                });
+                    updatedAt: Date.now()
+                };
 
-                const statusText = newStatus === 'picked' ? 'Order picked up!' : 'Order delivered!';
+                if (newStatus === 'out-for-delivery') {
+                    updateData.pickedAt = Date.now();
+                    updateData.pickedBy = currentUser.uid;
+                } else if (newStatus === 'delivered') {
+                    updateData.deliveredAt = Date.now();
+                    updateData.deliveredBy = currentUser.uid;
+                }
+                
+                await update(orderRef, updateData);
+
+                const statusText = newStatus === 'out-for-delivery' ? 'Delivery started!' : 'Order delivered!';
                 showToast(statusText, 'success');
             } catch (error) {
                 console.error('Error updating order status:', error);
@@ -997,7 +1039,6 @@
         window.filterOrders = function(filter) {
             currentFilter = filter;
             
-            // Update active tab
             document.querySelectorAll('.filter-tab').forEach(tab => {
                 tab.classList.remove('active');
             });
@@ -1034,7 +1075,7 @@
         window.logout = function() {
             if (confirm('Logout from delivery partner app?')) {
                 signOut(auth).then(() => {
-                    window.location.href = 'login.html';
+                    window.location.href = 'index.html';
                 }).catch((error) => {
                     console.error('Logout error:', error);
                     showToast('Error logging out', 'error');
