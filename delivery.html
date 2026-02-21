@@ -630,7 +630,7 @@
         <div class="unauthorized-icon">🚫</div>
         <h1 class="unauthorized-title">Access Denied</h1>
         <p class="unauthorized-text">You are not authorized to access the delivery partner portal.</p>
-        <a href="index.html" class="back-home-btn">Back to Home</a>
+        <a href="deliverylogin.html" class="back-home-btn">Back to Home</a>
     </div>
 
     <div id="mainApp" style="display: none;">
@@ -751,7 +751,7 @@
                     document.getElementById('unauthorizedScreen').classList.add('active');
                 }
             } else {
-                window.location.href = 'index.html';
+                window.location.href = 'deliverylogin.html';
             }
         });
 
@@ -1075,7 +1075,7 @@
         window.logout = function() {
             if (confirm('Logout from delivery partner app?')) {
                 signOut(auth).then(() => {
-                    window.location.href = 'index.html';
+                    window.location.href = 'deliverylogin.html';
                 }).catch((error) => {
                     console.error('Logout error:', error);
                     showToast('Error logging out', 'error');
