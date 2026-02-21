@@ -224,10 +224,6 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.12);
         }
 
-        .order-card.pending, .order-card.confirmed, .order-card.preparing, .order-card.cooking, .order-card.packing {
-            border-left-color: var(--warning-yellow);
-        }
-
         .order-card.out-for-delivery, .order-card.outfordelivery {
             border-left-color: var(--info-blue);
         }
@@ -269,16 +265,6 @@
             font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }
-
-        .status-pending, .status-confirmed {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .status-preparing, .status-cooking, .status-packing {
-            background: #ffe5cc;
-            color: #cc5500;
         }
 
         .status-out-for-delivery, .status-outfordelivery {
@@ -436,9 +422,72 @@
             color: var(--primary);
         }
 
+        /* Payment Collection Section */
+        .payment-collection {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border: 2px solid var(--warning-yellow);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .payment-collection-header {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #856404;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .payment-amount {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--brown);
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .payment-options {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .qr-container {
+            display: none;
+            text-align: center;
+            padding: 1rem;
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .qr-container.show {
+            display: block;
+        }
+
+        .qr-code {
+            width: 250px;
+            height: 250px;
+            margin: 1rem auto;
+            border: 4px solid var(--primary);
+            border-radius: 12px;
+            padding: 1rem;
+            background: white;
+        }
+
+        .qr-instructions {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
         .order-actions {
             display: flex;
             gap: 0.75rem;
+            flex-wrap: wrap;
         }
 
         .action-btn {
@@ -454,6 +503,7 @@
             letter-spacing: 0.5px;
             min-height: 48px;
             -webkit-tap-highlight-color: transparent;
+            min-width: 140px;
         }
 
         .btn-primary {
@@ -472,6 +522,15 @@
         }
 
         .btn-success:active {
+            transform: scale(0.98);
+        }
+
+        .btn-warning {
+            background: var(--warning-yellow);
+            color: #333;
+        }
+
+        .btn-warning:active {
             transform: scale(0.98);
         }
 
@@ -644,11 +703,20 @@
                 right: 10px;
                 margin: 0;
             }
+
+            .qr-code {
+                width: 200px;
+                height: 200px;
+            }
+
+            .action-btn {
+                min-width: 100%;
+            }
         }
 
         @media (min-width: 768px) {
             .stats-container {
-                grid-template-columns: repeat(4, 1fr);
+                grid-template-columns: repeat(3, 1fr);
             }
 
             .orders-container {
@@ -668,7 +736,7 @@
         <div class="unauthorized-icon">🚫</div>
         <h1 class="unauthorized-title">Access Denied</h1>
         <p class="unauthorized-text">You are not authorized to access the delivery partner portal.</p>
-        <a href="index.html" class="back-home-btn">Back to Home</a>
+        <a href="deliverylogin.html" class="back-home-btn">Back to Login</a>
     </div>
 
     <div id="mainApp" style="display: none;">
@@ -693,11 +761,6 @@
 
         <div class="stats-container">
             <div class="stat-card">
-                <div class="stat-icon">📦</div>
-                <div class="stat-value" id="statActive">0</div>
-                <div class="stat-label">Active Orders</div>
-            </div>
-            <div class="stat-card">
                 <div class="stat-icon">🚚</div>
                 <div class="stat-value" id="statInTransit">0</div>
                 <div class="stat-label">In Transit</div>
@@ -718,10 +781,6 @@
             <div class="filter-tab active" data-filter="all" onclick="filterOrders('all')">
                 All Orders
                 <span class="filter-badge" id="badgeAll">0</span>
-            </div>
-            <div class="filter-tab" data-filter="active" onclick="filterOrders('active')">
-                Active
-                <span class="filter-badge" id="badgeActive">0</span>
             </div>
             <div class="filter-tab" data-filter="in-transit" onclick="filterOrders('in-transit')">
                 In Transit
@@ -746,6 +805,7 @@
         <span id="toastText">Status updated!</span>
     </div>
 
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
@@ -769,11 +829,7 @@
         let currentUser = null;
         let allOrders = [];
         let currentFilter = 'all';
-
-        // Status categorization
-        const ACTIVE_STATUSES = ['pending', 'confirmed', 'preparing', 'cooking', 'packing'];
-        const IN_TRANSIT_STATUSES = ['out-for-delivery', 'outfordelivery'];
-        const DELIVERED_STATUSES = ['delivered'];
+        const UPI_ID = "tiubiriyani@paytm"; // Replace with your actual UPI ID
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -789,7 +845,7 @@
                     document.getElementById('unauthorizedScreen').classList.add('active');
                 }
             } else {
-                window.location.href = 'index.html';
+                window.location.href = 'deliverylogin.html';
             }
         });
 
@@ -838,10 +894,15 @@
 
                 Object.keys(ordersData).forEach(orderId => {
                     const order = ordersData[orderId];
-                    allOrders.push({
-                        id: orderId,
-                        ...order
-                    });
+                    const status = (order.orderDetails?.status || '').toLowerCase();
+                    
+                    // Only show orders that are out-for-delivery or delivered
+                    if (status === 'out-for-delivery' || status === 'outfordelivery' || status === 'delivered') {
+                        allOrders.push({
+                            id: orderId,
+                            ...order
+                        });
+                    }
                 });
 
                 // Sort by created date (newest first)
@@ -859,20 +920,17 @@
         function updateStats() {
             const today = new Date().setHours(0, 0, 0, 0);
             
-            let activeCount = 0;
             let inTransitCount = 0;
             let deliveredCount = 0;
             let earnings = 0;
 
             allOrders.forEach(order => {
-                const status = (order.orderDetails?.status || 'pending').toLowerCase();
+                const status = (order.orderDetails?.status || '').toLowerCase();
                 const orderDate = new Date(order.orderDetails?.createdAt || 0).setHours(0, 0, 0, 0);
                 
-                if (ACTIVE_STATUSES.includes(status)) {
-                    activeCount++;
-                } else if (IN_TRANSIT_STATUSES.includes(status)) {
+                if (status === 'out-for-delivery' || status === 'outfordelivery') {
                     inTransitCount++;
-                } else if (DELIVERED_STATUSES.includes(status)) {
+                } else if (status === 'delivered') {
                     if (orderDate === today) {
                         deliveredCount++;
                         earnings += order.orderDetails?.total || 0;
@@ -880,14 +938,12 @@
                 }
             });
 
-            document.getElementById('statActive').textContent = activeCount;
             document.getElementById('statInTransit').textContent = inTransitCount;
             document.getElementById('statDelivered').textContent = deliveredCount;
             document.getElementById('statEarnings').textContent = `₹${earnings.toFixed(0)}`;
 
             // Update filter badges
             document.getElementById('badgeAll').textContent = allOrders.length;
-            document.getElementById('badgeActive').textContent = activeCount;
             document.getElementById('badgeInTransit').textContent = inTransitCount;
             document.getElementById('badgeDelivered').textContent = deliveredCount;
         }
@@ -897,18 +953,15 @@
             
             let filteredOrders = allOrders;
             
-            if (currentFilter !== 'all') {
+            if (currentFilter === 'in-transit') {
                 filteredOrders = allOrders.filter(order => {
-                    const status = (order.orderDetails?.status || 'pending').toLowerCase();
-                    
-                    if (currentFilter === 'active') {
-                        return ACTIVE_STATUSES.includes(status);
-                    } else if (currentFilter === 'in-transit') {
-                        return IN_TRANSIT_STATUSES.includes(status);
-                    } else if (currentFilter === 'delivered') {
-                        return DELIVERED_STATUSES.includes(status);
-                    }
-                    return true;
+                    const status = (order.orderDetails?.status || '').toLowerCase();
+                    return status === 'out-for-delivery' || status === 'outfordelivery';
+                });
+            } else if (currentFilter === 'delivered') {
+                filteredOrders = allOrders.filter(order => {
+                    const status = (order.orderDetails?.status || '').toLowerCase();
+                    return status === 'delivered';
                 });
             }
 
@@ -924,7 +977,7 @@
         function createOrderCard(order) {
             const orderDetails = order.orderDetails || {};
             const userDetails = order.userDetails || {};
-            const status = (orderDetails.status || 'pending').toLowerCase();
+            const status = (orderDetails.status || '').toLowerCase();
             const orderNumber = orderDetails.orderNumber || order.id.slice(-6).toUpperCase();
             const createdAt = new Date(orderDetails.createdAt || Date.now());
             const timeString = formatTimeAgo(createdAt);
@@ -957,31 +1010,60 @@
             const paymentMethod = orderDetails.paymentMethod || 'cod';
             const paymentBadgeClass = paymentMethod === 'online' ? 'payment-badge online' : 'payment-badge';
             const paymentText = paymentMethod === 'online' ? 'PAID' : 'COD';
+            const paymentCollected = orderDetails.paymentCollected || false;
             
             const total = orderDetails.total || 0;
 
-            let actionButtons = '';
-            const isActive = ACTIVE_STATUSES.includes(status);
-            const isInTransit = IN_TRANSIT_STATUSES.includes(status);
-            const isDelivered = DELIVERED_STATUSES.includes(status);
+            const isInTransit = status === 'out-for-delivery' || status === 'outfordelivery';
+            const isDelivered = status === 'delivered';
+            const isCOD = paymentMethod === 'cod';
 
-            if (isActive) {
-                actionButtons = `
-                    <button class="action-btn btn-primary" onclick="updateOrderStatus('${order.id}', 'out-for-delivery')">
-                        🚚 Start Delivery
-                    </button>
+            let actionSection = '';
+
+            if (isInTransit && isCOD && !paymentCollected) {
+                // Show payment collection options for COD orders in transit
+                actionSection = `
+                    <div class="payment-collection">
+                        <div class="payment-collection-header">
+                            💰 Collect Payment
+                        </div>
+                        <div class="payment-amount">₹${total.toFixed(0)}</div>
+                        <div class="payment-options">
+                            <button class="action-btn btn-warning" onclick="showQR('${order.id}', ${total})">
+                                📱 Show QR
+                            </button>
+                            <button class="action-btn btn-success" onclick="markCashReceived('${order.id}')">
+                                💵 Received Cash
+                            </button>
+                        </div>
+                        <div class="qr-container" id="qr-${order.id}">
+                            <div class="qr-instructions">
+                                Customer can scan this QR code to pay via UPI
+                            </div>
+                            <div class="qr-code" id="qrcode-${order.id}"></div>
+                            <button class="action-btn btn-success" onclick="markUPIReceived('${order.id}')" style="max-width: 300px; margin: 0 auto;">
+                                ✓ Payment Received via UPI
+                            </button>
+                        </div>
+                    </div>
                 `;
-            } else if (isInTransit) {
-                actionButtons = `
-                    <button class="action-btn btn-success" onclick="updateOrderStatus('${order.id}', 'delivered')">
-                        ✓ Mark Delivered
-                    </button>
+            } else if (isInTransit && (paymentCollected || !isCOD)) {
+                // Payment already collected or online payment - show mark delivered button
+                actionSection = `
+                    <div class="order-actions">
+                        <button class="action-btn btn-success" onclick="markDelivered('${order.id}')">
+                            ✓ Mark Delivered
+                        </button>
+                    </div>
                 `;
             } else if (isDelivered) {
-                actionButtons = `
-                    <button class="action-btn btn-secondary" disabled>
-                        ✓ Delivered
-                    </button>
+                // Already delivered
+                actionSection = `
+                    <div class="order-actions">
+                        <button class="action-btn btn-secondary" disabled>
+                            ✓ Delivered
+                        </button>
+                    </div>
                 `;
             }
 
@@ -1018,9 +1100,7 @@
                         <div class="order-total">₹${total.toFixed(0)}</div>
                     </div>
 
-                    <div class="order-actions">
-                        ${actionButtons}
-                    </div>
+                    ${actionSection}
                 </div>
             `;
         }
@@ -1047,29 +1127,94 @@
             return date.toLocaleDateString();
         }
 
-        window.updateOrderStatus = async function(orderId, newStatus) {
+        window.showQR = function(orderId, amount) {
+            const qrContainer = document.getElementById(`qr-${orderId}`);
+            const qrCodeDiv = document.getElementById(`qrcode-${orderId}`);
+            
+            // Clear previous QR code
+            qrCodeDiv.innerHTML = '';
+            
+            // Generate UPI payment link
+            const upiLink = `upi://pay?pa=${UPI_ID}&pn=TIU Biriyani Canteen&am=${amount}&cu=INR&tn=Order ${orderId.slice(-6).toUpperCase()}`;
+            
+            // Generate QR code
+            new QRCode(qrCodeDiv, {
+                text: upiLink,
+                width: 200,
+                height: 200,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+            
+            // Show QR container
+            qrContainer.classList.add('show');
+        };
+
+        window.markCashReceived = async function(orderId) {
+            if (!confirm('Confirm that you have received cash payment?')) {
+                return;
+            }
+
             try {
                 const orderRef = ref(db, `tiutbc/orders/${orderId}/orderDetails`);
                 
-                const updateData = {
-                    status: newStatus,
-                    updatedAt: Date.now()
-                };
+                await update(orderRef, {
+                    paymentCollected: true,
+                    paymentCollectedAt: Date.now(),
+                    paymentCollectedBy: currentUser.uid,
+                    paymentCollectionMethod: 'cash'
+                });
 
-                if (newStatus === 'out-for-delivery') {
-                    updateData.pickedAt = Date.now();
-                    updateData.pickedBy = currentUser.uid;
-                } else if (newStatus === 'delivered') {
-                    updateData.deliveredAt = Date.now();
-                    updateData.deliveredBy = currentUser.uid;
-                }
-                
-                await update(orderRef, updateData);
-
-                const statusText = newStatus === 'out-for-delivery' ? 'Delivery started!' : 'Order delivered!';
-                showToast(statusText, 'success');
+                showToast('Cash payment marked as received!', 'success');
             } catch (error) {
-                console.error('Error updating order status:', error);
+                console.error('Error marking cash received:', error);
+                showToast('Failed to mark payment', 'error');
+            }
+        };
+
+        window.markUPIReceived = async function(orderId) {
+            if (!confirm('Confirm that you have received UPI payment?')) {
+                return;
+            }
+
+            try {
+                const orderRef = ref(db, `tiutbc/orders/${orderId}/orderDetails`);
+                
+                await update(orderRef, {
+                    paymentCollected: true,
+                    paymentCollectedAt: Date.now(),
+                    paymentCollectedBy: currentUser.uid,
+                    paymentCollectionMethod: 'upi'
+                });
+
+                showToast('UPI payment marked as received!', 'success');
+                
+                // Hide QR code
+                document.getElementById(`qr-${orderId}`).classList.remove('show');
+            } catch (error) {
+                console.error('Error marking UPI received:', error);
+                showToast('Failed to mark payment', 'error');
+            }
+        };
+
+        window.markDelivered = async function(orderId) {
+            if (!confirm('Mark this order as delivered?')) {
+                return;
+            }
+
+            try {
+                const orderRef = ref(db, `tiutbc/orders/${orderId}/orderDetails`);
+                
+                await update(orderRef, {
+                    status: 'delivered',
+                    deliveredAt: Date.now(),
+                    deliveredBy: currentUser.uid
+                });
+
+                showToast('Order marked as delivered!', 'success');
+            } catch (error) {
+                console.error('Error marking delivered:', error);
                 showToast('Failed to update status', 'error');
             }
         };
@@ -1093,7 +1238,7 @@
                 <div class="empty-state">
                     <div class="empty-icon">📭</div>
                     <div class="empty-title">No ${filterText}</div>
-                    <div class="empty-text">New orders will appear here automatically</div>
+                    <div class="empty-text">Orders assigned to you will appear here</div>
                 </div>
             `;
         }
@@ -1113,7 +1258,7 @@
         window.logout = function() {
             if (confirm('Logout from delivery partner app?')) {
                 signOut(auth).then(() => {
-                    window.location.href = 'index.html';
+                    window.location.href = 'deliverylogin.html';
                 }).catch((error) => {
                     console.error('Logout error:', error);
                     showToast('Error logging out', 'error');
