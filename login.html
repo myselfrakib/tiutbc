@@ -273,34 +273,80 @@
             transform: translateY(-2px);
         }
 
-        .admin-btn {
+        /* Fixed buttons container */
+        .fixed-buttons {
             position: fixed;
             right: 16px;
             bottom: 16px;
-            width: 48px;
-            height: 48px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 1200;
+        }
+
+        .floating-btn {
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
-            background: var(--primary);
-            color: var(--brown);
             border: none;
             box-shadow: 0 8px 20px rgba(0,0,0,0.18);
-            display: inline-flex;
+            display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 24px;
             cursor: pointer;
-            z-index: 1200;
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .floating-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.22);
+        }
+
+        .floating-btn:active {
+            transform: scale(0.96);
+        }
+
+        .admin-btn {
+            background: var(--primary);
+            color: var(--brown);
         }
 
         .admin-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 30px rgba(0,0,0,0.22);
             background: var(--secondary);
         }
 
-        .admin-btn:active {
-            transform: scale(0.96);
+        .delivery-btn {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .delivery-btn:hover {
+            background: #138496;
+        }
+
+        /* Tooltip */
+        .floating-btn::before {
+            content: attr(data-tooltip);
+            position: absolute;
+            right: 100%;
+            margin-right: 12px;
+            background: rgba(0,0,0,0.85);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .floating-btn:hover::before {
+            opacity: 1;
         }
 
         @media (max-width: 480px) {
@@ -320,12 +366,21 @@
                 top: 10px;
             }
 
-            .admin-btn {
+            .fixed-buttons {
                 right: 12px;
                 bottom: 12px;
-                width: 44px;
-                height: 44px;
-                font-size: 18px;
+                gap: 10px;
+            }
+
+            .floating-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+
+            .floating-btn::before {
+                font-size: 12px;
+                padding: 6px 10px;
             }
         }
 
@@ -386,7 +441,21 @@
         </div>
     </div>
 
-    <button class="admin-btn" id="adminBtn" title="Admin login (staff only)" aria-label="Admin login" onclick="window.location.href='adminlogin.html'">🔒</button>
+    <!-- Fixed floating buttons -->
+    <div class="fixed-buttons">
+        <button class="floating-btn delivery-btn" 
+                data-tooltip="Delivery Partner Login" 
+                onclick="window.location.href='delivery.html'" 
+                aria-label="Delivery partner login">
+            🏍️
+        </button>
+        <button class="floating-btn admin-btn" 
+                data-tooltip="Admin Login" 
+                onclick="window.location.href='adminlogin.html'" 
+                aria-label="Admin login">
+            🔒
+        </button>
+    </div>
 
     <div class="toast" id="toast"></div>
 
@@ -520,7 +589,6 @@
             });
         });
 
-        // FIXED: Check user exists WITHOUT authentication
         async function checkUserExists(phoneNumber) {
             try {
                 const usersRef = ref(database, 'tiutbc/users');
@@ -537,8 +605,6 @@
                 return false;
             } catch (error) {
                 console.error('Error checking user:', error);
-                // If there's a permission error, we can't check - let them proceed
-                // They'll be caught if they don't exist after OTP verification
                 return true;
             }
         }
@@ -572,7 +638,6 @@
             }
         }
 
-        // IMPROVED: Check user BEFORE sending OTP
         async function handlePhoneSubmit(phone) {
             if (phone.length !== 10 || !/^\d{10}$/.test(phone)) {
                 showToast('Please enter a valid 10-digit mobile number', 'error');
@@ -585,7 +650,6 @@
             showLoading(true);
 
             try {
-                // Check if user exists BEFORE sending OTP
                 const userExists = await checkUserExists(currentPhoneNumber);
                 
                 if (!userExists) {
@@ -598,7 +662,6 @@
                     return;
                 }
                 
-                // User exists, proceed with OTP
                 const result = await sendOTP(currentPhoneNumber);
                 
                 showLoading(false);
