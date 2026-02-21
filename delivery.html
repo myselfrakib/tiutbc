@@ -1131,24 +1131,34 @@
             const qrContainer = document.getElementById(`qr-${orderId}`);
             const qrCodeDiv = document.getElementById(`qrcode-${orderId}`);
             
+            if (!qrContainer || !qrCodeDiv) {
+                showToast('Error displaying QR code', 'error');
+                return;
+            }
+            
             // Clear previous QR code
             qrCodeDiv.innerHTML = '';
             
             // Generate UPI payment link
             const upiLink = `upi://pay?pa=${UPI_ID}&pn=TIU Biriyani Canteen&am=${amount}&cu=INR&tn=Order ${orderId.slice(-6).toUpperCase()}`;
             
-            // Generate QR code
-            new QRCode(qrCodeDiv, {
-                text: upiLink,
-                width: 200,
-                height: 200,
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
-            
-            // Show QR container
-            qrContainer.classList.add('show');
+            try {
+                // Generate QR code
+                new QRCode(qrCodeDiv, {
+                    text: upiLink,
+                    width: 200,
+                    height: 200,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+                
+                // Show QR container
+                qrContainer.classList.add('show');
+            } catch (error) {
+                console.error('Error generating QR code:', error);
+                showToast('Failed to generate QR code', 'error');
+            }
         };
 
         window.markCashReceived = async function(orderId) {
@@ -1169,7 +1179,7 @@
                 showToast('Cash payment marked as received!', 'success');
             } catch (error) {
                 console.error('Error marking cash received:', error);
-                showToast('Failed to mark payment', 'error');
+                showToast(`Failed to mark payment: ${error.message}`, 'error');
             }
         };
 
@@ -1190,11 +1200,14 @@
 
                 showToast('UPI payment marked as received!', 'success');
                 
-                // Hide QR code
-                document.getElementById(`qr-${orderId}`).classList.remove('show');
+                // Hide QR code safely
+                const qrContainer = document.getElementById(`qr-${orderId}`);
+                if (qrContainer) {
+                    qrContainer.classList.remove('show');
+                }
             } catch (error) {
                 console.error('Error marking UPI received:', error);
-                showToast('Failed to mark payment', 'error');
+                showToast(`Failed to mark payment: ${error.message}`, 'error');
             }
         };
 
@@ -1215,7 +1228,7 @@
                 showToast('Order marked as delivered!', 'success');
             } catch (error) {
                 console.error('Error marking delivered:', error);
-                showToast('Failed to update status', 'error');
+                showToast(`Failed to update status: ${error.message}`, 'error');
             }
         };
 
