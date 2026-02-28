@@ -156,6 +156,12 @@
             font-weight: 500;
         }
 
+        .earnings-note {
+            font-size: 0.7rem;
+            color: #999;
+            margin-top: 0.25rem;
+        }
+
         .filter-tabs {
             display: flex;
             gap: 0.5rem;
@@ -396,9 +402,9 @@
 
         .payment-method {
             display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.9rem;
+            flex-direction: column;
+            gap: 0.25rem;
+            font-size: 0.85rem;
             color: #666;
         }
 
@@ -409,6 +415,8 @@
             border-radius: 6px;
             font-weight: 700;
             font-size: 0.8rem;
+            display: inline-block;
+            width: fit-content;
         }
 
         .payment-badge.online {
@@ -422,66 +430,11 @@
             color: var(--primary);
         }
 
-        /* Payment Collection Section */
-        .payment-collection {
-            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
-            border: 2px solid var(--warning-yellow);
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .payment-collection-header {
-            font-weight: 700;
-            font-size: 1rem;
-            color: #856404;
-            margin-bottom: 0.75rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .payment-amount {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--brown);
-            text-align: center;
-            margin-bottom: 1rem;
-        }
-
-        .payment-options {
-            display: flex;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-        }
-
-        .qr-container {
-            display: none;
-            text-align: center;
-            padding: 1rem;
-            background: white;
-            border-radius: 12px;
-            margin-bottom: 1rem;
-        }
-
-        .qr-container.show {
-            display: block;
-        }
-
-        .qr-code {
-            width: 250px;
-            height: 250px;
-            margin: 1rem auto;
-            border: 4px solid var(--primary);
-            border-radius: 12px;
-            padding: 1rem;
-            background: white;
-        }
-
-        .qr-instructions {
-            color: #666;
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
+        .delivery-earnings {
+            font-size: 0.75rem;
+            color: var(--success-green);
+            font-weight: 600;
+            margin-top: 0.25rem;
         }
 
         .order-actions {
@@ -506,31 +459,12 @@
             min-width: 140px;
         }
 
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:active {
-            transform: scale(0.98);
-            background: var(--primary-dark);
-        }
-
         .btn-success {
             background: var(--success-green);
             color: white;
         }
 
         .btn-success:active {
-            transform: scale(0.98);
-        }
-
-        .btn-warning {
-            background: var(--warning-yellow);
-            color: #333;
-        }
-
-        .btn-warning:active {
             transform: scale(0.98);
         }
 
@@ -680,6 +614,10 @@
                 padding: 0.75rem 1rem;
             }
 
+            .stat-card:nth-child(3) {
+                grid-column: 1 / -1;
+            }
+
             .filter-tabs {
                 padding: 0.75rem 1rem;
             }
@@ -702,11 +640,6 @@
                 left: 10px;
                 right: 10px;
                 margin: 0;
-            }
-
-            .qr-code {
-                width: 200px;
-                height: 200px;
             }
 
             .action-btn {
@@ -774,6 +707,7 @@
                 <div class="stat-icon">💰</div>
                 <div class="stat-value" id="statEarnings">₹0</div>
                 <div class="stat-label">Today's Earnings</div>
+                <div class="earnings-note">(50% of delivery fees)</div>
             </div>
         </div>
 
@@ -805,7 +739,6 @@
         <span id="toastText">Status updated!</span>
     </div>
 
-    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
@@ -829,7 +762,6 @@
         let currentUser = null;
         let allOrders = [];
         let currentFilter = 'all';
-        const UPI_ID = "tiubiriyani@paytm"; // Replace with your actual UPI ID
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -933,14 +865,16 @@
                 } else if (status === 'delivered') {
                     if (orderDate === today) {
                         deliveredCount++;
-                        earnings += order.orderDetails?.total || 0;
+                        // Delivery partner gets 50% of delivery fee
+                        const deliveryFee = order.orderDetails?.deliveryFee || 0;
+                        earnings += deliveryFee * 0.5;
                     }
                 }
             });
 
             document.getElementById('statInTransit').textContent = inTransitCount;
             document.getElementById('statDelivered').textContent = deliveredCount;
-            document.getElementById('statEarnings').textContent = `₹${earnings.toFixed(0)}`;
+            document.getElementById('statEarnings').textContent = `₹${Math.round(earnings)}`;
 
             // Update filter badges
             document.getElementById('badgeAll').textContent = allOrders.length;
@@ -1009,46 +943,18 @@
 
             const paymentMethod = orderDetails.paymentMethod || 'cod';
             const paymentBadgeClass = paymentMethod === 'online' ? 'payment-badge online' : 'payment-badge';
-            const paymentText = paymentMethod === 'online' ? 'PAID' : 'COD';
-            const paymentCollected = orderDetails.paymentCollected || false;
+            const paymentText = paymentMethod === 'online' ? 'PAID ONLINE' : 'CASH ON DELIVERY';
             
             const total = orderDetails.total || 0;
+            const deliveryFee = orderDetails.deliveryFee || 0;
+            const deliveryEarning = deliveryFee * 0.5;
 
             const isInTransit = status === 'out-for-delivery' || status === 'outfordelivery';
             const isDelivered = status === 'delivered';
-            const isCOD = paymentMethod === 'cod';
 
             let actionSection = '';
 
-            if (isInTransit && isCOD && !paymentCollected) {
-                // Show payment collection options for COD orders in transit
-                actionSection = `
-                    <div class="payment-collection">
-                        <div class="payment-collection-header">
-                            💰 Collect Payment
-                        </div>
-                        <div class="payment-amount">₹${total.toFixed(0)}</div>
-                        <div class="payment-options">
-                            <button class="action-btn btn-warning" onclick="showQR('${order.id}', ${total})">
-                                📱 Show QR
-                            </button>
-                            <button class="action-btn btn-success" onclick="markCashReceived('${order.id}')">
-                                💵 Received Cash
-                            </button>
-                        </div>
-                        <div class="qr-container" id="qr-${order.id}">
-                            <div class="qr-instructions">
-                                Customer can scan this QR code to pay via UPI
-                            </div>
-                            <div class="qr-code" id="qrcode-${order.id}"></div>
-                            <button class="action-btn btn-success" onclick="markUPIReceived('${order.id}')" style="max-width: 300px; margin: 0 auto;">
-                                ✓ Payment Received via UPI
-                            </button>
-                        </div>
-                    </div>
-                `;
-            } else if (isInTransit && (paymentCollected || !isCOD)) {
-                // Payment already collected or online payment - show mark delivered button
+            if (isInTransit) {
                 actionSection = `
                     <div class="order-actions">
                         <button class="action-btn btn-success" onclick="markDelivered('${order.id}')">
@@ -1057,7 +963,6 @@
                     </div>
                 `;
             } else if (isDelivered) {
-                // Already delivered
                 actionSection = `
                     <div class="order-actions">
                         <button class="action-btn btn-secondary" disabled>
@@ -1097,7 +1002,10 @@
                             <span>Payment:</span>
                             <span class="${paymentBadgeClass}">${paymentText}</span>
                         </div>
-                        <div class="order-total">₹${total.toFixed(0)}</div>
+                        <div>
+                            <div class="order-total">₹${total.toFixed(0)}</div>
+                            <div class="delivery-earnings">Your earnings: ₹${deliveryEarning.toFixed(0)}</div>
+                        </div>
                     </div>
 
                     ${actionSection}
@@ -1126,90 +1034,6 @@
             
             return date.toLocaleDateString();
         }
-
-        window.showQR = function(orderId, amount) {
-            const qrContainer = document.getElementById(`qr-${orderId}`);
-            const qrCodeDiv = document.getElementById(`qrcode-${orderId}`);
-            
-            if (!qrContainer || !qrCodeDiv) {
-                showToast('Error displaying QR code', 'error');
-                return;
-            }
-            
-            // Clear previous QR code
-            qrCodeDiv.innerHTML = '';
-            
-            // Generate UPI payment link
-            const upiLink = `upi://pay?pa=${UPI_ID}&pn=TIU Biriyani Canteen&am=${amount}&cu=INR&tn=Order ${orderId.slice(-6).toUpperCase()}`;
-            
-            try {
-                // Generate QR code
-                new QRCode(qrCodeDiv, {
-                    text: upiLink,
-                    width: 200,
-                    height: 200,
-                    colorDark: "#000000",
-                    colorLight: "#ffffff",
-                    correctLevel: QRCode.CorrectLevel.H
-                });
-                
-                // Show QR container
-                qrContainer.classList.add('show');
-            } catch (error) {
-                console.error('Error generating QR code:', error);
-                showToast('Failed to generate QR code', 'error');
-            }
-        };
-
-        window.markCashReceived = async function(orderId) {
-            if (!confirm('Confirm that you have received cash payment?')) {
-                return;
-            }
-
-            try {
-                const orderRef = ref(db, `tiutbc/orders/${orderId}/orderDetails`);
-                
-                await update(orderRef, {
-                    paymentCollected: true,
-                    paymentCollectedAt: Date.now(),
-                    paymentCollectedBy: currentUser.uid,
-                    paymentCollectionMethod: 'cash'
-                });
-
-                showToast('Cash payment marked as received!', 'success');
-            } catch (error) {
-                console.error('Error marking cash received:', error);
-                showToast(`Failed to mark payment: ${error.message}`, 'error');
-            }
-        };
-
-        window.markUPIReceived = async function(orderId) {
-            if (!confirm('Confirm that you have received UPI payment?')) {
-                return;
-            }
-
-            try {
-                const orderRef = ref(db, `tiutbc/orders/${orderId}/orderDetails`);
-                
-                await update(orderRef, {
-                    paymentCollected: true,
-                    paymentCollectedAt: Date.now(),
-                    paymentCollectedBy: currentUser.uid,
-                    paymentCollectionMethod: 'upi'
-                });
-
-                showToast('UPI payment marked as received!', 'success');
-                
-                // Hide QR code safely
-                const qrContainer = document.getElementById(`qr-${orderId}`);
-                if (qrContainer) {
-                    qrContainer.classList.remove('show');
-                }
-            } catch (error) {
-                console.error('Error marking UPI received:', error);
-                showToast(`Failed to mark payment: ${error.message}`, 'error');
-            }
-        };
 
         window.markDelivered = async function(orderId) {
             if (!confirm('Mark this order as delivered?')) {
