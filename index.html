@@ -1,1081 +1,975 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-<title>The Biriyani Canteen · TIU</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   TOKENS — Midnight Canteen
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-:root{
-  /* palette */
-  --bg:      #f5f0eb;
-  --bg2:     #ede6dc;
-  --bg3:     #e8e0d8;
-  --surface: #f0ebe4;
-  --card:    #ffffff;
-  --border:  #e8e0d8;
-  --border2: #d4c9bc;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>TIU × The Biriyani Canteen</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #e8431a;
+            --primary-dark: #c73a15;
+            --primary-light: #ff6b35;
+            --accent: #f7931e;
+            --green: #2ecc71;
+            --green-dark: #27ae60;
+            --bg: #f5f0eb;
+            --card-bg: #ffffff;
+            --text: #1a1208;
+            --text-muted: #7a6f65;
+            --border: #e8e0d8;
+            --shadow: 0 2px 16px rgba(26,18,8,0.08);
+            --shadow-hover: 0 8px 32px rgba(26,18,8,0.15);
+            --radius: 14px;
+            --navbar-h: 64px;
+        }
 
-  --gold:    #e8431a;
-  --gold2:   #f7931e;
-  --gold-glow: rgba(232,67,26,0.18);
-  --gold-dim:  rgba(232,67,26,0.7);
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-  --ember:   #e8431a;
-  --ember-d: #c73a15;
-  --ember-g: rgba(232,67,26,0.20);
+        body {
+            font-family: 'DM Sans', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
 
-  --green:   #2ecc71;
-  --red-err: #e74c3c;
+        /* ===== NAVBAR ===== */
+        .navbar {
+            background: var(--card-bg);
+            height: var(--navbar-h);
+            padding: 0 1.25rem;
+            box-shadow: 0 1px 0 var(--border), var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
 
-  --text:    #1a1208;
-  --text2:   #4a3d30;
-  --text3:   #7a6f65;
+        .nav-left { display: flex; align-items: center; gap: 0.75rem; }
 
-  --nav-h:  60px;
-  --r:      12px;
-  --r2:     18px;
-}
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(1rem, 3.5vw, 1.2rem);
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1.1;
+            cursor: pointer;
+            letter-spacing: -0.5px;
+        }
+        .logo span { color: var(--text); }
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   RESET + BASE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{scroll-behavior:smooth}
-body{
-  font-family:'Barlow',system-ui,sans-serif;
-  background:linear-gradient(160deg,#2d1206 0%,#5c2810 50%,#7a3812 100%);
-  color:var(--text);
-  min-height:100vh;
-  overflow-x:hidden;
-}
-/* grain texture overlay */
-body::before{
-  content:'';
-  position:fixed;inset:0;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
-  opacity:0.012;
-  pointer-events:none;
-  z-index:9998;
-}
-a{text-decoration:none;color:inherit}
-button{font-family:inherit;cursor:pointer;border:none;background:none}
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 0.4rem;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        .hamburger:hover { background: var(--bg); }
+        .hamburger span { width: 20px; height: 2px; background: var(--text); border-radius: 2px; transition: all 0.3s; display: block; }
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   NAVBAR
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-.navbar{
-  position:sticky;top:0;z-index:900;
-  height:var(--nav-h);
-  background:rgba(245,240,235,0.92);
-  backdrop-filter:blur(20px) saturate(140%);
-  -webkit-backdrop-filter:blur(20px) saturate(140%);
-  border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 1.1rem;gap:0.75rem;
-}
-.nav-left{display:flex;align-items:center;gap:0.7rem}
+        .cart-btn {
+            position: relative;
+            cursor: pointer;
+            padding: 0.55rem 1.1rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.88rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            transition: all 0.25s;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .cart-btn:hover { background: var(--primary-dark); transform: translateY(-1px); }
 
-.logo{display:flex;align-items:center;gap:0.55rem;cursor:pointer}
-.logo-flame{
-  width:36px;height:36px;
-  background:linear-gradient(145deg,var(--ember),var(--gold));
-  border-radius:10px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:1.2rem;
-  flex-shrink:0;
-  box-shadow:0 0 18px var(--ember-g);
-}
-.logo-words{}
-.logo-name{
-  font-family:'Barlow Condensed',sans-serif;
-  font-weight:800;font-size:1.05rem;
-  color:var(--text);letter-spacing:0.02em;
-  line-height:1;text-transform:uppercase;
-}
-.logo-name span{color:var(--gold)}
-.logo-tag{
-  font-size:0.58rem;font-weight:600;
-  letter-spacing:0.1em;text-transform:uppercase;
-  color:var(--text3);display:block;margin-top:2px;
-}
+        .cart-badge {
+            position: absolute;
+            top: -7px;
+            right: -7px;
+            background: var(--text);
+            color: white;
+            border-radius: 50%;
+            min-width: 20px;
+            height: 20px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            border: 2px solid var(--card-bg);
+        }
+        .cart-badge.visible { display: flex; }
 
-.ham{
-  width:36px;height:36px;
-  border-radius:8px;
-  border:1px solid var(--border2);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
-  transition:background 0.18s;
-}
-.ham:hover{background:var(--surface)}
-.ham span{display:block;width:15px;height:1.5px;background:var(--text2);border-radius:2px}
+        /* ===== STORE CLOSED BANNER ===== */
+        .store-closed-banner {
+            display: none;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            text-align: center;
+            padding: 0.85rem 1.25rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            gap: 0.5rem;
+            align-items: center;
+            justify-content: center;
+        }
+        .store-closed-banner.visible { display: flex; }
 
-.nav-links{display:none;align-items:center;gap:0.1rem}
-.nav-link{
-  padding:0.38rem 0.8rem;border-radius:8px;
-  font-size:0.84rem;font-weight:600;
-  color:var(--text2);transition:all 0.18s;
-  display:flex;align-items:center;gap:0.4rem;
-}
-.nav-link:hover{background:var(--surface);color:var(--text)}
-.nav-link.hidden{display:none!important}
+        /* ===== DROPDOWN NAV ===== */
+        .nav-dropdown {
+            display: none;
+            position: fixed;
+            top: var(--navbar-h);
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            flex-direction: column;
+            z-index: 999;
+            padding: 0.5rem;
+        }
+        .nav-dropdown.active { display: flex; animation: dropDown 0.2s ease; }
 
-/* cart pill */
-.cart-pill{
-  display:flex;align-items:center;gap:0.45rem;
-  background:var(--gold);color:white;
-  padding:0.45rem 0.95rem;
-  border-radius:50px;
-  font-size:0.84rem;font-weight:800;
-  font-family:'Barlow Condensed',sans-serif;
-  letter-spacing:0.04em;text-transform:uppercase;
-  transition:all 0.22s;
-  box-shadow:0 0 20px var(--gold-glow);
-  white-space:nowrap;
-}
-.cart-pill:hover{background:var(--gold2);transform:translateY(-1px);box-shadow:0 4px 28px var(--gold-glow)}
-.cart-num{
-  background:var(--text);color:white;
-  border-radius:50px;min-width:21px;height:21px;
-  display:none;align-items:center;justify-content:center;
-  font-size:0.72rem;font-weight:800;padding:0 4px;
-}
-.cart-num.on{display:flex}
+        @keyframes dropDown {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-/* mobile nav */
-.mob-nav{
-  display:none;position:fixed;
-  top:var(--nav-h);left:0;right:0;
-  background:var(--card);
-  border-bottom:1px solid var(--border2);
-  box-shadow:0 12px 40px rgba(0,0,0,0.5);
-  flex-direction:column;z-index:899;
-  padding:0.5rem 0.7rem 0.8rem;gap:0.1rem;
-}
-.mob-nav.on{display:flex;animation:navSlide 0.2s ease}
-@keyframes navSlide{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
-.mob-nav .nav-link{padding:0.88rem 1rem;font-size:0.95rem;border-radius:8px}
+        .nav-item {
+            padding: 0.9rem 1rem;
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 500;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+        .nav-item:hover { background: var(--bg); }
+        .nav-item.hidden { display: none; }
 
-@media(min-width:768px){
-  .ham{display:none}
-  .nav-links{display:flex}
-}
+        @media (min-width: 768px) {
+            .hamburger { display: none; }
+            .nav-dropdown {
+                display: flex !important;
+                position: static;
+                flex-direction: row;
+                padding: 0;
+                box-shadow: none;
+                border: none;
+                background: transparent;
+                gap: 0.25rem;
+            }
+            .nav-item { padding: 0.4rem 0.9rem; font-size: 0.88rem; }
+        }
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   CLOSED BAR
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-.closed-bar{
-  display:none;
-  background:linear-gradient(90deg,#7f1d1d,#b91c1c);
-  color:rgba(255,255,255,0.95);
-  text-align:center;padding:0.62rem 1rem;
-  font-size:0.84rem;font-weight:600;
-  align-items:center;justify-content:center;gap:0.5rem;
-  border-bottom:1px solid rgba(255,100,100,0.2);
-}
-.closed-bar.on{display:flex}
+        /* ===== CONTAINER ===== */
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 1.25rem 1rem 120px;
+        }
+        @media (min-width: 768px) { .container { padding: 1.75rem 1.5rem 120px; } }
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   HERO
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-.hero{
-  position:relative;overflow:hidden;
-  padding:3rem 1.25rem 0;
-  background:linear-gradient(160deg,#2d1206 0%,#5c2810 50%,#7a3812 100%);
-}
-/* large decorative text background */
-.hero-bg-word{
-  position:absolute;
-  top:-0.15em;left:-0.04em;
-  font-family:'Barlow Condensed',sans-serif;
-  font-weight:800;
-  font-size:clamp(9rem,28vw,20rem);
-  color:rgba(255,255,255,0.06);
-  line-height:1;
-  letter-spacing:-0.03em;
-  text-transform:uppercase;
-  pointer-events:none;
-  white-space:nowrap;
-  user-select:none;
-}
-/* amber radial glow top-right */
-.hero::after{
-  content:'';position:absolute;
-  width:500px;height:500px;border-radius:50%;
-  background:radial-gradient(circle,rgba(232,67,26,0.15) 0%,transparent 70%);
-  top:-100px;right:-100px;pointer-events:none;
-}
-.hero-inner{
-  max-width:1440px;margin:0 auto;
-  position:relative;z-index:1;
-}
+        /* ===== LOGIN BANNER ===== */
+        .login-banner {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            padding: 1rem 1.25rem;
+            border-radius: var(--radius);
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 4px 20px rgba(232,67,26,0.25);
+        }
+        .login-banner h3 { font-family: 'Syne', sans-serif; font-size: 1.05rem; margin-bottom: 0.2rem; }
+        .login-banner p { font-size: 0.82rem; opacity: 0.92; }
+        .login-btn {
+            background: white;
+            color: var(--primary);
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 700;
+            text-decoration: none;
+            white-space: nowrap;
+            font-size: 0.88rem;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .login-btn:hover { transform: scale(1.03); }
 
-/* status pill */
-.hero-status{
-  display:inline-flex;align-items:center;gap:0.45rem;
-  border:1px solid var(--border2);
-  background:rgba(232,67,26,0.06);
-  color:var(--gold-dim);
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:0.75rem;font-weight:700;
-  letter-spacing:0.1em;text-transform:uppercase;
-  padding:0.3rem 0.85rem;border-radius:50px;
-  margin-bottom:1.1rem;
-}
-.pulse-dot{
-  width:6px;height:6px;border-radius:50%;
-  background:var(--gold);
-  animation:pulse 1.9s ease-in-out infinite;
-}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.3;transform:scale(0.7)}}
+        @media (max-width: 480px) {
+            .login-banner { flex-direction: column; text-align: center; }
+        }
 
-/* headline */
-.hero-h1{
-  font-family:'Cormorant Garamond',serif;
-  font-weight:700;
-  font-size:clamp(2.8rem,8vw,5.5rem);
-  line-height:0.95;
-  letter-spacing:-0.02em;
-  color:var(--text);
-  margin-bottom:1rem;
-}
-.hero-h1 em{
-  font-style:italic;
-  background:linear-gradient(120deg,var(--gold),var(--ember));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  background-clip:text;
-}
+        /* ===== CATEGORY HEADER ===== */
+        .category-section { margin-bottom: 2.25rem; }
 
-.hero-desc{
-  color:var(--text3);
-  font-size:clamp(0.88rem,2vw,1.02rem);
-  font-weight:500;max-width:420px;
-  line-height:1.65;margin-bottom:2rem;
-}
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.65rem;
+            border-bottom: 2px solid var(--border);
+        }
+        .category-emoji { font-size: 1.6rem; line-height: 1; }
+        .category-title {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(1.1rem, 3vw, 1.3rem);
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: -0.3px;
+        }
+        .category-count { color: var(--text-muted); font-size: 0.82rem; font-weight: 500; }
 
-/* stats row */
-.hero-stats{
-  display:flex;gap:0;
-  flex-wrap:wrap;
-  margin-bottom:2.25rem;
-  border:1px solid var(--border);
-  border-radius:var(--r);
-  overflow:hidden;
-  display:inline-flex;
-  background:var(--surface);
-}
-.h-stat{
-  padding:0.85rem 1.4rem;
-  border-right:1px solid var(--border);
-  display:flex;flex-direction:column;gap:0.1rem;
-}
-.h-stat:last-child{border-right:none}
-.h-stat-v{
-  font-family:'Barlow Condensed',sans-serif;
-  font-weight:800;font-size:1.3rem;
-  color:var(--gold);letter-spacing:0.01em;
-}
-.h-stat-l{
-  font-size:0.66rem;font-weight:700;
-  letter-spacing:0.08em;text-transform:uppercase;
-  color:var(--text3);
-}
+        /* ===== FOOD GRID ===== */
+        .food-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.85rem;
+        }
+        @media (min-width: 560px) { .food-grid { grid-template-columns: repeat(3, 1fr); gap: 1rem; } }
+        @media (min-width: 900px) { .food-grid { grid-template-columns: repeat(4, 1fr); gap: 1.1rem; } }
+        @media (min-width: 1200px) { .food-grid { grid-template-columns: repeat(5, 1fr); gap: 1.25rem; } }
+        @media (max-width: 340px) { .food-grid { grid-template-columns: 1fr; } }
 
-/* chips row */
-.hero-chips{
-  display:flex;gap:0.5rem;
-  overflow-x:auto;scrollbar-width:none;
-  padding-bottom:1.8rem;
-  -webkit-overflow-scrolling:touch;
-}
-.hero-chips::-webkit-scrollbar{display:none}
-.h-chip{
-  flex-shrink:0;
-  border:1px solid var(--border2);
-  background:transparent;
-  color:var(--text2);
-  padding:0.48rem 1rem;border-radius:50px;
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:0.84rem;font-weight:700;
-  letter-spacing:0.04em;text-transform:uppercase;
-  display:flex;align-items:center;gap:0.4rem;
-  cursor:pointer;transition:all 0.22s;white-space:nowrap;
-}
-.h-chip:hover,.h-chip.lit{
-  background:var(--gold);color:white;
-  border-color:var(--text);
-  box-shadow:0 0 18px var(--gold-glow);
-  transform:translateY(-2px);
-}
+        /* ===== FOOD CARD ===== */
+        .food-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            border: 1px solid var(--border);
+        }
+        .food-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+        }
 
-/* divider */
-.hero-line{
-  width:100%;height:1px;
-  background:linear-gradient(90deg,transparent,var(--border2),transparent);
-  margin-bottom:0;
-}
+        .food-img-wrap {
+            position: relative;
+            width: 100%;
+            height: 130px;
+            background: linear-gradient(135deg, #fdf0e6 0%, #fde8d8 100%);
+            overflow: hidden;
+        }
+        @media (min-width: 560px) { .food-img-wrap { height: 155px; } }
+        @media (min-width: 900px) { .food-img-wrap { height: 175px; } }
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   CONTAINER
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-.container{
-  max-width:1440px;margin:0 auto;
-  padding:2rem 1.1rem 140px;
-}
-@media(min-width:768px){.container{padding:2.5rem 1.5rem 140px}}
+        .food-img-wrap img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+        .food-card:hover .food-img-wrap img { transform: scale(1.06); }
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   LOGIN BANNER
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-.login-banner{
-  display:flex;align-items:center;
-  justify-content:space-between;gap:1rem;
-  background:var(--surface);
-  border:1px solid var(--border2);
-  border-radius:var(--r2);
-  padding:1.1rem 1.4rem;margin-bottom:2.25rem;
-  position:relative;overflow:hidden;
-}
-.login-banner::before{
-  content:'';position:absolute;
-  left:0;top:0;bottom:0;width:3px;
-  background:linear-gradient(to bottom,var(--gold),var(--ember));
-}
-.login-banner::after{
-  content:'🍛';
-  position:absolute;right:85px;top:50%;
-  transform:translateY(-50%) rotate(-20deg);
-  font-size:4rem;opacity:0.08;pointer-events:none;
-}
-.lb-t{
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:1.05rem;font-weight:700;
-  letter-spacing:0.03em;text-transform:uppercase;
-  color:var(--text);margin-bottom:0.22rem;
-}
-.lb-s{font-size:0.8rem;color:var(--text3);font-weight:500}
-.lb-btn{
-  flex-shrink:0;background:var(--gold);color:white;
-  padding:0.58rem 1.3rem;border-radius:50px;
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:0.84rem;font-weight:800;
-  letter-spacing:0.06em;text-transform:uppercase;
-  transition:all 0.2s;white-space:nowrap;position:relative;z-index:1;
-}
-.lb-btn:hover{background:var(--gold2);transform:scale(1.04)}
-@media(max-width:480px){.login-banner{flex-direction:column}.login-banner::after{display:none}}
+        .food-emoji-fallback {
+            width: 100%; height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+        }
+        @media (min-width: 560px) { .food-emoji-fallback { font-size: 4rem; } }
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   CATEGORY SECTION
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-.cat-sec{
-  margin-bottom:3rem;
-  scroll-margin-top:calc(var(--nav-h) + 12px);
-}
+        .veg-badge {
+            position: absolute;
+            top: 7px;
+            left: 7px;
+            width: 17px;
+            height: 17px;
+            border: 2px solid var(--green);
+            border-radius: 3px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .veg-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
 
-.cat-head{
-  display:flex;align-items:flex-end;
-  justify-content:space-between;
-  margin-bottom:1.25rem;
-  padding-bottom:0.9rem;
-  border-bottom:1px solid var(--border);
-}
-.cat-head-l{display:flex;align-items:center;gap:0.8rem}
+        .food-body { padding: 0.75rem; }
+        @media (min-width: 560px) { .food-body { padding: 0.9rem; } }
 
-.cat-emo{
-  width:44px;height:44px;
-  background:var(--surface);
-  border:1px solid var(--border2);
-  border-radius:12px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:1.5rem;flex-shrink:0;
-}
-.cat-title{
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:clamp(1.3rem,3.5vw,1.75rem);
-  font-weight:800;color:var(--text);
-  letter-spacing:0.02em;text-transform:uppercase;
-  line-height:1;
-}
-.cat-sub{
-  font-size:0.72rem;font-weight:600;
-  letter-spacing:0.08em;text-transform:uppercase;
-  color:var(--text3);margin-top:3px;
-}
-.cat-cnt{
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:0.78rem;font-weight:700;
-  letter-spacing:0.06em;text-transform:uppercase;
-  color:var(--text3);
-  background:var(--surface);
-  border:1px solid var(--border);
-  padding:0.25rem 0.65rem;border-radius:50px;
-}
+        .food-name {
+            font-weight: 700;
+            font-size: 0.88rem;
+            color: var(--text);
+            line-height: 1.3;
+            margin-bottom: 0.3rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        @media (min-width: 560px) { .food-name { font-size: 0.95rem; } }
+        @media (min-width: 900px) { .food-name { font-size: 1rem; } }
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   FOOD GRID
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-.food-grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:0.75rem;
-}
-@media(min-width:500px){.food-grid{grid-template-columns:repeat(3,1fr)}}
-@media(min-width:820px){.food-grid{grid-template-columns:repeat(4,1fr);gap:0.9rem}}
-@media(min-width:1080px){.food-grid{grid-template-columns:repeat(5,1fr);gap:1rem}}
-@media(max-width:340px){.food-grid{grid-template-columns:1fr}}
+        .food-desc {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            line-height: 1.4;
+            margin-bottom: 0.5rem;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   FOOD CARD
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-.food-card{
-  background:var(--card);
-  border-radius:var(--r2);
-  overflow:hidden;
-  border:1px solid var(--border);
-  display:flex;flex-direction:column;
-  transition:
-    transform 0.3s cubic-bezier(.34,1.56,.64,1),
-    border-color 0.3s ease,
-    box-shadow 0.3s ease;
-  animation:cardUp 0.45s ease both;
-}
-.food-card:hover{
-  transform:translateY(-6px) scale(1.018);
-  border-color:rgba(232,67,26,0.28);
-  box-shadow:0 8px 32px rgba(26,18,8,0.14),0 0 0 1px rgba(232,67,26,0.12),0 0 20px rgba(232,67,26,0.1);
-}
-@keyframes cardUp{
-  from{opacity:0;transform:translateY(18px)}
-  to{opacity:1;transform:translateY(0)}
-}
-.food-card:nth-child(1){animation-delay:.04s}
-.food-card:nth-child(2){animation-delay:.09s}
-.food-card:nth-child(3){animation-delay:.13s}
-.food-card:nth-child(4){animation-delay:.17s}
-.food-card:nth-child(5){animation-delay:.21s}
-.food-card:nth-child(n+6){animation-delay:.25s}
+        .food-rating {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+            background: var(--green);
+            color: white;
+            padding: 0.18rem 0.42rem;
+            border-radius: 5px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            margin-bottom: 0.55rem;
+        }
 
-/* image */
-.card-img{
-  position:relative;width:100%;
-  aspect-ratio:4/3;
-  background:var(--bg3);
-  overflow:hidden;flex-shrink:0;
-}
-.card-img img{
-  position:absolute;inset:0;
-  width:100%;height:100%;object-fit:cover;
-  transition:transform 0.4s ease;
-}
-.food-card:hover .card-img img{transform:scale(1.09)}
-.card-emo{
-  position:absolute;inset:0;
-  display:flex;align-items:center;justify-content:center;
-  font-size:clamp(2.2rem,5vw,3rem);
-}
-/* veg badge */
-.veg{
-  position:absolute;top:8px;left:8px;
-  width:18px;height:18px;
-  background:var(--card);border-radius:4px;
-  border:1.5px solid var(--green);
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 1px 6px rgba(0,0,0,0.4);
-}
-.veg-d{width:8px;height:8px;border-radius:50%;background:var(--green)}
+        .food-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.4rem;
+        }
 
-/* body */
-.card-body{
-  padding:0.8rem 0.9rem 0.95rem;
-  display:flex;flex-direction:column;
-  flex:1;
-}
-.card-name{
-  font-family:'Barlow Condensed',sans-serif;
-  font-weight:700;font-size:clamp(0.9rem,2vw,1.05rem);
-  letter-spacing:0.02em;
-  color:var(--text);line-height:1.25;
-  display:-webkit-box;-webkit-line-clamp:2;
-  -webkit-box-orient:vertical;overflow:hidden;
-  margin-bottom:0.3rem;
-}
-.card-desc{
-  font-size:0.72rem;color:var(--text3);
-  line-height:1.5;
-  display:-webkit-box;-webkit-line-clamp:2;
-  -webkit-box-orient:vertical;overflow:hidden;
-  margin-bottom:0.5rem;
-}
-.card-star{
-  display:inline-flex;align-items:center;gap:0.2rem;
-  color:var(--gold-dim);
-  font-size:0.7rem;font-weight:600;
-  margin-bottom:0.6rem;
-}
+        .food-price {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text);
+            flex-shrink: 0;
+        }
+        @media (min-width: 560px) { .food-price { font-size: 1.2rem; } }
 
-.card-foot{
-  display:flex;align-items:center;
-  justify-content:space-between;gap:0.4rem;
-  margin-top:auto;
-}
-.card-price{
-  font-family:'Cormorant Garamond',serif;
-  font-weight:700;
-  font-size:clamp(1.1rem,2.5vw,1.3rem);
-  color:var(--text);
-  line-height:1;flex-shrink:0;
-}
+        /* Add / Qty buttons */
+        .add-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.45rem 0.85rem;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.78rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'DM Sans', sans-serif;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .add-btn:hover { background: var(--primary-dark); transform: scale(1.04); }
+        .add-btn:active { transform: scale(0.97); }
+        .add-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
 
-/* ADD button */
-.btn-add{
-  background:transparent;
-  color:var(--text);
-  border:1.5px solid rgba(232,67,26,0.45);
-  padding:0.44rem 0.85rem;
-  border-radius:8px;
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:0.8rem;font-weight:800;
-  letter-spacing:0.06em;text-transform:uppercase;
-  transition:all 0.2s;
-  white-space:nowrap;flex-shrink:0;
-}
-.btn-add:hover{
-  background:var(--gold);color:white;
-  border-color:var(--text);
-  box-shadow:0 0 16px var(--gold-glow);
-  transform:scale(1.06);
-}
-.btn-add:active{transform:scale(0.95)}
-.btn-add:disabled{
-  border-color:var(--border);color:var(--text3);
-  cursor:not-allowed;transform:none;
-  background:transparent;box-shadow:none;
-}
+        .qty-ctrl {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            background: var(--primary);
+            border-radius: 8px;
+            padding: 0.3rem 0.55rem;
+            flex-shrink: 0;
+        }
 
-/* qty stepper */
-.qty-box{
-  display:flex;align-items:center;
-  background:var(--gold);border-radius:8px;
-  overflow:hidden;flex-shrink:0;
-}
-.qty-s{
-  background:transparent;color:white;
-  width:28px;height:30px;
-  font-size:1.05rem;font-weight:900;
-  display:flex;align-items:center;justify-content:center;
-  transition:background 0.15s;flex-shrink:0;
-}
-.qty-s:hover{background:rgba(0,0,0,0.12)}
-.qty-s:active{transform:scale(0.88)}
-.qty-n{color:white;font-weight:900;font-size:0.88rem;min-width:22px;text-align:center}
+        .qty-btn {
+            background: white;
+            color: var(--primary);
+            border: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            font-weight: 800;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+        .qty-btn:active { transform: scale(0.88); }
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   CART BAR
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-.cart-bar{
-  position:fixed;bottom:0;left:0;right:0;
-  z-index:800;display:none;
-  padding:0.85rem 1rem 1.1rem;
-  pointer-events:none;
-}
-.cart-bar.on{display:block;animation:barUp 0.35s cubic-bezier(.34,1.56,.64,1)}
-@keyframes barUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
+        .qty-num {
+            color: white;
+            font-weight: 700;
+            min-width: 18px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
 
-.cart-bar-in{
-  max-width:520px;margin:0 auto;
-  background:var(--surface);
-  border:1px solid rgba(232,67,26,0.22);
-  border-radius:var(--r2);
-  padding:0.9rem 0.9rem 0.9rem 1.35rem;
-  display:flex;align-items:center;
-  justify-content:space-between;gap:1rem;
-  box-shadow:0 -4px 24px rgba(26,18,8,0.12),0 0 24px rgba(232,67,26,0.12);
-  pointer-events:all;
-}
-.cb-left{display:flex;flex-direction:column;gap:0.08rem}
-.cb-count{font-size:0.72rem;color:var(--text3);font-weight:600;letter-spacing:0.04em;text-transform:uppercase}
-.cb-total{
-  font-family:'Cormorant Garamond',serif;
-  font-weight:700;font-size:1.45rem;color:var(--gold);line-height:1;
-}
-.cb-btn{
-  display:flex;align-items:center;gap:0.5rem;
-  background:var(--gold);color:white;
-  padding:0.75rem 1.35rem;
-  border-radius:var(--r);
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:0.88rem;font-weight:800;
-  letter-spacing:0.06em;text-transform:uppercase;
-  transition:all 0.2s;white-space:nowrap;flex-shrink:0;
-  box-shadow:0 4px 20px var(--gold-glow);
-}
-.cb-btn:hover{background:var(--ember-d);transform:scale(1.03)}
+        /* ===== BOTTOM CART BAR ===== */
+        .cart-bar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: var(--card-bg);
+            padding: 0.9rem 1.25rem;
+            box-shadow: 0 -4px 24px rgba(26,18,8,0.12);
+            display: none;
+            z-index: 1001;
+            border-top: 1px solid var(--border);
+        }
+        .cart-bar.visible { display: block; animation: slideUp 0.3s ease; }
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   TOAST
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-.toast{
-  position:fixed;top:calc(var(--nav-h)+10px);right:14px;
-  z-index:9999;
-  background:var(--surface);
-  border:1px solid var(--border2);
-  color:var(--text);
-  padding:0.72rem 1.1rem;
-  border-radius:var(--r);
-  font-size:0.84rem;font-weight:600;
-  display:none;align-items:center;gap:0.55rem;
-  min-width:185px;max-width:280px;
-  box-shadow:0 8px 32px rgba(0,0,0,0.4);
-  border-left:3px solid var(--green);
-}
-.toast.on{display:flex;animation:tPop 0.28s cubic-bezier(.34,1.56,.64,1)}
-.toast.err{border-left-color:var(--red-err)}
-@keyframes tPop{from{transform:translateX(18px) scale(0.94);opacity:0}to{transform:translateX(0) scale(1);opacity:1}}
-@media(max-width:480px){.toast{right:10px;left:10px;min-width:auto}}
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   LOADING / EMPTY
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-.load-wrap{
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  padding:6rem 1rem;gap:1rem;color:var(--text3);
-}
-.spinner{
-  width:36px;height:36px;
-  border:2.5px solid var(--bg3);
-  border-top-color:var(--text);
-  border-radius:50%;
-  animation:spin 0.7s linear infinite;
-}
-@keyframes spin{to{transform:rotate(360deg)}}
-.load-wrap p{
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:0.9rem;font-weight:700;
-  letter-spacing:0.08em;text-transform:uppercase;
-}
+        .cart-bar-inner {
+            max-width: 1440px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
 
-.empty-wrap{text-align:center;padding:5rem 1rem;color:var(--text3)}
-.empty-wrap .ei{font-size:3rem;margin-bottom:0.75rem;opacity:0.6}
-.empty-wrap h3{
-  font-family:'Cormorant Garamond',serif;
-  font-size:1.5rem;font-weight:700;color:var(--text);margin-bottom:0.4rem;
-}
-.empty-wrap p{font-size:0.86rem;font-weight:500}
-</style>
+        .cart-bar-info { display: flex; flex-direction: column; gap: 0.15rem; }
+        .cart-bar-count { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
+        .cart-bar-total { font-family: 'Syne', sans-serif; font-size: 1.25rem; font-weight: 800; color: var(--text); }
+
+        .view-cart-btn {
+            background: var(--green);
+            color: white;
+            padding: 0.85rem 1.75rem;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .view-cart-btn:hover { background: var(--green-dark); transform: translateY(-1px); }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            top: 80px;
+            right: 16px;
+            background: var(--card-bg);
+            padding: 0.85rem 1.25rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(26,18,8,0.18);
+            display: none;
+            z-index: 3000;
+            min-width: 220px;
+            max-width: 320px;
+            align-items: center;
+            gap: 0.65rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-left: 4px solid var(--green);
+            animation: toastIn 0.3s ease;
+        }
+        .toast.show { display: flex; }
+        .toast.error { border-left-color: var(--primary); }
+
+        @keyframes toastIn {
+            from { transform: translateX(120%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @media (max-width: 480px) {
+            .toast { right: 10px; left: 10px; min-width: auto; }
+        }
+
+        /* ===== LOADING ===== */
+        .loading-state {
+            text-align: center;
+            padding: 4rem 1rem;
+            color: var(--text-muted);
+        }
+        .spinner {
+            width: 44px; height: 44px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .loading-state p { font-size: 0.95rem; font-weight: 500; }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-muted);
+        }
+        .empty-state .big-emoji { font-size: 3.5rem; margin-bottom: 0.75rem; }
+        .empty-state h3 { font-family: 'Syne', sans-serif; font-size: 1.1rem; color: var(--text); margin-bottom: 0.4rem; }
+        .empty-state p { font-size: 0.88rem; }
+    </style>
 </head>
 <body>
 
-<!-- ══ NAVBAR ══ -->
+<!-- NAVBAR -->
 <nav class="navbar">
-  <div class="nav-left">
-    <button class="ham" id="hamBtn" aria-label="Menu" onclick="toggleMenu()">
-      <span></span><span></span><span></span>
-    </button>
-    <a href="#" class="logo">
-      <div class="logo-flame">🔥</div>
-      <div class="logo-words">
-        <div class="logo-name">Biriyani <span>Canteen</span></div>
-        <span class="logo-tag">TIU Campus</span>
-      </div>
+    <div class="nav-left">
+        <div class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
+            <span></span><span></span><span></span>
+        </div>
+        <div class="logo" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+            🍛 <span>TIU</span> Biriyani
+        </div>
+    </div>
+
+    <div class="nav-dropdown" id="navMenu">
+        <span class="nav-item" style="background:var(--bg); pointer-events:none;">🏠 Home</span>
+        <a href="orders.html"  class="nav-item hidden" id="ordersLink">📦 My Orders</a>
+        <a href="profile.html" class="nav-item hidden" id="profileLink">👤 Profile</a>
+        <span class="nav-item hidden" id="logoutLink" onclick="logout()">🚪 Logout</span>
+        <a href="login.html"   class="nav-item" id="loginLink">🔑 Login</a>
+    </div>
+
+    <a href="checkout.html" class="cart-btn" id="cartBtn">
+        🛒 Cart
+        <span class="cart-badge" id="cartBadge">0</span>
     </a>
-  </div>
-
-  <div class="nav-links" id="deskNav">
-    <a href="orders.html"  class="nav-link hidden" id="oLinkD">📦 Orders</a>
-    <a href="profile.html" class="nav-link hidden" id="pLinkD">👤 Profile</a>
-    <span class="nav-link hidden" id="lLinkD" onclick="doLogout()">🚪 Logout</span>
-    <a href="login.html"   class="nav-link" id="iLinkD">🔑 Login</a>
-  </div>
-
-  <a href="checkout.html" class="cart-pill" id="cartPill">
-    🛒 Cart
-    <span class="cart-num" id="cartNum">0</span>
-  </a>
 </nav>
 
-<!-- mobile nav -->
-<div class="mob-nav" id="mobNav">
-  <a href="orders.html"  class="nav-link hidden" id="oLinkM">📦 My Orders</a>
-  <a href="profile.html" class="nav-link hidden" id="pLinkM">👤 Profile</a>
-  <span class="nav-link hidden" id="lLinkM" onclick="doLogout()">🚪 Logout</span>
-  <a href="login.html"   class="nav-link" id="iLinkM">🔑 Login / Sign Up</a>
+<!-- STORE CLOSED BANNER -->
+<div class="store-closed-banner" id="storeClosedBanner">
+    🔒 &nbsp; We're currently closed. New orders are not being accepted right now. Check back soon!
 </div>
 
-<!-- ══ CLOSED BAR ══ -->
-<div class="closed-bar" id="closedBar">
-  🔒 &nbsp; We're closed right now — orders paused. Back soon!
+<!-- MAIN CONTENT -->
+<div class="container" id="mainContainer">
+    <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading delicious food…</p>
+    </div>
 </div>
 
-<!-- ══ HERO ══ -->
-<section class="hero">
-  <div class="hero-bg-word">Biriyani</div>
-  <div class="hero-inner">
-    <div class="hero-status">
-      <div class="pulse-dot"></div>
-      <span id="heroTagText">Now Open · Fast Delivery</span>
-    </div>
-    <h1 class="hero-h1">
-      Hot food,<br><em>right to your door.</em>
-    </h1>
-    <p class="hero-desc">
-      Fresh biriyani, maggi, chai &amp; more —<br>delivered straight to your room on campus.
-    </p>
-    <div class="hero-stats">
-      <div class="h-stat">
-        <div class="h-stat-v">₹0</div>
-        <div class="h-stat-l">Delivery above ₹200</div>
-      </div>
-      <div class="h-stat">
-        <div class="h-stat-v">~20 min</div>
-        <div class="h-stat-l">Average delivery</div>
-      </div>
-      <div class="h-stat">
-        <div class="h-stat-v">4.8 ★</div>
-        <div class="h-stat-l">Campus rating</div>
-      </div>
-    </div>
-    <div class="hero-chips" id="heroChips"></div>
-  </div>
-  <div class="hero-line"></div>
-</section>
-
-<!-- ══ MAIN ══ -->
-<main class="container" id="main">
-  <div class="load-wrap">
-    <div class="spinner"></div>
-    <p>Loading the menu…</p>
-  </div>
-</main>
-
-<!-- ══ CART BAR ══ -->
+<!-- BOTTOM CART BAR -->
 <div class="cart-bar" id="cartBar">
-  <div class="cart-bar-in">
-    <div class="cb-left">
-      <div class="cb-count" id="cbCount">0 items</div>
-      <div class="cb-total" id="cbTotal">₹0</div>
+    <div class="cart-bar-inner">
+        <div class="cart-bar-info">
+            <div class="cart-bar-count" id="cartBarCount">0 items</div>
+            <div class="cart-bar-total" id="cartBarTotal">₹0</div>
+        </div>
+        <a href="checkout.html" class="view-cart-btn">View Cart →</a>
     </div>
-    <a href="checkout.html" class="cb-btn">View Cart →</a>
-  </div>
 </div>
 
-<!-- ══ TOAST ══ -->
+<!-- TOAST -->
 <div class="toast" id="toast">
-  <span id="tIcon">✅</span>
-  <span id="tMsg">Done!</span>
+    <span id="toastIcon">✅</span>
+    <span id="toastMsg">Done!</span>
 </div>
 
 <script type="module">
-import { initializeApp }        from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut }
-                                from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getDatabase, ref, onValue, set, remove, get }
-                                from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { initializeApp }       from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getDatabase, ref, onValue, set, remove, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-/* ── Firebase ── */
-const app = initializeApp({
-    apiKey:"AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI",
-    authDomain:"hungrybites-c7930.firebaseapp.com",
-    projectId:"hungrybites-c7930",
-    storageBucket:"hungrybites-c7930.firebasestorage.app",
-    messagingSenderId:"346758544945",
-    appId:"1:346758544945:web:4bcad30016540d18e79f10",
-    measurementId:"G-B5GP5SYMRC",
-    databaseURL:"https://hungrybites-c7930-default-rtdb.firebaseio.com"
-});
-const auth = getAuth(app);
-const db   = getDatabase(app);
-
-/* ── State ── */
-let cart        = [];
-let food        = {};
-let user        = null;
-let authed      = false;
-let storeOpen   = true;
-let guestId     = null;
-let cartUnsub   = null;
-
-/* ── Category config (keys = exact Firebase names) ── */
-const CATS = [
-    { key:"Biriyani",     label:"Biriyani",   emoji:"🥘" },
-    { key:"Starters",     label:"Starters",   emoji:"🌯" },
-    { key:"Maagie",       label:"Maggi",      emoji:"🍜" },
-    { key:"pasta",        label:"Pasta",      emoji:"🍝" },
-    { key:"Sandwiches",   label:"Sandwiches", emoji:"🥪" },
-    { key:"Chai",         label:"Chai",       emoji:"☕" },
-    { key:"Beverages",    label:"Beverages",  emoji:"🍺" },
-    { key:"Packet Items", label:"Snacks",     emoji:"📦" },
-];
-
-/* ── Tiny helpers ── */
-const $ = id => document.getElementById(id);
-const esc = t => { if(!t) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; };
-
-function toast(msg, type='ok') {
-    const el=$('toast');
-    $('tIcon').textContent = type==='ok' ? '✅' : '❌';
-    $('tMsg').textContent  = msg;
-    el.className = `toast on${type==='err'?' err':''}`;
-    clearTimeout(el._t);
-    el._t = setTimeout(()=>el.classList.remove('on'), 3000);
-}
-
-/* ── Guest ID ── */
-function initGuest() {
-    let id = localStorage.getItem('tiutbc_guestId');
-    if (!id) { id=`guest_${Date.now()}_${Math.random().toString(36).substr(2,9)}`; localStorage.setItem('tiutbc_guestId',id); }
-    guestId = id;
-}
-
-/* ── Store status ── */
-function watchStore() {
-    onValue(ref(db,'tiutbc/storeStatus'), snap => {
-        storeOpen = (snap.val()||{}).isOpen !== false;
-        storeOpen ? $('closedBar').classList.remove('on') : $('closedBar').classList.add('on');
-        const tt = $('heroTagText');
-        if (tt) tt.textContent = storeOpen ? 'Now Open · Fast Delivery' : 'Currently Closed';
-        renderMenu();
+    /* ─── Firebase ─── */
+    const app = initializeApp({
+        apiKey: "AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI",
+        authDomain: "hungrybites-c7930.firebaseapp.com",
+        projectId: "hungrybites-c7930",
+        storageBucket: "hungrybites-c7930.firebasestorage.app",
+        messagingSenderId: "346758544945",
+        appId: "1:346758544945:web:4bcad30016540d18e79f10",
+        measurementId: "G-B5GP5SYMRC",
+        databaseURL: "https://hungrybites-c7930-default-rtdb.firebaseio.com"
     });
-}
+    const auth = getAuth(app);
+    const db   = getDatabase(app);
 
-/* ── Auth ── */
-onAuthStateChanged(auth, async u => {
-    const wasGuest = !authed;
-    user=u; authed=!!u;
-    updateNav();
-    if (u) {
-        if (wasGuest && guestId && guestId!==u.uid) await mergeGuest(u.uid);
-        listenCart(u.uid);
-    } else {
-        if (cartUnsub) { cartUnsub(); cartUnsub=null; }
-        syncDB();
+    /* ─── State ─── */
+    let cart          = [];
+    let allFoodData   = {};
+    let currentUser   = null;
+    let isAuth        = false;
+    let storeIsOpen   = true;
+    let guestId       = null;
+    let cartSyncUnsub = null;
+
+    const CATEGORY_ORDER = [
+        { key: "Biriyani",     display: "Biriyani",   emoji: "🥘" },
+        { key: "Starters",     display: "Starters",   emoji: "🌯" },
+        { key: "Maagie",       display: "Maggi",      emoji: "🍜" },
+        { key: "pasta",        display: "Pasta",      emoji: "🍝" },
+        { key: "Sandwiches",   display: "Sandwiches", emoji: "🥪" },
+        { key: "Chai",         display: "Chai",       emoji: "☕" },
+        { key: "Beverages",    display: "Beverages",  emoji: "🍺" },
+        { key: "Packet Items", display: "Snacks",     emoji: "📦" },
+    ];
+
+    /* ─── Helpers ─── */
+    const $ = id => document.getElementById(id);
+    const esc = t => { if (!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; };
+
+    function showToast(msg, type = 'success') {
+        const t = $('toast');
+        $('toastIcon').textContent = type === 'success' ? '✅' : '❌';
+        $('toastMsg').textContent  = msg;
+        t.className = `toast show${type === 'error' ? ' error' : ''}`;
+        clearTimeout(t._timer);
+        t._timer = setTimeout(() => t.classList.remove('show'), 3000);
     }
-});
 
-function updateNav() {
-    const S=(id)=>$(id)?.classList.remove('hidden');
-    const H=(id)=>$(id)?.classList.add('hidden');
-    if (authed) { S('oLinkD');S('pLinkD');S('lLinkD');S('oLinkM');S('pLinkM');S('lLinkM'); H('iLinkD');H('iLinkM'); }
-    else        { H('oLinkD');H('pLinkD');H('lLinkD');H('oLinkM');H('pLinkM');H('lLinkM'); S('iLinkD');S('iLinkM'); }
-}
+    /* ─── Guest ID ─── */
+    function initGuestId() {
+        let id = localStorage.getItem('tiutbc_guestId');
+        if (!id) {
+            id = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            localStorage.setItem('tiutbc_guestId', id);
+        }
+        guestId = id;
+    }
 
-/* ── Realtime cart ── */
-function listenCart(uid) {
-    if (cartUnsub) { cartUnsub(); cartUnsub=null; }
-    cartUnsub = onValue(ref(db,`tiutbc/carts/${uid}`), snap => {
-        const fresh = snap.exists() ? Object.keys(snap.val()).map(id=>({id,...snap.val()[id]})) : [];
-        if (JSON.stringify(cart)!==JSON.stringify(fresh)) { cart=fresh; saveLocal(); updateCartUI(); renderMenu(); }
-    });
-}
-
-/* ── Guest merge ── */
-async function mergeGuest(uid) {
-    try {
-        const gs = await get(ref(db,`tiutbc/carts/${guestId}`));
-        if (!gs.exists()) return;
-        const gd=gs.val(), us=await get(ref(db,`tiutbc/carts/${uid}`));
-        let m=us.exists()?{...us.val()}:{};
-        Object.keys(gd).forEach(id => {
-            m[id] = m[id] ? {...m[id],quantity:m[id].quantity+gd[id].quantity,lastUpdated:Date.now()} : {...gd[id],lastUpdated:Date.now()};
+    /* ─── Store Status ─── */
+    function watchStoreStatus() {
+        onValue(ref(db, 'tiutbc/storeStatus'), snap => {
+            storeIsOpen = (snap.val() || {}).isOpen !== false;
+            const banner = $('storeClosedBanner');
+            storeIsOpen ? banner.classList.remove('visible') : banner.classList.add('visible');
+            renderMenu();
         });
-        await set(ref(db,`tiutbc/carts/${uid}`),m);
-        try { await remove(ref(db,`tiutbc/carts/${guestId}`)); } catch(_){}
-        toast('Cart restored! 🎉');
-    } catch(e){ console.warn('mergeGuest:',e); }
-}
-
-/* ── Load food ── */
-function loadFood() {
-    onValue(ref(db,'tiutbc/foodItems'), snap => {
-        food = snap.val()||{};
-        buildChips();
-        renderMenu();
-    });
-}
-
-/* ── Hero chips ── */
-function buildChips() {
-    const wrap=$('heroChips'); if(!wrap) return;
-    wrap.innerHTML='';
-    CATS.forEach(cat => {
-        const d=food[cat.key]; if(!d) return;
-        const has=Object.keys(d).some(k=>k!=='emoji'&&d[k]?.isActive!==false);
-        if(!has) return;
-        const c=document.createElement('div');
-        c.className='h-chip';
-        c.innerHTML=`${cat.emoji} ${cat.label}`;
-        c.onclick=()=>{
-            document.getElementById(`sec-${cat.key}`)?.scrollIntoView({behavior:'smooth',block:'start'});
-            document.querySelectorAll('.h-chip').forEach(x=>x.classList.remove('lit'));
-            c.classList.add('lit'); setTimeout(()=>c.classList.remove('lit'),1400);
-        };
-        wrap.appendChild(c);
-    });
-}
-
-/* ── Render menu ── */
-function renderMenu() {
-    const container=$('main');
-    if (!Object.keys(food).length) return;
-
-    let html='';
-
-    if (!authed) {
-        html+=`<div class="login-banner">
-            <div><div class="lb-t">👋 Welcome, Guest!</div><div class="lb-s">Browse freely — login to place your order</div></div>
-            <a href="login.html" class="lb-btn">Login / Sign Up</a>
-        </div>`;
     }
 
-    let any=false;
-    CATS.forEach(cat => {
-        const raw=food[cat.key]; if(!raw) return;
-        const emoji=raw.emoji||cat.emoji;
-        const items=Object.keys(raw)
-            .filter(k=>k!=='emoji'&&raw[k]?.name&&raw[k].isActive!==false)
-            .map(k=>({id:k,...raw[k],_cat:cat.key}));
-        if(!items.length) return;
-        any=true;
-        html+=`<section class="cat-sec" id="sec-${cat.key}">
-            <div class="cat-head">
-                <div class="cat-head-l">
-                    <div class="cat-emo">${emoji}</div>
+    /* ─── Auth ─── */
+    onAuthStateChanged(auth, async user => {
+        const wasGuest = !isAuth;
+        currentUser = user;
+        isAuth = !!user;
+        updateNavUI();
+        if (user) {
+            if (wasGuest && guestId && guestId !== user.uid) await migrateGuestCart(user.uid);
+            attachCartSync(user.uid);
+        } else {
+            if (cartSyncUnsub) { cartSyncUnsub(); cartSyncUnsub = null; }
+            syncCartToDB();
+        }
+    });
+
+    function updateNavUI() {
+        const show = el => el && el.classList.remove('hidden');
+        const hide = el => el && el.classList.add('hidden');
+        if (isAuth) {
+            show($('ordersLink')); show($('profileLink')); show($('logoutLink'));
+            hide($('loginLink'));
+        } else {
+            hide($('ordersLink')); hide($('profileLink')); hide($('logoutLink'));
+            show($('loginLink'));
+        }
+    }
+
+    /* ─── Realtime cart sync ─── */
+    function attachCartSync(uid) {
+        if (cartSyncUnsub) { cartSyncUnsub(); cartSyncUnsub = null; }
+        cartSyncUnsub = onValue(ref(db, `tiutbc/carts/${uid}`), snap => {
+            const newCart = snap.exists()
+                ? Object.keys(snap.val()).map(id => ({ id, ...snap.val()[id] }))
+                : [];
+            if (JSON.stringify(cart) !== JSON.stringify(newCart)) {
+                cart = newCart;
+                saveCartLocal();
+                updateCartUI();
+                renderMenu();
+            }
+        });
+    }
+
+    /* ─── Guest cart migration ─── */
+    async function migrateGuestCart(uid) {
+        try {
+            const guestSnap = await get(ref(db, `tiutbc/carts/${guestId}`));
+            if (!guestSnap.exists()) return;
+            const guestData = guestSnap.val();
+            const userSnap  = await get(ref(db, `tiutbc/carts/${uid}`));
+            let merged = userSnap.exists() ? { ...userSnap.val() } : {};
+            Object.keys(guestData).forEach(itemId => {
+                if (merged[itemId]) {
+                    merged[itemId].quantity   += guestData[itemId].quantity;
+                    merged[itemId].lastUpdated = Date.now();
+                } else {
+                    merged[itemId] = { ...guestData[itemId], lastUpdated: Date.now() };
+                }
+            });
+            await set(ref(db, `tiutbc/carts/${uid}`), merged);
+            try { await remove(ref(db, `tiutbc/carts/${guestId}`)); } catch (_) {}
+            showToast('Cart restored!');
+        } catch (e) { console.warn('Guest cart migration error:', e); }
+    }
+
+    /* ─── Load food items ─── */
+    function loadFoodItems() {
+        onValue(ref(db, 'tiutbc/foodItems'), snap => {
+            allFoodData = snap.val() || {};
+            renderMenu();
+        });
+    }
+
+    /* ─── Render menu ─── */
+    function renderMenu() {
+        const container = $('mainContainer');
+        if (!Object.keys(allFoodData).length) return;
+
+        let html = '';
+
+        if (!isAuth) {
+            html += `
+                <div class="login-banner">
                     <div>
-                        <div class="cat-title">${esc(cat.label)}</div>
+                        <h3>👋 Welcome, Guest!</h3>
+                        <p>Browse our menu and login to place your order</p>
+                    </div>
+                    <a href="login.html" class="login-btn">Login / Sign Up</a>
+                </div>
+            `;
+        }
+
+        let anyRendered = false;
+
+        CATEGORY_ORDER.forEach(cat => {
+            const catData = allFoodData[cat.key];
+            if (!catData) return;
+
+            const emoji = catData.emoji || cat.emoji;
+            const activeItems = [];
+
+            Object.keys(catData).forEach(k => {
+                if (k === 'emoji') return;
+                const item = catData[k];
+                if (item && item.name && item.isActive !== false) {
+                    activeItems.push({ id: k, ...item, _catKey: cat.key });
+                }
+            });
+
+            if (!activeItems.length) return;
+            anyRendered = true;
+
+            html += `
+                <div class="category-section">
+                    <div class="category-header">
+                        <div class="category-emoji">${emoji}</div>
+                        <div>
+                            <div class="category-title">${esc(cat.display)}</div>
+                            <div class="category-count">${activeItems.length} item${activeItems.length !== 1 ? 's' : ''}</div>
+                        </div>
+                    </div>
+                    <div class="food-grid">
+                        ${activeItems.map(item => renderCard(item)).join('')}
                     </div>
                 </div>
-                <span class="cat-cnt">${items.length} item${items.length!==1?'s':''}</span>
+            `;
+        });
+
+        if (!anyRendered) {
+            html += `
+                <div class="empty-state">
+                    <div class="big-emoji">🍽️</div>
+                    <h3>Menu Coming Soon</h3>
+                    <p>We're preparing something delicious. Check back soon!</p>
+                </div>
+            `;
+        }
+
+        container.innerHTML = html;
+    }
+
+    function renderCard(item) {
+        const qty      = getQty(item.id);
+        const isDisabled = !storeIsOpen;
+
+        const imgHTML = item.imageurl
+            ? `<img src="${esc(item.imageurl)}" alt="${esc(item.name)}" loading="lazy"
+                    onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+               <div class="food-emoji-fallback" style="display:none;">${item.emoji || '🍽️'}</div>`
+            : `<div class="food-emoji-fallback">${item.emoji || '🍽️'}</div>`;
+
+        const btnHTML = isDisabled
+            ? `<button class="add-btn" disabled>Closed</button>`
+            : qty > 0
+                ? `<div class="qty-ctrl">
+                       <button class="qty-btn" onclick="changeQty('${esc(item.id)}', -1, event)">−</button>
+                       <span class="qty-num">${qty}</span>
+                       <button class="qty-btn" onclick="changeQty('${esc(item.id)}', 1, event)">+</button>
+                   </div>`
+                : `<button class="add-btn"
+                       onclick="addItem('${esc(item.id)}','${esc(item.name)}',${item.price || 0},'${esc(item.emoji || '')}','${esc(item._catKey)}', event)">
+                       Add
+                   </button>`;
+
+        return `
+            <div class="food-card"
+                 data-id="${esc(item.id)}"
+                 data-name="${esc(item.name)}"
+                 data-price="${item.price || 0}"
+                 data-emoji="${esc(item.emoji || '')}"
+                 data-cat="${esc(item._catKey)}">
+                <div class="food-img-wrap">
+                    ${imgHTML}
+                    <div class="veg-badge"><div class="veg-dot"></div></div>
+                </div>
+                <div class="food-body">
+                    <div class="food-name">${esc(item.name)}</div>
+                    ${item.description ? `<div class="food-desc">${esc(item.description)}</div>` : ''}
+                    <div class="food-rating">★ 4.5</div>
+                    <div class="food-footer">
+                        <div class="food-price">₹${item.price || 0}</div>
+                        ${btnHTML}
+                    </div>
+                </div>
             </div>
-            <div class="food-grid">${items.map(renderCard).join('')}</div>
-        </section>`;
+        `;
+    }
+
+    /* ─── Cart Operations ─── */
+    function getQty(id) {
+        const found = cart.find(i => i.id === id);
+        return found ? found.quantity : 0;
+    }
+
+    window.addItem = function(id, name, price, emoji, category, e) {
+        if (e) e.stopPropagation();
+        if (!storeIsOpen) { showToast('Store is currently closed', 'error'); return; }
+        const ts  = Date.now();
+        const idx = cart.findIndex(i => i.id === id);
+        if (idx > -1) { cart[idx].quantity++; cart[idx].lastUpdated = ts; }
+        else cart.push({ id, name, price: Number(price), emoji, category, quantity: 1, timestamp: ts, lastUpdated: ts });
+        saveCartLocal(); syncCartToDB(); updateCartUI(); updateCardBtn(id);
+        showToast(`${name} added!`);
+    };
+
+    window.changeQty = function(id, delta, e) {
+        if (e) e.stopPropagation();
+        const idx = cart.findIndex(i => i.id === id);
+        if (idx === -1) return;
+        cart[idx].quantity += delta;
+        cart[idx].lastUpdated = Date.now();
+        if (cart[idx].quantity <= 0) cart.splice(idx, 1);
+        saveCartLocal(); syncCartToDB(); updateCartUI(); updateCardBtn(id);
+    };
+
+    function updateCardBtn(id) {
+        const card = document.querySelector(`[data-id="${CSS.escape(id)}"]`);
+        if (!card) return;
+        const qty     = getQty(id);
+        const name    = card.dataset.name;
+        const price   = card.dataset.price;
+        const emoji   = card.dataset.emoji;
+        const cat     = card.dataset.cat;
+        const footer  = card.querySelector('.food-footer');
+        const priceEl = card.querySelector('.food-price');
+        const disabled = !storeIsOpen;
+
+        const btnHTML = disabled
+            ? `<button class="add-btn" disabled>Closed</button>`
+            : qty > 0
+                ? `<div class="qty-ctrl">
+                       <button class="qty-btn" onclick="changeQty('${esc(id)}', -1, event)">−</button>
+                       <span class="qty-num">${qty}</span>
+                       <button class="qty-btn" onclick="changeQty('${esc(id)}', 1, event)">+</button>
+                   </div>`
+                : `<button class="add-btn"
+                       onclick="addItem('${esc(id)}','${esc(name)}',${price},'${esc(emoji)}','${esc(cat)}', event)">
+                       Add
+                   </button>`;
+
+        footer.innerHTML = priceEl.outerHTML + btnHTML;
+    }
+
+    /* ─── DB Sync ─── */
+    function syncCartToDB() {
+        const uid = currentUser ? currentUser.uid : guestId;
+        if (!uid) return;
+        const cartRef = ref(db, `tiutbc/carts/${uid}`);
+        if (!cart.length) { remove(cartRef).catch(() => {}); return; }
+        const data = {};
+        const ts   = Date.now();
+        cart.forEach(item => {
+            data[item.id] = {
+                name: item.name, price: item.price, emoji: item.emoji,
+                category: item.category, quantity: item.quantity,
+                timestamp: item.timestamp || ts, lastUpdated: ts
+            };
+        });
+        set(cartRef, data).catch(e => console.error('Cart sync error:', e));
+    }
+
+    function saveCartLocal() { try { localStorage.setItem('tiutbc_cart', JSON.stringify(cart)); } catch (_) {} }
+    function loadCartLocal() {
+        try { const raw = localStorage.getItem('tiutbc_cart'); if (raw) cart = JSON.parse(raw); }
+        catch (_) { cart = []; }
+    }
+
+    /* ─── Cart UI ─── */
+    function updateCartUI() {
+        const totalQty = cart.reduce((s, i) => s + i.quantity, 0);
+        const totalAmt = cart.reduce((s, i) => s + i.price * i.quantity, 0);
+
+        const badge = $('cartBadge');
+        badge.textContent = totalQty;
+        totalQty > 0 ? badge.classList.add('visible') : badge.classList.remove('visible');
+
+        const bar = $('cartBar');
+        if (totalQty > 0) {
+            bar.classList.add('visible');
+            $('cartBarCount').textContent = `${totalQty} item${totalQty !== 1 ? 's' : ''}`;
+            $('cartBarTotal').textContent = `₹${totalAmt}`;
+        } else {
+            bar.classList.remove('visible');
+        }
+    }
+
+    /* ─── Nav toggle ─── */
+    window.toggleMenu = function() { $('navMenu').classList.toggle('active'); };
+    document.addEventListener('click', e => {
+        const menu = $('navMenu');
+        const ham  = $('hamburger');
+        if (menu && ham && !menu.contains(e.target) && !ham.contains(e.target))
+            menu.classList.remove('active');
     });
 
-    if (!any) html+=`<div class="empty-wrap"><div class="ei">🍽️</div><h3>Menu Coming Soon</h3><p>We're cooking up something great!</p></div>`;
-    container.innerHTML=html;
-}
+    /* ─── Logout ─── */
+    window.logout = function() {
+        if (!confirm('Logout?')) return;
+        signOut(auth).then(() => {
+            if (cartSyncUnsub) { cartSyncUnsub(); cartSyncUnsub = null; }
+            localStorage.removeItem('tiutbc_cart');
+            cart = [];
+            showToast('Logged out successfully');
+            setTimeout(() => window.location.href = 'login.html', 800);
+        }).catch(() => showToast('Logout failed', 'error'));
+    };
 
-/* ── Render card ── */
-function renderCard(item) {
-    const qty=getQty(item.id), closed=!storeOpen;
-    const imgHTML = item.imageurl
-        ? `<img src="${esc(item.imageurl)}" alt="${esc(item.name)}" loading="lazy"
-                onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
-           <div class="card-emo" style="display:none;">${item.emoji||'🍽️'}</div>`
-        : `<div class="card-emo">${item.emoji||'🍽️'}</div>`;
-
-    const btnHTML = closed
-        ? `<button class="btn-add" disabled>Closed</button>`
-        : qty>0
-            ? `<div class="qty-box">
-                   <button class="qty-s" onclick="chg('${esc(item.id)}',-1,event)">−</button>
-                   <span class="qty-n">${qty}</span>
-                   <button class="qty-s" onclick="chg('${esc(item.id)}',1,event)">+</button>
-               </div>`
-            : `<button class="btn-add" onclick="add('${esc(item.id)}','${esc(item.name)}',${item.price||0},'${esc(item.emoji||'')}','${esc(item._cat)}',event)">+ Add</button>`;
-
-    return `<div class="food-card"
-                 data-id="${esc(item.id)}" data-name="${esc(item.name)}"
-                 data-price="${item.price||0}" data-emoji="${esc(item.emoji||'')}" data-cat="${esc(item._cat)}">
-        <div class="card-img">
-            ${imgHTML}
-            <div class="veg"><div class="veg-d"></div></div>
-        </div>
-        <div class="card-body">
-            <div class="card-name">${esc(item.name)}</div>
-            ${item.description?`<div class="card-desc">${esc(item.description)}</div>`:''}
-            <div class="card-star">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.86L12 17.77l-6.18 3.23L7 14.14 2 9.27l6.91-1.01z"/></svg>
-                4.5
-            </div>
-            <div class="card-foot">
-                <div class="card-price">₹${item.price||0}</div>
-                ${btnHTML}
-            </div>
-        </div>
-    </div>`;
-}
-
-/* ── Cart ops ── */
-function getQty(id) { return (cart.find(i=>i.id===id)||{}).quantity||0; }
-
-window.add = function(id,name,price,emoji,category,e) {
-    if(e) e.stopPropagation();
-    if(!storeOpen) { toast('Store is closed right now','err'); return; }
-    const ts=Date.now(), idx=cart.findIndex(i=>i.id===id);
-    if(idx>-1) { cart[idx].quantity++; cart[idx].lastUpdated=ts; }
-    else cart.push({id,name,price:+price,emoji,category,quantity:1,timestamp:ts,lastUpdated:ts});
-    saveLocal(); syncDB(); updateCartUI(); patchBtn(id);
-    toast(`${name} added! 🎉`);
-};
-
-window.chg = function(id,d,e) {
-    if(e) e.stopPropagation();
-    const idx=cart.findIndex(i=>i.id===id); if(idx===-1) return;
-    cart[idx].quantity+=d; cart[idx].lastUpdated=Date.now();
-    if(cart[idx].quantity<=0) cart.splice(idx,1);
-    saveLocal(); syncDB(); updateCartUI(); patchBtn(id);
-};
-
-function patchBtn(id) {
-    const card=document.querySelector(`[data-id="${CSS.escape(id)}"]`); if(!card) return;
-    const qty=getQty(id), closed=!storeOpen;
-    const name=card.dataset.name, price=card.dataset.price, emoji=card.dataset.emoji, cat=card.dataset.cat;
-    const foot=card.querySelector('.card-foot'), priceEl=card.querySelector('.card-price');
-    const btn = closed
-        ? `<button class="btn-add" disabled>Closed</button>`
-        : qty>0
-            ? `<div class="qty-box"><button class="qty-s" onclick="chg('${esc(id)}',-1,event)">−</button><span class="qty-n">${qty}</span><button class="qty-s" onclick="chg('${esc(id)}',1,event)">+</button></div>`
-            : `<button class="btn-add" onclick="add('${esc(id)}','${esc(name)}',${price},'${esc(emoji)}','${esc(cat)}',event)">+ Add</button>`;
-    foot.innerHTML = priceEl.outerHTML + btn;
-}
-
-/* ── DB sync ── */
-function syncDB() {
-    const uid=user?user.uid:guestId; if(!uid) return;
-    const r=ref(db,`tiutbc/carts/${uid}`);
-    if(!cart.length) { remove(r).catch(()=>{}); return; }
-    const ts=Date.now(), data={};
-    cart.forEach(item=>{ data[item.id]={name:item.name,price:item.price,emoji:item.emoji,category:item.category,quantity:item.quantity,timestamp:item.timestamp||ts,lastUpdated:ts}; });
-    set(r,data).catch(e=>console.error('sync:',e));
-}
-
-function saveLocal() { try{ localStorage.setItem('tiutbc_cart',JSON.stringify(cart)); }catch(_){} }
-function loadLocal() { try{ const r=localStorage.getItem('tiutbc_cart'); if(r) cart=JSON.parse(r); }catch(_){ cart=[]; } }
-
-/* ── Cart UI ── */
-function updateCartUI() {
-    const qty=cart.reduce((s,i)=>s+i.quantity,0);
-    const amt=cart.reduce((s,i)=>s+i.price*i.quantity,0);
-    const cn=$('cartNum'); cn.textContent=qty; qty>0?cn.classList.add('on'):cn.classList.remove('on');
-    const bar=$('cartBar');
-    if(qty>0){ bar.classList.add('on'); $('cbCount').textContent=`${qty} item${qty!==1?'s':''} in cart`; $('cbTotal').textContent=`₹${amt}`; }
-    else bar.classList.remove('on');
-}
-
-/* ── Nav ── */
-window.toggleMenu = ()=>$('mobNav').classList.toggle('on');
-document.addEventListener('click', e => {
-    const mn=$('mobNav'), hb=$('hamBtn');
-    if(mn&&hb&&!mn.contains(e.target)&&!hb.contains(e.target)) mn.classList.remove('on');
-});
-
-window.doLogout = ()=>{
-    if(!confirm('Logout?')) return;
-    signOut(auth).then(()=>{
-        if(cartUnsub){cartUnsub();cartUnsub=null;}
-        localStorage.removeItem('tiutbc_cart'); cart=[];
-        toast('Logged out'); setTimeout(()=>window.location.href='login.html',800);
-    }).catch(()=>toast('Logout failed','err'));
-};
-
-/* ── Boot ── */
-initGuest(); loadLocal(); updateCartUI(); watchStore(); loadFood();
+    /* ─── Boot ─── */
+    initGuestId();
+    loadCartLocal();
+    updateCartUI();
+    watchStoreStatus();
+    loadFoodItems();
 </script>
 </body>
 </html>
