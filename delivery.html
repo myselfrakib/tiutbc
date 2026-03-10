@@ -162,6 +162,36 @@
             margin-top: 0.25rem;
         }
 
+        .toggle-online-btn {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            border: none;
+            padding: 0.65rem 1.2rem;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+        }
+
+        .toggle-online-btn:active {
+            transform: scale(0.98);
+        }
+
+        .toggle-online-btn.online {
+            background: linear-gradient(135deg, var(--success-green) 0%, #4a9638 100%);
+            box-shadow: 0 2px 8px rgba(96, 178, 70, 0.3);
+        }
+
+        .toggle-online-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
         .filter-tabs {
             display: flex;
             gap: 0.5rem;
@@ -921,10 +951,14 @@
                 <div class="partner-details">
                     <div class="partner-name" id="partnerName">Loading...</div>
                     <div class="partner-status">
-                        <div class="status-indicator"></div>
-                        <span>Active • Online</span>
+                        <div class="status-indicator" id="statusIndicator"></div>
+                        <span id="statusText">Checking...</span>
                     </div>
                 </div>
+                <button class="toggle-online-btn" id="toggleOnlineBtn" onclick="toggleOnlineStatus()">
+                    <span id="toggleBtnIcon">⏳</span>
+                    <span id="toggleBtnText">Loading...</span>
+                </button>
             </div>
         </div>
 
@@ -1055,17 +1089,70 @@
         async function loadDeliveryPartnerInfo() {
             try {
                 const agentRef = ref(db, `tiutbc/deliveryagent/${currentUser.uid}`);
-                const snapshot = await get(agentRef);
                 
-                if (snapshot.exists()) {
-                    const agentData = snapshot.val();
-                    document.getElementById('partnerName').textContent = agentData.name || 'Delivery Partner';
-                }
+                // Listen for real-time updates
+                onValue(agentRef, (snapshot) => {
+                    if (snapshot.exists()) {
+                        const agentData = snapshot.val();
+                        document.getElementById('partnerName').textContent = agentData.name || 'Delivery Partner';
+                        
+                        // Update online status UI
+                        const isOnline = agentData.isOnline === true;
+                        updateOnlineStatusUI(isOnline);
+                    }
+                });
             } catch (error) {
                 console.error('Error loading partner info:', error);
                 document.getElementById('partnerName').textContent = 'Delivery Partner';
             }
         }
+
+        function updateOnlineStatusUI(isOnline) {
+            const statusIndicator = document.getElementById('statusIndicator');
+            const statusText = document.getElementById('statusText');
+            const toggleBtn = document.getElementById('toggleOnlineBtn');
+            const toggleIcon = document.getElementById('toggleBtnIcon');
+            const toggleText = document.getElementById('toggleBtnText');
+
+            if (isOnline) {
+                statusIndicator.style.background = 'var(--success-green)';
+                statusText.textContent = 'Online';
+                toggleBtn.classList.add('online');
+                toggleIcon.textContent = '🔴';
+                toggleText.textContent = 'Go Offline';
+            } else {
+                statusIndicator.style.background = '#95a5a6';
+                statusText.textContent = 'Offline';
+                toggleBtn.classList.remove('online');
+                toggleIcon.textContent = '🟢';
+                toggleText.textContent = 'Go Online';
+            }
+            
+            toggleBtn.disabled = false;
+        }
+
+        window.toggleOnlineStatus = async function() {
+            const toggleBtn = document.getElementById('toggleOnlineBtn');
+            toggleBtn.disabled = true;
+
+            try {
+                const agentRef = ref(db, `tiutbc/deliveryagent/${currentUser.uid}`);
+                const snapshot = await get(agentRef);
+                const currentStatus = snapshot.val()?.isOnline === true;
+                const newStatus = !currentStatus;
+
+                await update(agentRef, {
+                    isOnline: newStatus,
+                    lastOnlineAt: Date.now()
+                });
+
+                showToast(newStatus ? 'You are now online!' : 'You are now offline', 'success');
+            } catch (error) {
+                console.error('Error toggling status:', error);
+                showToast('Failed to update status', 'error');
+                toggleBtn.disabled = false;
+            }
+        };
 
         function loadOrders() {
             const ordersRef = ref(db, 'tiutbc/orders');
@@ -1082,13 +1169,17 @@
                 Object.keys(ordersData).forEach(orderId => {
                     const order = ordersData[orderId];
                     const status = (order.orderDetails?.status || '').toLowerCase();
+                    const assignedTo = order.orderDetails?.assignedTo;
                     
-                    // Only show orders that are out-for-delivery or delivered
-                    if (status === 'out-for-delivery' || status === 'outfordelivery' || status === 'delivered') {
-                        allOrders.push({
-                            id: orderId,
-                            ...order
-                        });
+                    // Only show orders assigned to this delivery partner
+                    if (assignedTo === currentUser.uid) {
+                        // Show out-for-delivery and delivered orders
+                        if (status === 'out-for-delivery' || status === 'outfordelivery' || status === 'delivered') {
+                            allOrders.push({
+                                id: orderId,
+                                ...order
+                            });
+                        }
                     }
                 });
 
