@@ -708,34 +708,19 @@
         });
 
         // ========== USERS ==========
-        // FIX: Read from BOTH root 'users/' AND 'tiutbc/users/' — the app uses both paths
         function loadUsers() {
-            let tiutbcData = {}, rootData = {};
-            const mergeAndDisplay = () => {
+            const usersRef = dbRef(db, 'tiutbc/users');
+            const callback = snapshot => {
                 allUsers = {};
-                // Load root users first
-                Object.keys(rootData).forEach(uid => {
-                    if (rootData[uid] && rootData[uid].allDetails) allUsers[uid] = rootData[uid].allDetails;
-                });
-                // tiutbc users overwrite root if same uid (tiutbc is newer/preferred)
-                Object.keys(tiutbcData).forEach(uid => {
-                    if (tiutbcData[uid] && tiutbcData[uid].allDetails) allUsers[uid] = tiutbcData[uid].allDetails;
+                const data = snapshot.val() || {};
+                Object.keys(data).forEach(uid => {
+                    if (data[uid] && data[uid].allDetails) allUsers[uid] = data[uid].allDetails;
                 });
                 displayUsers();
                 updateUserStats();
-                // Note: do NOT call displayCarts() here — loadCarts has its own listener
-                // and calling displayCarts while allCarts is still empty shows "No active carts"
             };
-
-            const tiutbcRef = dbRef(db, 'tiutbc/users');
-            const tiutbcCb = snapshot => { tiutbcData = snapshot.val() || {}; mergeAndDisplay(); };
-            onValue(tiutbcRef, tiutbcCb);
-            dbListeners.push({ ref: tiutbcRef, callback: tiutbcCb });
-
-            const rootRef = dbRef(db, 'users');
-            const rootCb = snapshot => { rootData = snapshot.val() || {}; mergeAndDisplay(); };
-            onValue(rootRef, rootCb);
-            dbListeners.push({ ref: rootRef, callback: rootCb });
+            onValue(usersRef, callback);
+            dbListeners.push({ ref: usersRef, callback });
         }
 
         function displayUsers() {
@@ -949,23 +934,11 @@
         }
 
         // ========== ORDERS ==========
-        // FIX: Read from BOTH root 'orders/' AND 'tiutbc/orders/' and merge
         function loadOrders() {
-            let tiutbcOrders = {}, rootOrders = {};
-            const mergeAndDisplay = () => {
-                allOrders = { ...rootOrders, ...tiutbcOrders }; // tiutbc takes precedence
-                displayOrders();
-            };
-
-            const tiutbcRef = dbRef(db, 'tiutbc/orders');
-            const tiutbcCb = snapshot => { tiutbcOrders = snapshot.val() || {}; mergeAndDisplay(); };
-            onValue(tiutbcRef, tiutbcCb);
-            dbListeners.push({ ref: tiutbcRef, callback: tiutbcCb });
-
-            const rootRef = dbRef(db, 'orders');
-            const rootCb = snapshot => { rootOrders = snapshot.val() || {}; mergeAndDisplay(); };
-            onValue(rootRef, rootCb);
-            dbListeners.push({ ref: rootRef, callback: rootCb });
+            const ordersRef = dbRef(db, 'tiutbc/orders');
+            const callback = snapshot => { allOrders = snapshot.val() || {}; displayOrders(); };
+            onValue(ordersRef, callback);
+            dbListeners.push({ ref: ordersRef, callback });
         }
 
         function displayOrders() {
