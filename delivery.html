@@ -514,15 +514,16 @@
             if (!currentPaymentOrderId) return;
             if (!confirm('Confirm that the customer has completed the UPI payment?')) return;
             try {
+                // FIX: Do NOT update paymentMethod — Firebase rules only allow 'cod' or 'online' for that field.
+                // Use collectionMethod:'upi' instead to record how payment was collected at the door.
                 await update(ref(db, `tiutbc/orders/${currentPaymentOrderId}/orderDetails`), {
                     paymentCollected: true,
                     paymentCollectedAt: Date.now(),
                     paymentCollectedBy: currentUser.uid,
-                    paymentMethod: 'upi'  // FIX: update method to 'upi' to reflect actual payment
+                    collectionMethod: 'upi'
                 });
                 closeQRModal();
                 showToast('Payment marked as collected via UPI!', 'success');
-                // FIX: No manual renderOrders() call needed — onValue listener re-renders automatically
             } catch (error) {
                 console.error('Error updating payment:', error);
                 showToast('Failed to update payment status', 'error');
@@ -539,7 +540,6 @@
                     collectionMethod: 'cash'
                 });
                 showToast('Cash payment marked as collected!', 'success');
-                // FIX: No manual renderOrders() call needed — onValue listener re-renders automatically
             } catch (error) {
                 console.error('Error updating payment:', error);
                 showToast('Failed to update payment status', 'error');
@@ -555,7 +555,6 @@
                     deliveredBy: currentUser.uid
                 });
                 showToast('Order marked as delivered!', 'success');
-                // FIX: No manual renderOrders() call needed — onValue listener re-renders automatically
             } catch (error) {
                 console.error('Error marking delivered:', error);
                 showToast(`Failed to update status: ${error.message}`, 'error');
