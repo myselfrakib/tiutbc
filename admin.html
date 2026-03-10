@@ -1614,136 +1614,6 @@
                 font-size: 1.8rem;
             }
         }
-    
-        /* ========================================= */
-        /* ======= CATEGORY MANAGEMENT STYLES ====== */
-        /* ========================================= */
-        
-        .categories-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .category-manage-card {
-            background: white;
-            border-radius: 15px;
-            padding: 1.8rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            transition: all 0.3s;
-            border-top: 4px solid #667eea;
-        }
-
-        .category-manage-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 35px rgba(0,0,0,0.15);
-        }
-
-        .category-emoji-large {
-            font-size: 3rem;
-            text-align: center;
-            margin-bottom: 1rem;
-        }
-
-        .category-name-large {
-            font-size: 1.4rem;
-            font-weight: 700;
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 0.5rem;
-        }
-
-        .category-item-count {
-            text-align: center;
-            color: #7f8c8d;
-            font-size: 0.9rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .category-actions {
-            display: flex;
-            gap: 0.75rem;
-        }
-
-        .btn-edit-category {
-            flex: 1;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 0.8rem;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-edit-category:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-delete-category {
-            flex: 1;
-            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-            color: white;
-            border: none;
-            padding: 0.8rem;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-delete-category:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
-        }
-
-        .btn-delete-category:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .add-category-card {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-            border: 2px dashed #667eea;
-            border-radius: 15px;
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            min-height: 220px;
-        }
-
-        .add-category-card:hover {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
-            border-color: #764ba2;
-            transform: scale(1.02);
-        }
-
-        .add-category-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-
-        .add-category-text {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #667eea;
-        }
-
-        .add-category-form {
-            background: white;
-            padding: 2.2rem;
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            margin-bottom: 2.5rem;
-        }
-
     </style>
 </head>
 <body>
@@ -1766,8 +1636,7 @@
             <div class="mobile-menu-title">Dashboard</div>
             <button class="close-menu-btn" onclick="toggleMenu()">✕</button>
         </div>
-        <div class="mobile-menu-item active" onclick="switchTab('categories')">📁 Categories</div>
-        <div class="mobile-menu-item" onclick="switchTab('carts')">🛒 Carts</div>
+        <div class="mobile-menu-item active" onclick="switchTab('carts')">🛒 Carts</div>
         <div class="mobile-menu-item" onclick="switchTab('orders')">📦 Orders</div>
         <div class="mobile-menu-item" onclick="switchTab('users')">👥 Users</div>
         <div class="mobile-menu-item" onclick="switchTab('reviews')">⭐ Reviews</div>
@@ -1779,8 +1648,7 @@
 
     <div class="container">
         <div class="tabs">
-            <button class="tab active" onclick="switchTab('categories')">📁 Categories</button>
-            <button class="tab" onclick="switchTab('carts')">🛒 Carts</button>
+            <button class="tab active" onclick="switchTab('carts')">🛒 Carts</button>
             <button class="tab" onclick="switchTab('orders')">📦 Orders</button>
             <button class="tab" onclick="switchTab('users')">👥 Users</button>
             <button class="tab" onclick="switchTab('reviews')">⭐ Reviews</button>
@@ -1788,38 +1656,8 @@
             <button class="tab" onclick="switchTab('food')">🍛 Manage Menu</button>
         </div>
 
-        
-        <!-- CATEGORIES TAB -->
-        <div id="categoriesTab" class="tab-content active">
-            <h2 class="section-title">📁 Category Management</h2>
-            
-            <div class="add-category-form">
-                <h3 class="form-title">➕ Add New Category</h3>
-                <form onsubmit="addCategory(event)" id="addCategoryForm">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Category Name *</label>
-                            <input type="text" id="newCategoryName" required placeholder="e.g., Desserts">
-                        </div>
-                        <div class="form-group">
-                            <label>Category Emoji *</label>
-                            <input type="text" id="newCategoryEmoji" required placeholder="🍰" maxlength="2">
-                        </div>
-                    </div>
-                    <button type="submit" class="btn-primary" id="addCategoryBtn">Add Category</button>
-                </form>
-            </div>
-
-            <div id="categoriesContainer" class="categories-grid">
-                <div class="empty-state">
-                    <div class="loading-spinner"></div>
-                    <div class="empty-state-text">Loading categories...</div>
-                </div>
-            </div>
-        </div>
-
         <!-- CARTS TAB -->
-        <div id="cartsTab" class="tab-content">
+        <div id="cartsTab" class="tab-content active">
             <h2 class="section-title">🛒 Customer Carts</h2>
             <div class="stats-grid">
                 <div class="stat-card">
@@ -2165,7 +2003,6 @@
                 }
                 isAdmin = true;
                 loadUsers();
-                loadCategories();
                 loadCarts(); 
                 loadOrders(); 
                 loadStoreStatus(); 
@@ -2180,231 +2017,7 @@
         function loadUsers() {
             const usersRef = dbRef(db, 'tiutbc/users');
             const callback = snapshot => {
-                allUsers = {}
-
-
-        // ========== CATEGORY MANAGEMENT ==========
-        let allCategories = {};
-        let currentEditCategoryName = null;
-
-        function loadCategories() {
-            const categoriesRef = dbRef(db, 'tiutbc/foodItems');
-            const callback = snapshot => {
-                allCategories = snapshot.val() || {};
-                displayCategories();
-                updateCategorySelect();
-            };
-            onValue(categoriesRef, callback);
-            dbListeners.push({ ref: categoriesRef, callback });
-        }
-
-        function displayCategories() {
-            const container = $('categoriesContainer');
-            const categoryNames = Object.keys(allCategories);
-            
-            if (!categoryNames.length) {
-                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📁</div><div class="empty-state-text">No categories yet. Add your first category!</div></div>';
-                return;
-            }
-            
-            container.innerHTML = '';
-            
-            categoryNames.forEach(catName => {
-                const catData = allCategories[catName];
-                const emoji = catData.emoji || '🍽️';
-                const itemCount = Object.keys(catData).filter(k => k !== 'emoji').length;
-                
-                const card = document.createElement('div');
-                card.className = 'category-manage-card';
-                card.innerHTML = `
-                    <div class="category-emoji-large">${emoji}</div>
-                    <div class="category-name-large">${escapeHtml(catName)}</div>
-                    <div class="category-item-count">${itemCount} item${itemCount !== 1 ? 's' : ''}</div>
-                    <div class="category-actions">
-                        <button class="btn-edit-category" onclick="editCategory('${escapeHtml(catName).replace(/'/g, "\'")}')">Edit</button>
-                        <button class="btn-delete-category" onclick="deleteCategory('${escapeHtml(catName).replace(/'/g, "\'")}')}" ${itemCount > 0 ? 'disabled' : ''}>
-                            Delete
-                        </button>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function updateCategorySelect() {
-            const select = $('categorySelect');
-            if (!select) return;
-            
-            const categoryNames = Object.keys(allCategories);
-            
-            if (!categoryNames.length) {
-                select.innerHTML = '<option value="">No categories available - Add one first</option>';
-                return;
-            }
-            
-            const currentValue = select.value;
-            select.innerHTML = '<option value="">Select category...</option>';
-            categoryNames.forEach(catName => {
-                const option = document.createElement('option');
-                option.value = catName;
-                option.textContent = `${allCategories[catName].emoji || '🍽️'} ${catName}`;
-                option.setAttribute('data-emoji', allCategories[catName].emoji || '🍽️');
-                select.appendChild(option);
-            });
-            
-            if (currentValue && categoryNames.includes(currentValue)) {
-                select.value = currentValue;
-            }
-        }
-
-        window.addCategory = async function(e) {
-            e.preventDefault();
-            if (!isAdmin) { 
-                showNotification('Unauthorized', true); 
-                return; 
-            }
-            
-            const btn = $('addCategoryBtn');
-            btn.disabled = true;
-            btn.textContent = 'Adding...';
-            
-            const catName = $('newCategoryName').value.trim();
-            const emoji = $('newCategoryEmoji').value.trim();
-            
-            if (!catName) {
-                showNotification('Category name is required', true);
-                btn.disabled = false;
-                btn.textContent = 'Add Category';
-                return;
-            }
-            
-            if (!emoji) {
-                showNotification('Category emoji is required', true);
-                btn.disabled = false;
-                btn.textContent = 'Add Category';
-                return;
-            }
-            
-            try {
-                const catRef = dbRef(db, `tiutbc/foodItems/${catName}`);
-                const existing = await get(catRef);
-                
-                if (existing.exists()) {
-                    showNotification('Category already exists', true);
-                    btn.disabled = false;
-                    btn.textContent = 'Add Category';
-                    return;
-                }
-                
-                await set(dbRef(db, `tiutbc/foodItems/${catName}/emoji`), emoji);
-                
-                $('addCategoryForm').reset();
-                showNotification('Category added successfully!');
-            } catch (error) {
-                showNotification('Error: ' + error.message, true);
-            } finally {
-                btn.disabled = false;
-                btn.textContent = 'Add Category';
-            }
-        };
-
-        window.editCategory = async function(catName) {
-            if (!isAdmin) { 
-                showNotification('Unauthorized', true); 
-                return; 
-            }
-            
-            currentEditCategoryName = catName;
-            
-            try {
-                const catData = allCategories[catName];
-                $('editCategoryName').value = catName;
-                $('editCategoryEmoji').value = catData.emoji || '🍽️';
-                
-                $('editCategoryModal').classList.add('active');
-            } catch (error) {
-                showNotification('Error: ' + error.message, true);
-            }
-        };
-
-        window.saveEditCategory = async function(e) {
-            e.preventDefault();
-            if (!isAdmin) { 
-                showNotification('Unauthorized', true); 
-                return; 
-            }
-            
-            const btn = $('saveEditCategoryBtn');
-            btn.disabled = true;
-            btn.textContent = 'Saving...';
-            
-            const newName = $('editCategoryName').value.trim();
-            const newEmoji = $('editCategoryEmoji').value.trim();
-            
-            try {
-                const oldRef = dbRef(db, `tiutbc/foodItems/${currentEditCategoryName}`);
-                const oldData = (await get(oldRef)).val();
-                
-                if (newName !== currentEditCategoryName) {
-                    const newRef = dbRef(db, `tiutbc/foodItems/${newName}`);
-                    
-                    const existing = await get(newRef);
-                    if (existing.exists()) {
-                        showNotification('Category name already exists', true);
-                        btn.disabled = false;
-                        btn.textContent = 'Save Changes';
-                        return;
-                    }
-                    
-                    await set(newRef, { ...oldData, emoji: newEmoji });
-                    await remove(oldRef);
-                } else {
-                    await update(oldRef, { emoji: newEmoji });
-                }
-                
-                closeEditCategoryModal();
-                showNotification('Category updated successfully!');
-            } catch (error) {
-                showNotification('Error: ' + error.message, true);
-            } finally {
-                btn.disabled = false;
-                btn.textContent = 'Save Changes';
-            }
-        };
-
-        window.closeEditCategoryModal = function() {
-            $('editCategoryModal').classList.remove('active');
-            $('editCategoryForm').reset();
-            currentEditCategoryName = null;
-        };
-
-        window.deleteCategory = async function(catName) {
-            if (!isAdmin) { 
-                showNotification('Unauthorized', true); 
-                return; 
-            }
-            
-            const catData = allCategories[catName];
-            const itemCount = Object.keys(catData).filter(k => k !== 'emoji').length;
-            
-            if (itemCount > 0) {
-                showNotification('Cannot delete category with items. Remove all items first.', true);
-                return;
-            }
-            
-            if (!confirm(`Are you sure you want to delete the "${catName}" category? This action cannot be undone.`)) {
-                return;
-            }
-            
-            try {
-                await remove(dbRef(db, `tiutbc/foodItems/${catName}`));
-                showNotification('Category deleted successfully!');
-            } catch (error) {
-                showNotification('Error: ' + error.message, true);
-            }
-        };
-
-;
+                allUsers = {};
                 const data = snapshot.val() || {};
                 Object.keys(data).forEach(uid => { 
                     if (data[uid] && data[uid].allDetails) {
@@ -3527,30 +3140,5 @@
 
         window.addEventListener('beforeunload', cleanupListeners);
     </script>
-
-    <!-- EDIT CATEGORY MODAL -->
-    <div id="editCategoryModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Edit Category</h3>
-                <button class="modal-close" onclick="closeEditCategoryModal()">&times;</button>
-            </div>
-            <form onsubmit="saveEditCategory(event)" id="editCategoryForm">
-                <div class="form-group">
-                    <label>Category Name *</label>
-                    <input type="text" id="editCategoryName" required>
-                </div>
-                <div class="form-group">
-                    <label>Category Emoji *</label>
-                    <input type="text" id="editCategoryEmoji" required maxlength="2">
-                </div>
-                <div class="modal-buttons">
-                    <button type="button" class="btn-cancel" onclick="closeEditCategoryModal()">Cancel</button>
-                    <button type="submit" class="btn-save" id="saveEditCategoryBtn">Save Changes</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
 </body>
 </html>
