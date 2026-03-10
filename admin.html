@@ -722,7 +722,8 @@
                 });
                 displayUsers();
                 updateUserStats();
-                displayCarts();
+                // Note: do NOT call displayCarts() here — loadCarts has its own listener
+                // and calling displayCarts while allCarts is still empty shows "No active carts"
             };
 
             const tiutbcRef = dbRef(db, 'tiutbc/users');
@@ -840,32 +841,43 @@
                 return;
             }
             container.innerHTML = '<div class="empty-state"><div class="loading-spinner"></div><div class="empty-state-text">Loading cart details...</div></div>';
-            try {
-                await Promise.all(userIds.map(async uid => {
-                    if (allUsers[uid]) return;
-                    try {
-                        // FIX: Try tiutbc/users first, then fall back to root users/
-                        let snap = await get(dbRef(db, `tiutbc/users/${uid}/allDetails`));
-                        if (snap.exists()) { allUsers[uid] = snap.val(); return; }
-                        snap = await get(dbRef(db, `users/${uid}/allDetails`));
-                        if (snap.exists()) { allUsers[uid] = snap.val(); return; }
-                        allUsers[uid] = { name: uid.startsWith('guest_') ? 'Guest User' : 'Unknown User', email: 'N/A', phoneNumber: 'N/A' };
-                    } catch {
-                        allUsers[uid] = { name: 'Error Loading User', email: 'N/A', phoneNumber: 'N/A' };
-                    }
-                }));
-                const sorted = [...userIds].sort((a, b) => {
-                    const getLatest = cart => {
-                        const vals = Object.values(cart);
-                        if (!vals.length) return 0;
-                        return Math.max(...vals.map(i => i.lastUpdated || i.timestamp || 0));
-                    };
-                    return getLatest(allCarts[b]) - getLatest(allCarts[a]);
-                });
-                container.innerHTML = '';
-                sorted.forEach(uid => container.appendChild(createCartCard(uid, allCarts[uid], allUsers[uid])));
-            } catch (err) {
-                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">❌</div><div class="empty-state-text">Error loading carts. Please refresh.</div></div>';
+
+            // Fetch any missing user details — each lookup is individually try/caught
+            await Promise.all(userIds.map(async uid => {
+                if (allUsers[uid]) return;
+                if (uid.startsWith('guest_')) {
+                    allUsers[uid] = { name: 'Guest User', email: 'N/A', phoneNumber: 'N/A' };
+                    return;
+                }
+                try {
+                    let snap = await get(dbRef(db, `tiutbc/users/${uid}/allDetails`));
+                    if (snap.exists()) { allUsers[uid] = snap.val(); return; }
+                    snap = await get(dbRef(db, `users/${uid}/allDetails`));
+                    if (snap.exists()) { allUsers[uid] = snap.val(); return; }
+                } catch { /* permission denied or network error — fall through to unknown */ }
+                allUsers[uid] = { name: 'Unknown User', email: 'N/A', phoneNumber: 'N/A' };
+            }));
+
+            const sorted = [...userIds].sort((a, b) => {
+                const getLatest = cart => {
+                    const vals = Object.values(cart);
+                    if (!vals.length) return 0;
+                    return Math.max(...vals.map(i => i.lastUpdated || i.timestamp || 0));
+                };
+                return getLatest(allCarts[b]) - getLatest(allCarts[a]);
+            });
+
+            container.innerHTML = '';
+            sorted.forEach(uid => {
+                try {
+                    container.appendChild(createCartCard(uid, allCarts[uid], allUsers[uid]));
+                } catch (e) {
+                    console.error('Error rendering cart for', uid, e);
+                }
+            });
+
+            if (!container.children.length) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🛒</div><div class="empty-state-text">No active carts</div></div>';
             }
         }
 
