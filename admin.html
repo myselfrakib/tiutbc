@@ -707,20 +707,33 @@
         });
 
         // ========== USERS ==========
+        // FIX: Read from BOTH root 'users/' AND 'tiutbc/users/' — the app uses both paths
         function loadUsers() {
-            const usersRef = dbRef(db, 'tiutbc/users');
-            const callback = snapshot => {
+            let tiutbcData = {}, rootData = {};
+            const mergeAndDisplay = () => {
                 allUsers = {};
-                const data = snapshot.val() || {};
-                Object.keys(data).forEach(uid => {
-                    if (data[uid] && data[uid].allDetails) allUsers[uid] = data[uid].allDetails;
+                // Load root users first
+                Object.keys(rootData).forEach(uid => {
+                    if (rootData[uid] && rootData[uid].allDetails) allUsers[uid] = rootData[uid].allDetails;
+                });
+                // tiutbc users overwrite root if same uid (tiutbc is newer/preferred)
+                Object.keys(tiutbcData).forEach(uid => {
+                    if (tiutbcData[uid] && tiutbcData[uid].allDetails) allUsers[uid] = tiutbcData[uid].allDetails;
                 });
                 displayUsers();
                 updateUserStats();
                 displayCarts();
             };
-            onValue(usersRef, callback);
-            dbListeners.push({ ref: usersRef, callback });
+
+            const tiutbcRef = dbRef(db, 'tiutbc/users');
+            const tiutbcCb = snapshot => { tiutbcData = snapshot.val() || {}; mergeAndDisplay(); };
+            onValue(tiutbcRef, tiutbcCb);
+            dbListeners.push({ ref: tiutbcRef, callback: tiutbcCb });
+
+            const rootRef = dbRef(db, 'users');
+            const rootCb = snapshot => { rootData = snapshot.val() || {}; mergeAndDisplay(); };
+            onValue(rootRef, rootCb);
+            dbListeners.push({ ref: rootRef, callback: rootCb });
         }
 
         function displayUsers() {
@@ -800,11 +813,23 @@
         window.closeUserModal = function() { $('userDetailsModal').classList.remove('active'); };
 
         // ========== CARTS ==========
+        // FIX: Read from BOTH root 'carts/' AND 'tiutbc/carts/' — the app writes to both paths
         function loadCarts() {
-            const cartsRef = dbRef(db, 'tiutbc/carts');
-            const callback = snapshot => { allCarts = snapshot.val() || {}; displayCarts(); updateCartStats(); };
-            onValue(cartsRef, callback);
-            dbListeners.push({ ref: cartsRef, callback });
+            let tiutbcCarts = {}, rootCarts = {};
+            const mergeAndDisplay = () => {
+                allCarts = { ...rootCarts, ...tiutbcCarts }; // tiutbc takes precedence
+                displayCarts();
+                updateCartStats();
+            };
+            const tiutbcRef = dbRef(db, 'tiutbc/carts');
+            const tiutbcCb = snapshot => { tiutbcCarts = snapshot.val() || {}; mergeAndDisplay(); };
+            onValue(tiutbcRef, tiutbcCb);
+            dbListeners.push({ ref: tiutbcRef, callback: tiutbcCb });
+
+            const rootRef = dbRef(db, 'carts');
+            const rootCb = snapshot => { rootCarts = snapshot.val() || {}; mergeAndDisplay(); };
+            onValue(rootRef, rootCb);
+            dbListeners.push({ ref: rootRef, callback: rootCb });
         }
 
         async function displayCarts() {
@@ -817,20 +842,29 @@
             container.innerHTML = '<div class="empty-state"><div class="loading-spinner"></div><div class="empty-state-text">Loading cart details...</div></div>';
             try {
                 await Promise.all(userIds.map(async uid => {
-                    if (!allUsers[uid]) {
-                        try {
-                            const snap = await get(dbRef(db, `tiutbc/users/${uid}/allDetails`));
-                            allUsers[uid] = snap.exists() ? snap.val() : { name: 'Deleted User', email: 'N/A', phoneNumber: 'N/A' };
-                        } catch { allUsers[uid] = { name: 'Error Loading User', email: 'N/A', phoneNumber: 'N/A' }; }
+                    if (allUsers[uid]) return;
+                    try {
+                        // FIX: Try tiutbc/users first, then fall back to root users/
+                        let snap = await get(dbRef(db, `tiutbc/users/${uid}/allDetails`));
+                        if (snap.exists()) { allUsers[uid] = snap.val(); return; }
+                        snap = await get(dbRef(db, `users/${uid}/allDetails`));
+                        if (snap.exists()) { allUsers[uid] = snap.val(); return; }
+                        allUsers[uid] = { name: uid.startsWith('guest_') ? 'Guest User' : 'Unknown User', email: 'N/A', phoneNumber: 'N/A' };
+                    } catch {
+                        allUsers[uid] = { name: 'Error Loading User', email: 'N/A', phoneNumber: 'N/A' };
                     }
                 }));
-                const sorted = userIds.sort((a, b) => {
-                    const getLatest = cart => Math.max(0, ...Object.values(cart).map(i => i.lastUpdated || i.timestamp || 0));
+                const sorted = [...userIds].sort((a, b) => {
+                    const getLatest = cart => {
+                        const vals = Object.values(cart);
+                        if (!vals.length) return 0;
+                        return Math.max(...vals.map(i => i.lastUpdated || i.timestamp || 0));
+                    };
                     return getLatest(allCarts[b]) - getLatest(allCarts[a]);
                 });
                 container.innerHTML = '';
                 sorted.forEach(uid => container.appendChild(createCartCard(uid, allCarts[uid], allUsers[uid])));
-            } catch {
+            } catch (err) {
                 container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">❌</div><div class="empty-state-text">Error loading carts. Please refresh.</div></div>';
             }
         }
@@ -893,11 +927,23 @@
         }
 
         // ========== ORDERS ==========
+        // FIX: Read from BOTH root 'orders/' AND 'tiutbc/orders/' and merge
         function loadOrders() {
-            const ordersRef = dbRef(db, 'tiutbc/orders');
-            const callback = snapshot => { allOrders = snapshot.val() || {}; displayOrders(); };
-            onValue(ordersRef, callback);
-            dbListeners.push({ ref: ordersRef, callback });
+            let tiutbcOrders = {}, rootOrders = {};
+            const mergeAndDisplay = () => {
+                allOrders = { ...rootOrders, ...tiutbcOrders }; // tiutbc takes precedence
+                displayOrders();
+            };
+
+            const tiutbcRef = dbRef(db, 'tiutbc/orders');
+            const tiutbcCb = snapshot => { tiutbcOrders = snapshot.val() || {}; mergeAndDisplay(); };
+            onValue(tiutbcRef, tiutbcCb);
+            dbListeners.push({ ref: tiutbcRef, callback: tiutbcCb });
+
+            const rootRef = dbRef(db, 'orders');
+            const rootCb = snapshot => { rootOrders = snapshot.val() || {}; mergeAndDisplay(); };
+            onValue(rootRef, rootCb);
+            dbListeners.push({ ref: rootRef, callback: rootCb });
         }
 
         function displayOrders() {
@@ -946,6 +992,26 @@
                 </div>`;
             }
 
+            // Helper: build the assignment panel HTML and schedule partner load
+            const buildAssignmentPanel = (showAutoFirst) => {
+                setTimeout(() => loadPartnersForAssignment(orderId), 100);
+                return `
+                <div class="assignment-section">
+                    <div class="assignment-title">🚚 Assign Delivery Partner:</div>
+                    ${showAutoFirst ? `<button class="btn-auto-assign" onclick="autoAssignOrder('${orderId}')">⚡ Auto-Assign to Best Available</button>` : ''}
+                    <div id="partnersList-${orderId}" class="partners-list"><div class="loading-partners">Loading partners...</div></div>
+                    ${!showAutoFirst ? `<button class="btn-auto-assign" onclick="autoAssignOrder('${orderId}')">⚡ Auto-Assign to Best Available</button>` : ''}
+                </div>`;
+            };
+
+            const assignedTo = orderDetails.assignedTo;
+            const assignedPartner = assignedTo ? allDeliveryPartners[assignedTo] : null;
+            const assignedBadge = assignedPartner ? `<div class="assigned-partner-badge">
+                <span>🏍️</span>
+                <span>Assigned to: ${escapeHtml(assignedPartner.name)}</span>
+                ${assignedPartner.phone ? `<span>📞 ${escapeHtml(assignedPartner.phone)}</span>` : ''}
+            </div>` : '';
+
             let actions = '';
             if (status === 'pending') {
                 actions = `${ctaButtons}<div class="order-actions">
@@ -953,15 +1019,10 @@
                     <button class="action-btn btn-reject" onclick="updateOrderStatus('${orderId}', 'rejected')">❌ Reject Order</button>
                 </div>`;
             } else if (status === 'confirmed') {
+                // No assignment here — just move to cooking
                 actions = `${ctaButtons}<div class="order-actions">
                     <button class="action-btn btn-cooking" onclick="updateOrderStatus('${orderId}', 'cooking')">🍳 Start Cooking</button>
-                </div>
-                <div class="assignment-section">
-                    <div class="assignment-title">🚚 Assign to Delivery Partner:</div>
-                    <div id="partnersList-${orderId}" class="partners-list"><div class="loading-partners">Loading partners...</div></div>
-                    <button class="btn-auto-assign" onclick="autoAssignOrder('${orderId}')">⚡ Auto-Assign to Best Available</button>
                 </div>`;
-                setTimeout(() => loadPartnersForAssignment(orderId), 100);
             } else if (status === 'cooking') {
                 actions = `${ctaButtons}<div class="order-actions">
                     <button class="action-btn btn-packing" onclick="updateOrderStatus('${orderId}', 'packing')">📦 Start Packing</button>
@@ -971,18 +1032,16 @@
                     <button class="action-btn btn-delivery" onclick="updateOrderStatus('${orderId}', 'out-for-delivery')">🚚 Out for Delivery</button>
                 </div>`;
             } else if (status === 'out-for-delivery') {
-                const assignedTo = orderDetails.assignedTo;
-                const assignedPartner = assignedTo ? allDeliveryPartners[assignedTo] : null;
-                const partnerInfo = assignedPartner ? `<div class="assigned-partner-badge">
-                    <span>🏍️</span>
-                    <span>Assigned to: ${escapeHtml(assignedPartner.name)}</span>
-                    ${assignedPartner.phone ? `<span>📞 ${escapeHtml(assignedPartner.phone)}</span>` : ''}
-                </div>` : '';
-                actions = `${ctaButtons}${partnerInfo}<div class="order-actions">
+                // Assignment panel only shows after admin marks Out for Delivery.
+                // Auto-assign button is shown prominently first, manual partner list below.
+                actions = `${ctaButtons}
+                ${assignedBadge}
+                ${buildAssignmentPanel(true)}
+                <div class="order-actions" style="margin-top:1rem;">
                     <button class="action-btn btn-delivered" onclick="updateOrderStatus('${orderId}', 'delivered')">✔️ Mark Delivered</button>
                 </div>`;
             } else if (status === 'delivered' || status === 'rejected') {
-                actions = ctaButtons;
+                actions = `${ctaButtons}${assignedBadge}`;
             }
 
             const itemsList = orderDetails.items || [];
@@ -1273,9 +1332,12 @@
             if (!partner) { showNotification('Partner not found', true); return; }
             if (!confirm(`Assign this order to ${partner.name}?`)) return;
             try {
+                // Only update assignedTo — do NOT change status, admin controls that separately
                 await update(dbRef(db, `tiutbc/orders/${orderId}/orderDetails`), {
-                    status: 'out-for-delivery', assignedTo: partnerId,
-                    assignedAt: Date.now(), assignedBy: auth.currentUser.uid, assignmentMethod: 'manual'
+                    assignedTo: partnerId,
+                    assignedAt: Date.now(),
+                    assignedBy: auth.currentUser.uid,
+                    assignmentMethod: 'manual'
                 });
                 showNotification(`Order assigned to ${partner.name}!`);
             } catch (error) { showNotification('Failed to assign order: ' + error.message, true); }
@@ -1291,9 +1353,12 @@
                 if (!available.length) { showNotification('No online delivery partners available', true); return; }
                 const best = available[0];
                 if (!confirm(`Auto-assign to ${best.name}?\n\nCurrently has ${best.activeOrders} active order(s).`)) return;
+                // Only update assignedTo — do NOT change status, admin controls that separately
                 await update(dbRef(db, `tiutbc/orders/${orderId}/orderDetails`), {
-                    status: 'out-for-delivery', assignedTo: best.uid,
-                    assignedAt: Date.now(), assignedBy: auth.currentUser.uid, assignmentMethod: 'auto'
+                    assignedTo: best.uid,
+                    assignedAt: Date.now(),
+                    assignedBy: auth.currentUser.uid,
+                    assignmentMethod: 'auto'
                 });
                 showNotification(`Order auto-assigned to ${best.name}!`);
             } catch (error) { showNotification('Failed to auto-assign: ' + error.message, true); }
