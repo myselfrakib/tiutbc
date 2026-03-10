@@ -475,6 +475,100 @@
             cursor: not-allowed;
         }
 
+        /* Payment Collection Section */
+        .payment-collection-section {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffe8a1 100%);
+            border: 2px solid var(--warning-yellow);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .payment-collection-header {
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: #856404;
+            margin-bottom: 0.75rem;
+            text-align: center;
+        }
+
+        .payment-collection-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        .collect-btn {
+            padding: 1rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .upi-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .upi-btn:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .cash-btn {
+            background: linear-gradient(135deg, var(--success-green) 0%, #4a9638 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(96, 178, 70, 0.3);
+        }
+
+        .cash-btn:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 8px rgba(96, 178, 70, 0.3);
+        }
+
+        .payment-collected-badge {
+            background: linear-gradient(135deg, var(--success-green) 0%, #4a9638 100%);
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .payment-pending-badge {
+            background: linear-gradient(135deg, var(--warning-yellow) 0%, #e0a800 100%);
+            color: #856404;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @media (min-width: 768px) {
+            .collect-btn:hover {
+                transform: translateY(-2px);
+            }
+        }
+
         .empty-state {
             text-align: center;
             padding: 3rem 1rem;
@@ -703,12 +797,6 @@
                 <div class="stat-value" id="statDelivered">0</div>
                 <div class="stat-label">Delivered Today</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon">💰</div>
-                <div class="stat-value" id="statEarnings">₹0</div>
-                <div class="stat-label">Today's Earnings</div>
-                <div class="earnings-note">(50% of delivery fees)</div>
-            </div>
         </div>
 
         <div class="filter-tabs">
@@ -854,7 +942,6 @@
             
             let inTransitCount = 0;
             let deliveredCount = 0;
-            let earnings = 0;
 
             allOrders.forEach(order => {
                 const status = (order.orderDetails?.status || '').toLowerCase();
@@ -865,16 +952,12 @@
                 } else if (status === 'delivered') {
                     if (orderDate === today) {
                         deliveredCount++;
-                        // Delivery partner gets 50% of delivery fee
-                        const deliveryFee = order.orderDetails?.deliveryFee || 0;
-                        earnings += deliveryFee * 0.5;
                     }
                 }
             });
 
             document.getElementById('statInTransit').textContent = inTransitCount;
             document.getElementById('statDelivered').textContent = deliveredCount;
-            document.getElementById('statEarnings').textContent = `₹${Math.round(earnings)}`;
 
             // Update filter badges
             document.getElementById('badgeAll').textContent = allOrders.length;
@@ -946,24 +1029,51 @@
             const paymentText = paymentMethod === 'online' ? 'PAID ONLINE' : 'CASH ON DELIVERY';
             
             const total = orderDetails.total || 0;
-            const deliveryFee = orderDetails.deliveryFee || 0;
-            const deliveryEarning = deliveryFee * 0.5;
 
             const isInTransit = status === 'out-for-delivery' || status === 'outfordelivery';
             const isDelivered = status === 'delivered';
+            const paymentCollected = orderDetails.paymentCollected || false;
+            const isCOD = paymentMethod === 'cod';
 
             let actionSection = '';
 
             if (isInTransit) {
-                actionSection = `
-                    <div class="order-actions">
-                        <button class="action-btn btn-success" onclick="markDelivered('${order.id}')">
-                            ✓ Mark Delivered
-                        </button>
-                    </div>
-                `;
+                // Show payment collection buttons for COD orders
+                if (isCOD && !paymentCollected) {
+                    actionSection = `
+                        <div class="payment-collection-section">
+                            <div class="payment-collection-header">💰 Collect Payment: ₹${total.toFixed(0)}</div>
+                            <div class="payment-collection-buttons">
+                                <button class="collect-btn upi-btn" onclick="collectViaUPI('${order.id}', ${total})">
+                                    📱 UPI Payment
+                                </button>
+                                <button class="collect-btn cash-btn" onclick="collectCash('${order.id}')">
+                                    💵 Cash Collected
+                                </button>
+                            </div>
+                        </div>
+                        <div class="order-actions">
+                            <button class="action-btn btn-success" onclick="markDelivered('${order.id}')" disabled title="Collect payment first">
+                                ✓ Mark Delivered
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    actionSection = `
+                        <div class="order-actions">
+                            <button class="action-btn btn-success" onclick="markDelivered('${order.id}')">
+                                ✓ Mark Delivered
+                            </button>
+                        </div>
+                    `;
+                }
             } else if (isDelivered) {
+                const collectionStatus = paymentCollected ? 
+                    `<div class="payment-collected-badge">✓ Payment Collected</div>` : 
+                    (isCOD ? `<div class="payment-pending-badge">⚠️ Payment Not Collected</div>` : '');
+                
                 actionSection = `
+                    ${collectionStatus}
                     <div class="order-actions">
                         <button class="action-btn btn-secondary" disabled>
                             ✓ Delivered
@@ -1002,10 +1112,7 @@
                             <span>Payment:</span>
                             <span class="${paymentBadgeClass}">${paymentText}</span>
                         </div>
-                        <div>
-                            <div class="order-total">₹${total.toFixed(0)}</div>
-                            <div class="delivery-earnings">Your earnings: ₹${deliveryEarning.toFixed(0)}</div>
-                        </div>
+                        <div class="order-total">₹${total.toFixed(0)}</div>
                     </div>
 
                     ${actionSection}
@@ -1034,6 +1141,57 @@
             
             return date.toLocaleDateString();
         }
+
+        window.collectViaUPI = async function(orderId, amount) {
+            const UPI_ID = '9907718066@ptyes';
+            const upiLink = `upi://pay?pa=${UPI_ID}&pn=TIU Biriyani Canteen&am=${amount}&cu=INR&tn=Order Payment`;
+            
+            // Try to open UPI app
+            window.location.href = upiLink;
+            
+            // Show confirmation dialog after a delay
+            setTimeout(async () => {
+                if (confirm('Has the customer completed the UPI payment?')) {
+                    try {
+                        const orderRef = ref(db, `tiutbc/orders/${orderId}/orderDetails`);
+                        await update(orderRef, {
+                            paymentCollected: true,
+                            paymentCollectedAt: Date.now(),
+                            paymentCollectedBy: currentUser.uid,
+                            paymentMethod: 'upi'
+                        });
+                        
+                        showToast('Payment marked as collected via UPI!', 'success');
+                        renderOrders();
+                    } catch (error) {
+                        console.error('Error updating payment:', error);
+                        showToast('Failed to update payment status', 'error');
+                    }
+                }
+            }, 2000);
+        };
+
+        window.collectCash = async function(orderId) {
+            if (!confirm('Confirm that you have collected cash from the customer?')) {
+                return;
+            }
+
+            try {
+                const orderRef = ref(db, `tiutbc/orders/${orderId}/orderDetails`);
+                await update(orderRef, {
+                    paymentCollected: true,
+                    paymentCollectedAt: Date.now(),
+                    paymentCollectedBy: currentUser.uid,
+                    collectionMethod: 'cash'
+                });
+                
+                showToast('Cash payment marked as collected!', 'success');
+                renderOrders();
+            } catch (error) {
+                console.error('Error updating payment:', error);
+                showToast('Failed to update payment status', 'error');
+            }
+        };
 
         window.markDelivered = async function(orderId) {
             if (!confirm('Mark this order as delivered?')) {
