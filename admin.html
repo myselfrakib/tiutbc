@@ -1614,6 +1614,212 @@
                 font-size: 1.8rem;
             }
         }
+
+        /* ========== ASSIGNMENT SYSTEM STYLES ========== */
+        
+        /* Partner Cards */
+        .partner-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.8rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border-left: 5px solid #667eea;
+            transition: all 0.3s;
+        }
+
+        .partner-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        .partner-card.online {
+            border-left-color: #60b246;
+        }
+
+        .partner-card.offline {
+            border-left-color: #95a5a6;
+            opacity: 0.8;
+        }
+
+        .partner-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .partner-status-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .partner-status-dot.online {
+            background: #60b246;
+            box-shadow: 0 0 8px rgba(96, 178, 70, 0.5);
+        }
+
+        .partner-status-dot.offline {
+            background: #95a5a6;
+        }
+
+        .partner-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        /* Assignment Section */
+        .assignment-section {
+            background: linear-gradient(135deg, #f5f7fa 0%, #ecf0f1 100%);
+            padding: 1.8rem;
+            border-radius: 12px;
+            margin-top: 1.5rem;
+            border: 2px dashed #667eea;
+        }
+
+        .assignment-title {
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 1.2rem;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .partners-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-bottom: 1.2rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .partner-option {
+            background: white;
+            border: 2px solid #ecf0f1;
+            border-radius: 10px;
+            padding: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .partner-option:hover:not(.offline) {
+            border-color: #667eea;
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .partner-option.online {
+            border-left: 4px solid #60b246;
+        }
+
+        .partner-option.offline {
+            opacity: 0.5;
+            cursor: not-allowed;
+            border-left: 4px solid #95a5a6;
+        }
+
+        .partner-option-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+        }
+
+        .partner-info .partner-name {
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 0.3rem;
+            font-size: 1rem;
+        }
+
+        .partner-stats {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-assign {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+            font-size: 0.9rem;
+        }
+
+        .btn-assign:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-assign:active {
+            transform: translateY(0);
+        }
+
+        .btn-auto-assign {
+            width: 100%;
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            color: white;
+            border: none;
+            padding: 1.1rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.7rem;
+            font-size: 1rem;
+        }
+
+        .btn-auto-assign:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(243, 156, 18, 0.4);
+        }
+
+        .btn-auto-assign:active {
+            transform: translateY(0);
+        }
+
+        .assigned-partner-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-top: 1.5rem;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .loading-partners {
+            text-align: center;
+            padding: 2rem;
+            color: #7f8c8d;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -1640,6 +1846,7 @@
         <div class="mobile-menu-item" onclick="switchTab('orders')">📦 Orders</div>
         <div class="mobile-menu-item" onclick="switchTab('users')">👥 Users</div>
         <div class="mobile-menu-item" onclick="switchTab('reviews')">⭐ Reviews</div>
+        <div class="mobile-menu-item" onclick="switchTab('partners')">🏍️ Partners</div>
         <div class="mobile-menu-item" onclick="switchTab('store')">🍛 Store Control</div>
         <div class="mobile-menu-item" onclick="switchTab('food')">🍛 Manage Menu</div>
     </div>
@@ -1652,6 +1859,7 @@
             <button class="tab" onclick="switchTab('orders')">📦 Orders</button>
             <button class="tab" onclick="switchTab('users')">👥 Users</button>
             <button class="tab" onclick="switchTab('reviews')">⭐ Reviews</button>
+            <button class="tab" onclick="switchTab('partners')">🏍️ Partners</button>
             <button class="tab" onclick="switchTab('store')">🍛 Store Control</button>
             <button class="tab" onclick="switchTab('food')">🍛 Manage Menu</button>
         </div>
@@ -1777,6 +1985,36 @@
                 <div class="empty-state">
                     <div class="loading-spinner"></div>
                     <div class="empty-state-text">Loading reviews...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DELIVERY PARTNERS TAB -->
+        <div id="partnersTab" class="tab-content">
+            <h2 class="section-title">🏍️ Delivery Partners</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-value" id="totalPartners">0</div>
+                    <div class="stat-label">Total Partners</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🟢</div>
+                    <div class="stat-value" id="onlinePartners">0</div>
+                    <div class="stat-label">Online Now</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🚚</div>
+                    <div class="stat-value" id="activeDeliveries">0</div>
+                    <div class="stat-label">Active Deliveries</div>
+                </div>
+            </div>
+
+            <div id="partnersContainer">
+                <div class="empty-state">
+                    <div class="loading-spinner"></div>
+                    <div class="empty-state-text">Loading partners...</div>
                 </div>
             </div>
         </div>
@@ -1950,6 +2188,7 @@
         let allUsers = {};
         let allOrders = {};
         let allReviews = {};
+        let allDeliveryPartners = {};
         let currentFilter = 'all';
         let currentReviewFilter = 'all';
         let currentEditId = null;
@@ -2008,6 +2247,7 @@
                 loadStoreStatus(); 
                 loadFoodItems();
                 loadReviews();
+                loadDeliveryPartners();
             } catch (err) { 
                 showNotification('Error verifying admin: ' + err.message, true); 
             }
@@ -2404,7 +2644,18 @@
                     <div class="order-actions">
                         <button class="action-btn btn-cooking" onclick="updateOrderStatus('${orderId}', 'cooking')">🍳 Start Cooking</button>
                     </div>
+                    <div class="assignment-section">
+                        <div class="assignment-title">🚚 Assign to Delivery Partner:</div>
+                        <div id="partnersList-${orderId}" class="partners-list">
+                            <div class="loading-partners">Loading partners...</div>
+                        </div>
+                        <button class="btn-auto-assign" onclick="autoAssignOrder('${orderId}')">
+                            ⚡ Auto-Assign to Best Available
+                        </button>
+                    </div>
                 `;
+                // Load partners after a short delay to ensure DOM is ready
+                setTimeout(() => loadPartnersForAssignment(orderId), 100);
             } else if (status === 'cooking') {
                 actions = `
                     ${ctaButtons}
@@ -2420,8 +2671,19 @@
                     </div>
                 `;
             } else if (status === 'out-for-delivery') {
+                const assignedTo = orderDetails.assignedTo;
+                const assignedPartner = assignedTo ? allDeliveryPartners[assignedTo] : null;
+                const partnerInfo = assignedPartner ? `
+                    <div class="assigned-partner-badge">
+                        <span>🏍️</span>
+                        <span>Assigned to: ${escapeHtml(assignedPartner.name)}</span>
+                        <span>${assignedPartner.phone ? `📞 ${escapeHtml(assignedPartner.phone)}` : ''}</span>
+                    </div>
+                ` : '';
+                
                 actions = `
                     ${ctaButtons}
+                    ${partnerInfo}
                     <div class="order-actions">
                         <button class="action-btn btn-delivered" onclick="updateOrderStatus('${orderId}', 'delivered')">✔️ Mark Delivered</button>
                     </div>
@@ -2692,6 +2954,257 @@
                     orderCard.style.animation = 'highlight 2s ease-in-out';
                 }
             }, 300);
+        };
+
+        // ========== DELIVERY PARTNERS & ASSIGNMENT ==========
+        
+        function loadDeliveryPartners() {
+            const partnersRef = dbRef(db, 'tiutbc/deliveryagent');
+            const callback = snapshot => {
+                allDeliveryPartners = snapshot.val() || {};
+                displayDeliveryPartners();
+                updatePartnerStats();
+            };
+            onValue(partnersRef, callback);
+            dbListeners.push({ ref: partnersRef, callback });
+        }
+
+        function displayDeliveryPartners() {
+            const container = $('partnersContainer');
+            if (!container) return;
+
+            const partnerIds = Object.keys(allDeliveryPartners);
+            
+            if (!partnerIds.length) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🏍️</div><div class="empty-state-text">No delivery partners registered</div></div>';
+                return;
+            }
+
+            const online = [];
+            const offline = [];
+
+            partnerIds.forEach(uid => {
+                const partner = allDeliveryPartners[uid];
+                if (partner.status === true) {
+                    if (partner.isOnline === true) {
+                        online.push({ uid, ...partner });
+                    } else {
+                        offline.push({ uid, ...partner });
+                    }
+                }
+            });
+
+            let html = '';
+
+            if (online.length > 0) {
+                html += '<h3 style="margin:0 0 1.5rem 0;color:#2c3e50;font-size:1.3rem;">🟢 Online Partners (' + online.length + ')</h3>';
+                html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.5rem;margin-bottom:3rem;">';
+                online.forEach(partner => {
+                    const activeOrders = getPartnerActiveOrders(partner.uid);
+                    html += `
+                        <div class="partner-card online">
+                            <div class="partner-header">
+                                <div class="partner-status-dot online"></div>
+                                <div style="flex:1;">
+                                    <div class="partner-name">${escapeHtml(partner.name)}</div>
+                                </div>
+                            </div>
+                            <div class="partner-details">
+                                <div>📞 ${escapeHtml(partner.phone || 'N/A')}</div>
+                                <div>📧 ${escapeHtml(partner.email || 'N/A')}</div>
+                                <div>🏍️ ${escapeHtml(partner.vehicleType || 'N/A')} • ${escapeHtml(partner.vehicleNumber || 'N/A')}</div>
+                                <div style="font-weight:700;color:#667eea;margin-top:0.5rem;">🚚 Active Orders: ${activeOrders}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            }
+
+            if (offline.length > 0) {
+                html += '<h3 style="margin:0 0 1.5rem 0;color:#7f8c8d;font-size:1.3rem;">⚪ Offline Partners (' + offline.length + ')</h3>';
+                html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.5rem;">';
+                offline.forEach(partner => {
+                    const lastSeen = partner.lastOnlineAt 
+                        ? new Date(partner.lastOnlineAt).toLocaleString() 
+                        : 'Never online';
+                    html += `
+                        <div class="partner-card offline">
+                            <div class="partner-header">
+                                <div class="partner-status-dot offline"></div>
+                                <div style="flex:1;">
+                                    <div class="partner-name">${escapeHtml(partner.name)}</div>
+                                </div>
+                            </div>
+                            <div class="partner-details">
+                                <div>📞 ${escapeHtml(partner.phone || 'N/A')}</div>
+                                <div>📧 ${escapeHtml(partner.email || 'N/A')}</div>
+                                <div>🏍️ ${escapeHtml(partner.vehicleType || 'N/A')} • ${escapeHtml(partner.vehicleNumber || 'N/A')}</div>
+                                <div style="margin-top:0.5rem;">⏰ Last seen: ${lastSeen}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            }
+
+            if (!online.length && !offline.length) {
+                html = '<div class="empty-state"><div class="empty-state-icon">🏍️</div><div class="empty-state-text">No approved delivery partners</div></div>';
+            }
+
+            container.innerHTML = html;
+        }
+
+        function getPartnerActiveOrders(partnerId) {
+            let count = 0;
+            Object.values(allOrders).forEach(order => {
+                const assignedTo = order.orderDetails?.assignedTo;
+                const status = (order.orderDetails?.status || '').toLowerCase();
+                if (assignedTo === partnerId && status === 'out-for-delivery') {
+                    count++;
+                }
+            });
+            return count;
+        }
+
+        function updatePartnerStats() {
+            const total = Object.keys(allDeliveryPartners).filter(uid => allDeliveryPartners[uid].status === true).length;
+            const online = Object.values(allDeliveryPartners).filter(p => p.status === true && p.isOnline === true).length;
+            const active = Object.keys(allDeliveryPartners).filter(uid => getPartnerActiveOrders(uid) > 0).length;
+
+            const totalEl = $('totalPartners');
+            const onlineEl = $('onlinePartners');
+            const activeEl = $('activeDeliveries');
+
+            if (totalEl) totalEl.textContent = total;
+            if (onlineEl) onlineEl.textContent = online;
+            if (activeEl) activeEl.textContent = active;
+        }
+
+        async function loadPartnersForAssignment(orderId) {
+            const container = $(`partnersList-${orderId}`);
+            if (!container) return;
+
+            const onlinePartners = Object.keys(allDeliveryPartners)
+                .filter(uid => allDeliveryPartners[uid].status === true)
+                .map(uid => ({ uid, ...allDeliveryPartners[uid] }))
+                .sort((a, b) => {
+                    if ((a.isOnline === true) && (b.isOnline !== true)) return -1;
+                    if ((a.isOnline !== true) && (b.isOnline === true)) return 1;
+                    return getPartnerActiveOrders(a.uid) - getPartnerActiveOrders(b.uid);
+                });
+
+            if (!onlinePartners.length) {
+                container.innerHTML = '<div class="loading-partners">No delivery partners available</div>';
+                return;
+            }
+
+            let html = '';
+            onlinePartners.forEach(partner => {
+                const isOnline = partner.isOnline === true;
+                const activeOrders = getPartnerActiveOrders(partner.uid);
+                const canAssign = isOnline;
+
+                html += `
+                    <div class="partner-option ${isOnline ? 'online' : 'offline'}">
+                        <div class="partner-option-left">
+                            <div class="partner-status-dot ${isOnline ? 'online' : 'offline'}"></div>
+                            <div class="partner-info">
+                                <div class="partner-name">${escapeHtml(partner.name)}</div>
+                                <div class="partner-stats">
+                                    ${isOnline ? '🟢 Online' : '⚪ Offline'} • 
+                                    ${activeOrders} active
+                                </div>
+                            </div>
+                        </div>
+                        ${canAssign 
+                            ? `<button class="btn-assign" onclick="event.stopPropagation(); assignOrderToPartner('${orderId}', '${partner.uid}')">Assign</button>` 
+                            : '<span style="color:#95a5a6;font-size:0.85rem;">Offline</span>'
+                        }
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        window.assignOrderToPartner = async function(orderId, partnerId) {
+            if (!isAdmin) {
+                showNotification('Unauthorized', true);
+                return;
+            }
+
+            const partner = allDeliveryPartners[partnerId];
+            if (!partner) {
+                showNotification('Partner not found', true);
+                return;
+            }
+
+            if (!confirm(`Assign this order to ${partner.name}?`)) {
+                return;
+            }
+
+            try {
+                const orderRef = dbRef(db, `tiutbc/orders/${orderId}/orderDetails`);
+                await update(orderRef, {
+                    status: 'out-for-delivery',
+                    assignedTo: partnerId,
+                    assignedAt: Date.now(),
+                    assignedBy: auth.currentUser.uid,
+                    assignmentMethod: 'manual'
+                });
+
+                showNotification(`Order assigned to ${partner.name}!`);
+            } catch (error) {
+                console.error('Error assigning order:', error);
+                showNotification('Failed to assign order: ' + error.message, true);
+            }
+        };
+
+        window.autoAssignOrder = async function(orderId) {
+            if (!isAdmin) {
+                showNotification('Unauthorized', true);
+                return;
+            }
+
+            try {
+                const onlinePartners = Object.keys(allDeliveryPartners)
+                    .filter(uid => 
+                        allDeliveryPartners[uid].status === true && 
+                        allDeliveryPartners[uid].isOnline === true
+                    )
+                    .map(uid => ({
+                        uid,
+                        ...allDeliveryPartners[uid],
+                        activeOrders: getPartnerActiveOrders(uid)
+                    }))
+                    .sort((a, b) => a.activeOrders - b.activeOrders);
+
+                if (!onlinePartners.length) {
+                    showNotification('No online delivery partners available', true);
+                    return;
+                }
+
+                const bestPartner = onlinePartners[0];
+
+                if (!confirm(`Auto-assign to ${bestPartner.name}?\n\nCurrently has ${bestPartner.activeOrders} active order(s).`)) {
+                    return;
+                }
+
+                const orderRef = dbRef(db, `tiutbc/orders/${orderId}/orderDetails`);
+                await update(orderRef, {
+                    status: 'out-for-delivery',
+                    assignedTo: bestPartner.uid,
+                    assignedAt: Date.now(),
+                    assignedBy: auth.currentUser.uid,
+                    assignmentMethod: 'auto'
+                });
+
+                showNotification(`Order auto-assigned to ${bestPartner.name}!`);
+            } catch (error) {
+                console.error('Error auto-assigning order:', error);
+                showNotification('Failed to auto-assign: ' + error.message, true);
+            }
         };
 
         // ========== STORE CONTROL ==========
