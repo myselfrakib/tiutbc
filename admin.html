@@ -96,7 +96,8 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: all 0.3s; border-top: 4px solid #667eea;
         }
         .cart-card:hover { transform: translateY(-5px); box-shadow: 0 8px 35px rgba(0,0,0,0.15); }
-        .cart-header { margin-bottom: 1.5rem; padding-bottom: 1.2rem; border-bottom: 2px solid #ecf0f1; }
+        .cart-header { margin-bottom: 1.5rem; padding-bottom: 1.2rem; border-bottom: 2px solid #ecf0f1; display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+        .cart-last-updated { font-size: 0.78rem; color: #7f8c8d; white-space: nowrap; padding-top: 0.2rem; }
         .cart-user-info { display: flex; align-items: center; gap: 1rem; }
         .cart-user-avatar {
             width: 50px; height: 50px; border-radius: 50%;
@@ -814,23 +815,15 @@
         window.closeUserModal = function() { $('userDetailsModal').classList.remove('active'); };
 
         // ========== CARTS ==========
-        // FIX: Read from BOTH root 'carts/' AND 'tiutbc/carts/' — the app writes to both paths
         function loadCarts() {
-            let tiutbcCarts = {}, rootCarts = {};
-            const mergeAndDisplay = () => {
-                allCarts = { ...rootCarts, ...tiutbcCarts }; // tiutbc takes precedence
+            const cartsRef = dbRef(db, 'tiutbc/carts');
+            const callback = snapshot => {
+                allCarts = snapshot.val() || {};
                 displayCarts();
                 updateCartStats();
             };
-            const tiutbcRef = dbRef(db, 'tiutbc/carts');
-            const tiutbcCb = snapshot => { tiutbcCarts = snapshot.val() || {}; mergeAndDisplay(); };
-            onValue(tiutbcRef, tiutbcCb);
-            dbListeners.push({ ref: tiutbcRef, callback: tiutbcCb });
-
-            const rootRef = dbRef(db, 'carts');
-            const rootCb = snapshot => { rootCarts = snapshot.val() || {}; mergeAndDisplay(); };
-            onValue(rootRef, rootCb);
-            dbListeners.push({ ref: rootRef, callback: rootCb });
+            onValue(cartsRef, callback);
+            dbListeners.push({ ref: cartsRef, callback });
         }
 
         async function displayCarts() {
@@ -842,7 +835,14 @@
             }
             container.innerHTML = '<div class="empty-state"><div class="loading-spinner"></div><div class="empty-state-text">Loading cart details...</div></div>';
 
-            // Fetch any missing user details — each lookup is individually try/caught
+            // Helper: get latest timestamp across all items in a cart
+            const getLatest = cart => {
+                const vals = Object.values(cart);
+                if (!vals.length) return 0;
+                return Math.max(...vals.map(i => i.lastUpdated || i.timestamp || 0));
+            };
+
+            // Fetch any missing user details
             await Promise.all(userIds.map(async uid => {
                 if (allUsers[uid]) return;
                 if (uid.startsWith('guest_')) {
@@ -850,27 +850,20 @@
                     return;
                 }
                 try {
-                    let snap = await get(dbRef(db, `tiutbc/users/${uid}/allDetails`));
+                    const snap = await get(dbRef(db, `tiutbc/users/${uid}/allDetails`));
                     if (snap.exists()) { allUsers[uid] = snap.val(); return; }
-                    snap = await get(dbRef(db, `users/${uid}/allDetails`));
-                    if (snap.exists()) { allUsers[uid] = snap.val(); return; }
-                } catch { /* permission denied or network error — fall through to unknown */ }
+                } catch { /* permission denied or network error */ }
                 allUsers[uid] = { name: 'Unknown User', email: 'N/A', phoneNumber: 'N/A' };
             }));
 
-            const sorted = [...userIds].sort((a, b) => {
-                const getLatest = cart => {
-                    const vals = Object.values(cart);
-                    if (!vals.length) return 0;
-                    return Math.max(...vals.map(i => i.lastUpdated || i.timestamp || 0));
-                };
-                return getLatest(allCarts[b]) - getLatest(allCarts[a]);
-            });
+            // Sort by most recently updated cart first
+            const sorted = [...userIds].sort((a, b) => getLatest(allCarts[b]) - getLatest(allCarts[a]));
 
             container.innerHTML = '';
             sorted.forEach(uid => {
                 try {
-                    container.appendChild(createCartCard(uid, allCarts[uid], allUsers[uid]));
+                    const lastUpdated = getLatest(allCarts[uid]);
+                    container.appendChild(createCartCard(uid, allCarts[uid], allUsers[uid], lastUpdated));
                 } catch (e) {
                     console.error('Error rendering cart for', uid, e);
                 }
@@ -881,7 +874,7 @@
             }
         }
 
-        function createCartCard(userId, cartItems, user) {
+        function createCartCard(userId, cartItems, user, lastUpdated) {
             const card = document.createElement('div');
             card.className = 'cart-card';
             const name = user?.name || 'Unknown User';
@@ -889,6 +882,22 @@
             const phone = user?.phoneNumber || 'N/A';
             const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
             const items = Object.entries(cartItems).map(([id, item]) => ({ id, ...item }));
+
+            // Format last updated time
+            let lastUpdatedStr = 'N/A';
+            if (lastUpdated) {
+                const d = new Date(lastUpdated);
+                const now = new Date();
+                const diffMs = now - d;
+                const diffMins = Math.floor(diffMs / 60000);
+                const diffHrs = Math.floor(diffMins / 60);
+                const diffDays = Math.floor(diffHrs / 24);
+                if (diffMins < 1) lastUpdatedStr = 'Just now';
+                else if (diffMins < 60) lastUpdatedStr = `${diffMins}m ago`;
+                else if (diffHrs < 24) lastUpdatedStr = `${diffHrs}h ${diffMins % 60}m ago`;
+                else lastUpdatedStr = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+            }
+
             let html = '';
             let subtotal = 0;
             items.forEach(item => {
@@ -918,6 +927,7 @@
                             <div class="cart-user-phone">📞 ${escapeHtml(phone)}</div>
                         </div>
                     </div>
+                    <div class="cart-last-updated">🕒 ${lastUpdatedStr}</div>
                 </div>
                 <div class="cart-items-list">${html}</div>
                 <div class="cart-summary">
