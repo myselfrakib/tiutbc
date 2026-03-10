@@ -459,11 +459,7 @@
 
                 sections.style.display = 'block';
                 const subtotal = this.cart.reduce((s, i) => s + i.price * i.quantity, 0);
-                const deliveryFee = this.calculateDeliveryFee(subtotal);
-                const total = subtotal + deliveryFee;
-
-                const isFirstOrders = this.userTotalOrders < this.FIRST_TWO_ORDERS_FREE;
-                const isFreeByThreshold = subtotal >= this.FREE_DELIVERY_THRESHOLD;
+                const total = subtotal; // No delivery fee
 
                 const cartHTML = this.cart.map((item, i) => `
                     <div class="cart-item">
@@ -485,20 +481,9 @@
                     </div>
                 `).join('');
 
-                const deliveryFeeClass = deliveryFee === 0 ? 'summary-row delivery free' : 'summary-row delivery';
-                let deliveryText = '';
-                if (isFirstOrders) {
-                    deliveryText = `<span>Delivery Fee</span><span><span class="delivery-value">₹${this.DELIVERY_FEE}</span> <strong>FREE (First Order!)</strong></span>`;
-                } else if (isFreeByThreshold) {
-                    deliveryText = `<span>Delivery Fee</span><span><span class="delivery-value">₹${this.DELIVERY_FEE}</span> <strong>FREE</strong></span>`;
-                } else {
-                    deliveryText = `<span>Delivery Fee</span><span>₹${deliveryFee.toFixed(2)}</span>`;
-                }
-
                 content.innerHTML = cartHTML + `
                     <div class="cart-summary">
                         <div class="summary-row subtotal"><span>Subtotal</span><span>₹${subtotal.toFixed(2)}</span></div>
-                        <div class="${deliveryFeeClass}">${deliveryText}</div>
                         <div class="cart-total"><span>Total</span><span>₹${total.toFixed(2)}</span></div>
                     </div>`;
             },
@@ -834,11 +819,7 @@
                 btn.disabled = true;
 
                 const subtotal = this.cart.reduce((s, i) => s + i.price * i.quantity, 0);
-                const deliveryFee = this.calculateDeliveryFee(subtotal);
-                const total = subtotal + deliveryFee;
-
-                const isFirstOrder = this.userTotalOrders === 0;
-                const isFreeByThreshold = subtotal >= this.FREE_DELIVERY_THRESHOLD;
+                const total = subtotal; // No delivery fee
 
                 try {
                     const newOrderRef = push(ref(db, 'tiutbc/orders'));
@@ -857,10 +838,7 @@
                         orderDetails: {
                             items: this.cart,
                             subtotal,
-                            deliveryFee,
                             total,
-                            freeDelivery: deliveryFee === 0,
-                            freeDeliveryReason: isFirstOrder ? 'first_order' : (isFreeByThreshold ? 'threshold' : null),
                             paymentMethod: method,
                             paymentStatus: method === 'online' ? 'paid' : 'pending',
                             ...(paymentId && { paymentId }),
