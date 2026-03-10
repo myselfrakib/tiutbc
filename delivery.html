@@ -611,6 +611,179 @@
             100% { transform: rotate(360deg); }
         }
 
+        /* QR Code Modal */
+        .qr-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 4000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .qr-modal.active {
+            display: flex;
+        }
+
+        .qr-modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            animation: slideUp 0.3s ease;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .qr-modal-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .qr-modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .qr-modal-subtitle {
+            font-size: 0.95rem;
+            color: #666;
+        }
+
+        .qr-code-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            border: 3px solid #667eea;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        #qrCodeImage {
+            width: 100%;
+            max-width: 280px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .qr-amount-display {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .qr-upi-id {
+            background: #f5f7fa;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            font-family: monospace;
+            font-size: 0.95rem;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .qr-instructions {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .qr-instructions-title {
+            font-weight: 700;
+            color: #856404;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .qr-instructions-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .qr-instructions-list li {
+            color: #856404;
+            font-size: 0.85rem;
+            padding: 0.3rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .qr-modal-buttons {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .qr-btn {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .qr-btn-confirm {
+            background: linear-gradient(135deg, var(--success-green) 0%, #4a9638 100%);
+            color: white;
+        }
+
+        .qr-btn-confirm:active {
+            transform: scale(0.98);
+        }
+
+        .qr-btn-cancel {
+            background: #ecf0f1;
+            color: #2c3e50;
+        }
+
+        .qr-btn-cancel:active {
+            transform: scale(0.98);
+        }
+
+        @media (min-width: 768px) {
+            .qr-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
+        }
+
         .toast {
             position: fixed;
             top: 80px;
@@ -825,6 +998,41 @@
     <div class="toast" id="toast">
         <span id="toastIcon">✅</span>
         <span id="toastText">Status updated!</span>
+    </div>
+
+    <!-- QR Code Modal -->
+    <div class="qr-modal" id="qrModal">
+        <div class="qr-modal-content">
+            <div class="qr-modal-header">
+                <div class="qr-modal-title">📱 Scan QR to Pay</div>
+                <div class="qr-modal-subtitle">Customer can scan this QR code</div>
+            </div>
+
+            <div class="qr-amount-display" id="qrAmount">₹0</div>
+
+            <div class="qr-code-container">
+                <img id="qrCodeImage" src="" alt="UPI QR Code">
+            </div>
+
+            <div class="qr-upi-id">
+                UPI ID: 9907718066@ptyes
+            </div>
+
+            <div class="qr-instructions">
+                <div class="qr-instructions-title">📋 Instructions:</div>
+                <ul class="qr-instructions-list">
+                    <li>✓ Customer scans QR with any UPI app</li>
+                    <li>✓ Amount is pre-filled automatically</li>
+                    <li>✓ Wait for payment confirmation</li>
+                    <li>✓ Click "Payment Received" below</li>
+                </ul>
+            </div>
+
+            <div class="qr-modal-buttons">
+                <button class="qr-btn qr-btn-cancel" onclick="closeQRModal()">Cancel</button>
+                <button class="qr-btn qr-btn-confirm" onclick="confirmUPIPayment()">💰 Payment Received</button>
+            </div>
+        </div>
     </div>
 
     <script type="module">
@@ -1142,33 +1350,55 @@
             return date.toLocaleDateString();
         }
 
-        window.collectViaUPI = async function(orderId, amount) {
+        let currentPaymentOrderId = null;
+
+        window.collectViaUPI = function(orderId, amount) {
+            currentPaymentOrderId = orderId;
+            
+            // Update amount display
+            document.getElementById('qrAmount').textContent = `₹${amount}`;
+            
+            // Generate UPI QR code using API
             const UPI_ID = '9907718066@ptyes';
-            const upiLink = `upi://pay?pa=${UPI_ID}&pn=TIU Biriyani Canteen&am=${amount}&cu=INR&tn=Order Payment`;
+            const upiString = `upi://pay?pa=${UPI_ID}&pn=TIU Biriyani Canteen&am=${amount}&cu=INR&tn=Order Payment`;
             
-            // Try to open UPI app
-            window.location.href = upiLink;
+            // Use QR code generation API
+            const qrCodeURL = `https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=${encodeURIComponent(upiString)}`;
             
-            // Show confirmation dialog after a delay
-            setTimeout(async () => {
-                if (confirm('Has the customer completed the UPI payment?')) {
-                    try {
-                        const orderRef = ref(db, `tiutbc/orders/${orderId}/orderDetails`);
-                        await update(orderRef, {
-                            paymentCollected: true,
-                            paymentCollectedAt: Date.now(),
-                            paymentCollectedBy: currentUser.uid,
-                            paymentMethod: 'upi'
-                        });
-                        
-                        showToast('Payment marked as collected via UPI!', 'success');
-                        renderOrders();
-                    } catch (error) {
-                        console.error('Error updating payment:', error);
-                        showToast('Failed to update payment status', 'error');
-                    }
-                }
-            }, 2000);
+            document.getElementById('qrCodeImage').src = qrCodeURL;
+            
+            // Show modal
+            document.getElementById('qrModal').classList.add('active');
+        };
+
+        window.closeQRModal = function() {
+            document.getElementById('qrModal').classList.remove('active');
+            currentPaymentOrderId = null;
+        };
+
+        window.confirmUPIPayment = async function() {
+            if (!currentPaymentOrderId) return;
+            
+            if (!confirm('Confirm that the customer has completed the UPI payment?')) {
+                return;
+            }
+
+            try {
+                const orderRef = ref(db, `tiutbc/orders/${currentPaymentOrderId}/orderDetails`);
+                await update(orderRef, {
+                    paymentCollected: true,
+                    paymentCollectedAt: Date.now(),
+                    paymentCollectedBy: currentUser.uid,
+                    paymentMethod: 'upi'
+                });
+                
+                closeQRModal();
+                showToast('Payment marked as collected via UPI!', 'success');
+                renderOrders();
+            } catch (error) {
+                console.error('Error updating payment:', error);
+                showToast('Failed to update payment status', 'error');
+            }
         };
 
         window.collectCash = async function(orderId) {
@@ -1260,6 +1490,13 @@
                 });
             }
         };
+
+        // Close QR modal when clicking outside
+        document.getElementById('qrModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeQRModal();
+            }
+        });
     </script>
 </body>
 </html>
