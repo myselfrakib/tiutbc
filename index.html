@@ -5,596 +5,1382 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>TIU × The Biriyani Canteen</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* ── TIU × Biriyani Canteen palette ── */
-            --primary:       #cc1f1f;   /* TIU red */
-            --primary-dark:  #a81515;   /* deep red */
-            --primary-light: #e63333;   /* bright red */
-            --accent:        #f5c518;   /* Biriyani gold/yellow */
-            --accent-dark:   #d4a800;   /* deep gold */
-            --blue:          #1a3a8f;   /* royal blue from Biriyani Canteen badge */
-            --blue-dark:     #122a6e;
-            --bg:            #f7f7f9;   /* clean off-white */
+            /* TIU Brand Colors */
+            --tiu-red:       #d01e1e;
+            --tiu-red-dark:  #a81515;
+            --tiu-red-light: #ff3333;
+            --tiu-blue:      #1a3c96;
+            --tiu-blue-dark: #0f2558;
+            --tiu-blue-mid:  #2049b8;
+            --tiu-gold:      #f5c518;
+            --tiu-gold-dark: #c9a200;
+            --tiu-gold-light:#ffe570;
+            
+            /* Premium Neutrals */
+            --white:         #ffffff;
+            --off-white:     #fafafa;
+            --black:         #0d0d0d;
+            --ink:           #12122a;
+            --muted:         #6b6b82;
+            --border:        #e0e4f0;
             --card-bg:       #ffffff;
-            --text:          #0f0f0f;   /* near black */
-            --text-muted:    #5a5a6e;
-            --border:        #e0e0ea;
-            --shadow:        0 2px 16px rgba(15,15,15,0.08);
-            --shadow-hover:  0 8px 28px rgba(26,58,143,0.16);
-            --radius:        14px;
+            --bg-gradient:   linear-gradient(180deg, #f8f9fd 0%, #ffffff 100%);
+            
+            /* Shadows */
+            --shadow-sm:     0 2px 8px rgba(26,60,150,0.06);
+            --shadow-md:     0 4px 16px rgba(26,60,150,0.10);
+            --shadow-lg:     0 8px 32px rgba(26,60,150,0.15);
+            --shadow-xl:     0 12px 48px rgba(26,60,150,0.20);
+            --shadow-glow:   0 0 40px rgba(245,197,24,0.25);
+            
+            /* Layout */
             --navbar-h:      80px;
+            --radius-sm:     8px;
+            --radius-md:     12px;
+            --radius-lg:     16px;
+            --radius-xl:     24px;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+        }
+        
+        html { 
+            scroll-behavior: smooth; 
+        }
 
         body {
-            font-family: 'DM Sans', -apple-system, sans-serif;
-            background: var(--bg);
-            color: var(--text);
+            font-family: 'Poppins', -apple-system, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--ink);
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        /* ===== NAVBAR ===== */
+        /* ═══════════════════════════════════════════════════════
+           NAVBAR - PREMIUM GLASS MORPHISM
+        ═══════════════════════════════════════════════════════ */
         .navbar {
-            background: var(--blue);
-            height: var(--navbar-h);
-            padding: 0 1.25rem;
-            box-shadow: 0 2px 20px rgba(26,58,143,0.35);
             position: sticky;
             top: 0;
             z-index: 1000;
+            height: var(--navbar-h);
+            background: rgba(15, 37, 88, 0.95);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
             display: flex;
+            align-items: center;
             justify-content: space-between;
-            align-items: center;
+            padding: 0 1.5rem;
             gap: 1rem;
+            box-shadow: 
+                0 1px 0 0 rgba(245,197,24,0.8),
+                0 8px 32px rgba(10,28,90,0.4);
+            border-bottom: 2px solid var(--tiu-gold);
         }
 
-        .nav-left { display: flex; align-items: center; gap: 0.65rem; }
-
-        /* ===== LOGO ===== */
-        .logo-wrap {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            text-decoration: none;
-            user-select: none;
+        .navbar::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                rgba(245,197,24,0.05) 50%,
+                transparent 100%
+            );
+            pointer-events: none;
         }
 
-        .logo-img {
-            height: 52px;
-            width: auto;
-            display: block;
-            object-fit: contain;
-            filter: drop-shadow(0 2px 8px rgba(204,31,31,0.2));
-            transition: filter 0.25s, transform 0.25s;
-            flex-shrink: 0;
+        .nav-left, .nav-right { 
+            display: flex; 
+            align-items: center; 
+            gap: 1rem; 
+            position: relative;
+            z-index: 2;
         }
-        .logo-wrap:hover .logo-img {
-            filter: drop-shadow(0 4px 16px rgba(204,31,31,0.38));
-            transform: scale(1.05);
-        }
-
-        /* hide divider/text — logo image alone is the brand mark */
-        .logo-divider,
-        .logo-text-block { display: none; }
 
         .hamburger {
-            display: flex;
-            flex-direction: column;
+            display: flex; 
+            flex-direction: column; 
             gap: 5px;
-            cursor: pointer;
-            padding: 0.4rem;
-            border-radius: 8px;
-            transition: background 0.2s;
-        }
-        .hamburger:hover { background: rgba(255,255,255,0.15); }
-        .hamburger span { width: 20px; height: 2px; background: #ffffff; border-radius: 2px; transition: all 0.3s; display: block; }
-
-        .cart-btn {
-            position: relative;
-            cursor: pointer;
-            padding: 0.38rem 0.75rem;
-            background: var(--accent);
-            color: var(--text);
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 0.78rem;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 0.35rem;
-            transition: all 0.25s;
-            font-family: 'DM Sans', sans-serif;
-        }
-        .cart-btn:hover { background: var(--accent-dark); transform: translateY(-1px); }
-
-        .cart-badge {
-            position: absolute;
-            top: -7px;
-            right: -7px;
-            background: var(--primary);
-            color: white;
-            border-radius: 50%;
-            min-width: 20px;
-            height: 20px;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7rem;
-            font-weight: 700;
-            border: 2px solid var(--card-bg);
-        }
-        .cart-badge.visible { display: flex; }
-
-        /* ===== STORE CLOSED BANNER ===== */
-        .store-closed-banner {
-            display: none;
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-            color: white;
-            text-align: center;
-            padding: 0.85rem 1.25rem;
-            font-weight: 600;
-            font-size: 0.95rem;
-            gap: 0.5rem;
-            align-items: center;
-            justify-content: center;
-        }
-        .store-closed-banner.visible { display: flex; }
-
-        /* ===== DROPDOWN NAV ===== */
-        .nav-dropdown {
-            display: none;
-            position: fixed;
-            top: var(--navbar-h);
-            left: 0;
-            right: 0;
-            background: var(--card-bg);
-            border-bottom: 1px solid var(--border);
-            box-shadow: var(--shadow);
-            flex-direction: column;
-            z-index: 999;
+            cursor: pointer; 
             padding: 0.5rem;
+            border-radius: var(--radius-sm); 
+            transition: all 0.3s; 
+            flex-shrink: 0;
+            background: rgba(255,255,255,0.08);
         }
-        .nav-dropdown.active { display: flex; animation: dropDown 0.2s ease; }
+        .hamburger:hover { 
+            background: rgba(255,255,255,0.15); 
+            transform: scale(1.05);
+        }
+        .hamburger span { 
+            width: 22px; 
+            height: 2.5px; 
+            background: linear-gradient(90deg, var(--tiu-gold), var(--tiu-gold-light)); 
+            border-radius: 3px; 
+            display: block; 
+            transition: all 0.3s; 
+        }
 
-        @keyframes dropDown {
-            from { opacity: 0; transform: translateY(-8px); }
-            to { opacity: 1; transform: translateY(0); }
+        .logo-wrap {
+            display: flex; 
+            align-items: center;
+            cursor: pointer; 
+            user-select: none; 
+            flex-shrink: 0;
+            transition: transform 0.3s;
+        }
+        .logo-wrap:hover {
+            transform: scale(1.03);
+        }
+        .logo-img {
+            height: 58px; 
+            width: auto; 
+            display: block; 
+            object-fit: contain;
+            filter: drop-shadow(0 4px 12px rgba(245,197,24,0.4));
+            transition: filter 0.3s;
+        }
+        .logo-wrap:hover .logo-img {
+            filter: drop-shadow(0 6px 16px rgba(245,197,24,0.6));
+        }
+
+        /* Nav Menu */
+        .nav-dropdown {
+            display: none; 
+            position: fixed; 
+            top: var(--navbar-h);
+            left: 0; 
+            right: 0; 
+            background: rgba(15, 37, 88, 0.98);
+            backdrop-filter: blur(20px);
+            border-bottom: 2px solid var(--tiu-gold);
+            flex-direction: column; 
+            z-index: 999; 
+            padding: 0.5rem;
+            box-shadow: 0 12px 48px rgba(10,28,90,0.6);
+        }
+        .nav-dropdown.active { 
+            display: flex; 
+            animation: navSlide 0.25s ease; 
+        }
+
+        @keyframes navSlide {
+            from { opacity: 0; transform: translateY(-10px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
         .nav-item {
-            padding: 0.9rem 1rem;
-            border-radius: 10px;
+            padding: 1rem 1.25rem; 
+            border-radius: var(--radius-md); 
             text-decoration: none;
-            color: var(--text);
-            font-weight: 500;
-            font-size: 0.95rem;
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            transition: background 0.2s, color 0.2s;
+            color: rgba(255,255,255,0.9);
+            font-family: 'Rajdhani', sans-serif; 
+            font-weight: 700; 
+            font-size: 1.05rem;
+            letter-spacing: 0.5px; 
+            display: flex; 
+            align-items: center; 
+            gap: 0.75rem;
+            transition: all 0.25s; 
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
         }
-        @media (min-width: 768px) {
-            .nav-item { color: rgba(255,255,255,0.92); }
-            .nav-item:hover { background: rgba(255,255,255,0.15) !important; color: #fff; }
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 0;
+            background: linear-gradient(90deg, var(--tiu-gold), transparent);
+            transition: width 0.3s;
         }
-        .nav-item:hover { background: #eef1fa; }
-        .nav-item.hidden { display: none; }
+        .nav-item:hover {
+            background: rgba(255,255,255,0.12); 
+            color: var(--tiu-gold);
+            transform: translateX(8px);
+        }
+        .nav-item:hover::before {
+            width: 4px;
+        }
+        .nav-item.hidden { 
+            display: none; 
+        }
 
         @media (min-width: 768px) {
             .hamburger { display: none; }
             .nav-dropdown {
-                display: flex !important;
-                position: static;
+                display: flex !important; 
+                position: static; 
                 flex-direction: row;
-                padding: 0;
-                box-shadow: none;
-                border: none;
-                background: transparent;
+                padding: 0; 
+                box-shadow: none; 
+                border: none; 
+                background: transparent; 
                 gap: 0.25rem;
             }
-            .nav-item { padding: 0.4rem 0.9rem; font-size: 0.88rem; }
-            .logo-img { height: 56px; }
+            .nav-item { 
+                padding: 0.5rem 1rem; 
+                font-size: 0.95rem; 
+            }
+            .nav-item:hover {
+                transform: translateY(-2px);
+            }
         }
 
-        /* ===== CONTAINER ===== */
-        .container {
-            max-width: 1440px;
-            margin: 0 auto;
-            padding: 1.25rem 1rem 120px;
-        }
-        @media (min-width: 768px) { .container { padding: 1.75rem 1.5rem 120px; } }
-
-        /* ===== LOGIN BANNER ===== */
-        .login-banner {
-            background: linear-gradient(135deg, var(--blue) 0%, var(--primary) 100%);
-            color: white;
-            padding: 1rem 1.25rem;
-            border-radius: var(--radius);
-            margin-bottom: 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 1rem;
-            box-shadow: 0 4px 20px rgba(26,58,143,0.25);
-        }
-        .login-banner h3 { font-family: 'Syne', sans-serif; font-size: 1.05rem; margin-bottom: 0.2rem; }
-        .login-banner p { font-size: 0.82rem; opacity: 0.92; }
-        .login-btn {
-            background: white;
-            color: var(--blue);
-            padding: 0.6rem 1.2rem;
-            border-radius: 8px;
-            font-weight: 700;
+        /* Cart Button - Premium Gradient */
+        .cart-btn {
+            position: relative; 
+            cursor: pointer;
+            padding: 0.65rem 1.25rem;
+            background: linear-gradient(135deg, var(--tiu-gold) 0%, var(--tiu-gold-light) 100%);
+            color: var(--black);
+            border-radius: var(--radius-lg);
+            font-family: 'Rajdhani', sans-serif; 
+            font-weight: 800; 
+            font-size: 0.95rem;
+            letter-spacing: 0.8px; 
             text-decoration: none;
-            white-space: nowrap;
-            font-size: 0.88rem;
-            transition: all 0.2s;
+            display: flex; 
+            align-items: center; 
+            gap: 0.5rem;
+            transition: all 0.3s; 
+            white-space: nowrap; 
             flex-shrink: 0;
+            box-shadow: 0 4px 16px rgba(245,197,24,0.35);
         }
-        .login-btn:hover { transform: scale(1.03); }
-
-        @media (max-width: 480px) {
-            .login-banner { flex-direction: column; text-align: center; }
+        .cart-btn:hover { 
+            background: linear-gradient(135deg, var(--tiu-gold-light) 0%, #fff9cc 100%);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 24px rgba(245,197,24,0.5);
         }
 
-        /* ===== CATEGORY HEADER ===== */
-        .category-section { margin-bottom: 2.25rem; }
+        .cart-badge {
+            position: absolute; 
+            top: -8px; 
+            right: -8px;
+            background: linear-gradient(135deg, var(--tiu-red) 0%, var(--tiu-red-light) 100%);
+            color: white; 
+            border-radius: 50%;
+            min-width: 22px; 
+            height: 22px; 
+            display: none;
+            align-items: center; 
+            justify-content: center;
+            font-size: 0.7rem; 
+            font-weight: 800; 
+            border: 2px solid var(--tiu-blue-dark);
+            box-shadow: 0 2px 8px rgba(208,30,30,0.4);
+            animation: badgePop 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        .cart-badge.visible { 
+            display: flex; 
+        }
+
+        @keyframes badgePop {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           STORE CLOSED BANNER - ENHANCED
+        ═══════════════════════════════════════════════════════ */
+        .store-closed-banner {
+            display: none;
+            background: linear-gradient(135deg, var(--tiu-red) 0%, var(--tiu-red-dark) 100%);
+            color: white; 
+            text-align: center;
+            padding: 1rem 1.5rem;
+            font-family: 'Rajdhani', sans-serif; 
+            font-weight: 800;
+            font-size: 1.1rem; 
+            letter-spacing: 1px;
+            gap: 0.75rem; 
+            align-items: center; 
+            justify-content: center;
+            border-bottom: 3px solid var(--tiu-red-dark);
+            box-shadow: 0 4px 16px rgba(208,30,30,0.3);
+            animation: bannerPulse 2s ease-in-out infinite;
+        }
+        .store-closed-banner.visible { 
+            display: flex; 
+        }
+
+        @keyframes bannerPulse {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           IMAGE MARQUEE BANNER - NEW PREMIUM FEATURE
+        ═══════════════════════════════════════════════════════ */
+        .marquee-banner {
+            position: relative;
+            background: linear-gradient(135deg, var(--tiu-blue-dark) 0%, var(--tiu-blue) 100%);
+            padding: 2rem 0;
+            overflow: hidden;
+            border-top: 3px solid var(--tiu-gold);
+            border-bottom: 3px solid var(--tiu-gold);
+            box-shadow: 
+                inset 0 2px 8px rgba(0,0,0,0.2),
+                0 8px 32px rgba(10,28,90,0.3);
+        }
+
+        .marquee-banner::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: 
+                repeating-linear-gradient(
+                    -45deg,
+                    transparent,
+                    transparent 40px,
+                    rgba(255,255,255,0.02) 40px,
+                    rgba(255,255,255,0.02) 80px
+                );
+            pointer-events: none;
+        }
+
+        .marquee-title {
+            text-align: center;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(1.5rem, 4vw, 2.2rem);
+            color: var(--tiu-gold);
+            letter-spacing: 2px;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .marquee-container {
+            position: relative;
+            overflow: hidden;
+            padding: 1rem 0;
+        }
+
+        .marquee-content {
+            display: flex;
+            gap: 2rem;
+            animation: marqueeScroll 40s linear infinite;
+        }
+
+        @keyframes marqueeScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .marquee-item {
+            flex-shrink: 0;
+            width: 320px;
+            height: 200px;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            border: 3px solid var(--tiu-gold);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .marquee-item::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                180deg,
+                transparent 0%,
+                rgba(26,60,150,0.3) 100%
+            );
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .marquee-item:hover {
+            transform: scale(1.08) translateY(-8px);
+            box-shadow: 
+                0 16px 48px rgba(0,0,0,0.4),
+                0 0 40px rgba(245,197,24,0.4);
+            border-color: var(--tiu-gold-light);
+        }
+
+        .marquee-item:hover::before {
+            opacity: 1;
+        }
+
+        .marquee-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.4s;
+        }
+
+        .marquee-item:hover img {
+            transform: scale(1.1);
+        }
+
+        /* Pause on hover */
+        .marquee-container:hover .marquee-content {
+            animation-play-state: paused;
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           HERO BANNER - ULTRA PREMIUM
+        ═══════════════════════════════════════════════════════ */
+        .hero-banner {
+            background: var(--tiu-blue);
+            background-image:
+                radial-gradient(ellipse at 10% 50%, rgba(208,30,30,0.35) 0%, transparent 60%),
+                radial-gradient(ellipse at 90% 50%, rgba(245,197,24,0.2) 0%, transparent 60%),
+                repeating-linear-gradient(
+                    -55deg, 
+                    transparent, 
+                    transparent 30px,
+                    rgba(255,255,255,0.025) 30px, 
+                    rgba(255,255,255,0.025) 31px
+                );
+            padding: 2.5rem 1.5rem 2.75rem;
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            gap: 1.5rem;
+            border-bottom: 4px solid var(--tiu-gold);
+            position: relative; 
+            overflow: hidden;
+            box-shadow: inset 0 -20px 40px rgba(0,0,0,0.15);
+        }
+
+        /* Animated Background Glow */
+        .hero-banner::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(
+                circle,
+                rgba(245,197,24,0.1) 0%,
+                transparent 70%
+            );
+            animation: heroGlow 8s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes heroGlow {
+            0%, 100% { transform: translate(0, 0); opacity: 0.5; }
+            50% { transform: translate(20%, 20%); opacity: 0.8; }
+        }
+
+        /* TIU Watermark */
+        .hero-banner::before {
+            content: 'TIU';
+            position: absolute; 
+            bottom: -30px; 
+            right: -15px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 10rem; 
+            color: rgba(255,255,255,0.04);
+            letter-spacing: 8px; 
+            pointer-events: none; 
+            line-height: 1;
+            font-weight: 700;
+        }
+
+        .hero-text {
+            position: relative;
+            z-index: 1;
+        }
+        .hero-eyebrow {
+            font-family: 'Rajdhani', sans-serif; 
+            font-size: 0.8rem;
+            font-weight: 800; 
+            letter-spacing: 4px; 
+            text-transform: uppercase;
+            color: var(--tiu-gold); 
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            animation: fadeInUp 0.6s ease 0.2s backwards;
+        }
+        .hero-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2.2rem, 7vw, 3.8rem);
+            color: var(--white); 
+            line-height: 0.95; 
+            letter-spacing: 2px;
+            text-shadow: 0 4px 16px rgba(0,0,0,0.4);
+            animation: fadeInUp 0.6s ease 0.3s backwards;
+        }
+        .hero-title em { 
+            color: var(--tiu-gold); 
+            font-style: normal;
+            background: linear-gradient(135deg, var(--tiu-gold) 0%, var(--tiu-gold-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-sub {
+            font-size: 0.9rem; 
+            color: rgba(255,255,255,0.75);
+            margin-top: 0.75rem; 
+            font-style: italic;
+            font-weight: 500;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            animation: fadeInUp 0.6s ease 0.4s backwards;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero-badge {
+            flex-shrink: 0;
+            background: linear-gradient(135deg, var(--tiu-red) 0%, var(--tiu-red-dark) 100%);
+            border: 3px solid var(--tiu-gold);
+            border-radius: 50%; 
+            width: 90px; 
+            height: 90px;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            text-align: center; 
+            animation: badgeFloat 3s ease-in-out infinite;
+            box-shadow: 
+                0 0 0 6px rgba(245,197,24,0.2),
+                0 8px 32px rgba(208,30,30,0.4);
+            position: relative; 
+            z-index: 1;
+        }
+
+        @keyframes badgeFloat {
+            0%, 100% { 
+                transform: translateY(0) rotate(0deg); 
+                box-shadow: 
+                    0 0 0 6px rgba(245,197,24,0.2),
+                    0 8px 32px rgba(208,30,30,0.4);
+            }
+            50% { 
+                transform: translateY(-12px) rotate(5deg); 
+                box-shadow: 
+                    0 0 0 12px rgba(245,197,24,0.1),
+                    0 16px 48px rgba(208,30,30,0.5);
+            }
+        }
+
+        .hero-badge-emoji { 
+            font-size: 2.2rem; 
+            line-height: 1; 
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+        .hero-badge-label {
+            font-family: 'Rajdhani', sans-serif; 
+            font-size: 0.6rem;
+            font-weight: 800; 
+            letter-spacing: 1px; 
+            text-transform: uppercase;
+            color: var(--tiu-gold); 
+            margin-top: 0.25rem; 
+            line-height: 1.2;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        @media (max-width: 480px) { 
+            .hero-badge { 
+                width: 75px; 
+                height: 75px; 
+            }
+            .hero-badge-emoji {
+                font-size: 1.8rem;
+            }
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           CONTAINER
+        ═══════════════════════════════════════════════════════ */
+        .container {
+            max-width: 1440px; 
+            margin: 0 auto;
+            padding: 2rem 1.25rem 140px;
+        }
+        @media (min-width: 768px) { 
+            .container { 
+                padding: 2.5rem 2rem 140px; 
+            } 
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           LOGIN BANNER - PREMIUM GLASS CARD
+        ═══════════════════════════════════════════════════════ */
+        .login-banner {
+            position: relative; 
+            overflow: hidden;
+            background: linear-gradient(135deg, 
+                rgba(26,60,150,0.95) 0%, 
+                rgba(15,37,88,0.98) 100%
+            );
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(245,197,24,0.3);
+            color: white; 
+            padding: 1.75rem 1.5rem 1.75rem 2rem;
+            border-radius: var(--radius-xl); 
+            margin-bottom: 2.5rem;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            gap: 1.5rem;
+            box-shadow: var(--shadow-xl);
+            animation: cardSlideIn 0.6s ease backwards;
+        }
+
+        @keyframes cardSlideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-banner::before {
+            content: ''; 
+            position: absolute; 
+            left: 0; 
+            top: 0; 
+            bottom: 0;
+            width: 6px; 
+            background: linear-gradient(180deg, var(--tiu-red), var(--tiu-gold));
+            border-radius: var(--radius-xl) 0 0 var(--radius-xl);
+        }
+
+        .login-banner::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(
+                circle at 80% 50%,
+                rgba(245,197,24,0.15) 0%,
+                transparent 60%
+            );
+            pointer-events: none;
+        }
+
+        .login-banner-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .login-banner h3 {
+            font-family: 'Bebas Neue', sans-serif; 
+            font-size: 1.4rem;
+            letter-spacing: 1px; 
+            margin-bottom: 0.25rem; 
+            color: var(--tiu-gold);
+            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .login-banner p { 
+            font-size: 0.85rem; 
+            opacity: 0.85;
+            font-weight: 500;
+        }
+        .login-btn {
+            background: linear-gradient(135deg, var(--tiu-gold) 0%, var(--tiu-gold-light) 100%);
+            color: var(--black);
+            padding: 0.85rem 1.75rem; 
+            border-radius: var(--radius-md);
+            font-family: 'Rajdhani', sans-serif; 
+            font-weight: 800; 
+            font-size: 0.95rem;
+            letter-spacing: 0.8px; 
+            text-decoration: none; 
+            white-space: nowrap;
+            transition: all 0.3s; 
+            flex-shrink: 0;
+            box-shadow: 0 4px 16px rgba(245,197,24,0.3);
+            position: relative;
+            z-index: 1;
+        }
+        .login-btn:hover { 
+            background: linear-gradient(135deg, var(--tiu-gold-light) 0%, #fff9cc 100%);
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 8px 24px rgba(245,197,24,0.5);
+        }
+
+        @media (max-width: 580px) { 
+            .login-banner { 
+                flex-direction: column; 
+                text-align: center; 
+                padding: 1.5rem;
+            }
+            .login-banner::before {
+                width: 100%;
+                height: 4px;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: auto;
+                background: linear-gradient(90deg, var(--tiu-red), var(--tiu-gold));
+                border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            }
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           CATEGORY SECTION - ENHANCED
+        ═══════════════════════════════════════════════════════ */
+        .category-section { 
+            margin-bottom: 3.5rem;
+            animation: sectionFadeIn 0.6s ease backwards;
+        }
+
+        @keyframes sectionFadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
         .category-header {
-            display: flex;
-            align-items: center;
-            gap: 0.65rem;
-            margin-bottom: 1rem;
-            padding-bottom: 0.65rem;
-            border-bottom: 2px solid var(--blue);
+            display: flex; 
+            align-items: center; 
+            gap: 1rem;
+            margin-bottom: 1.5rem; 
+            padding-bottom: 1rem;
+            border-bottom: 3px solid transparent;
+            border-image: linear-gradient(
+                90deg, 
+                var(--tiu-red) 0%, 
+                var(--tiu-gold) 50%, 
+                transparent 100%
+            ) 1;
+            position: relative;
         }
-        .category-emoji { font-size: 1.6rem; line-height: 1; }
+
+        .category-header::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--tiu-gold), transparent);
+            animation: lineGrow 0.6s ease;
+        }
+
+        @keyframes lineGrow {
+            from { width: 0; opacity: 0; }
+            to { width: 80px; opacity: 1; }
+        }
+
+        .cat-icon-wrap {
+            width: 52px; 
+            height: 52px;
+            background: linear-gradient(135deg, var(--tiu-blue) 0%, var(--tiu-blue-mid) 100%);
+            border-radius: var(--radius-md); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            font-size: 1.6rem; 
+            flex-shrink: 0;
+            box-shadow: 
+                0 4px 16px rgba(26,60,150,0.3),
+                inset 0 2px 4px rgba(255,255,255,0.2);
+            border: 2px solid rgba(245,197,24,0.3);
+            transition: all 0.3s;
+        }
+
+        .category-header:hover .cat-icon-wrap {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 
+                0 6px 24px rgba(26,60,150,0.4),
+                0 0 20px rgba(245,197,24,0.3);
+        }
+
+        .category-meta {}
         .category-title {
-            font-family: 'Syne', sans-serif;
-            font-size: clamp(1.1rem, 3vw, 1.3rem);
-            font-weight: 700;
-            color: var(--text);
-            letter-spacing: -0.3px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(1.4rem, 4vw, 1.8rem);
+            letter-spacing: 1.5px; 
+            color: var(--ink); 
+            line-height: 1;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
-        .category-count { color: var(--text-muted); font-size: 0.82rem; font-weight: 500; }
+        .category-count {
+            font-family: 'Rajdhani', sans-serif; 
+            color: var(--muted);
+            font-size: 0.8rem; 
+            font-weight: 700; 
+            letter-spacing: 0.8px; 
+            text-transform: uppercase;
+            margin-top: 0.25rem;
+        }
 
-        /* ===== FOOD GRID ===== */
+        /* ═══════════════════════════════════════════════════════
+           FOOD GRID - RESPONSIVE
+        ═══════════════════════════════════════════════════════ */
         .food-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.85rem;
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 1.25rem;
         }
-        @media (min-width: 560px) { .food-grid { grid-template-columns: repeat(3, 1fr); gap: 1rem; } }
-        @media (min-width: 900px) { .food-grid { grid-template-columns: repeat(4, 1fr); gap: 1.1rem; } }
-        @media (min-width: 1200px) { .food-grid { grid-template-columns: repeat(5, 1fr); gap: 1.25rem; } }
-        @media (max-width: 340px) { .food-grid { grid-template-columns: 1fr; } }
+        @media (min-width: 540px)  { .food-grid { grid-template-columns: repeat(3, 1fr); gap: 1.5rem; } }
+        @media (min-width: 900px)  { .food-grid { grid-template-columns: repeat(4, 1fr); } }
+        @media (min-width: 1200px) { .food-grid { grid-template-columns: repeat(5, 1fr); } }
+        @media (max-width: 380px)  { .food-grid { grid-template-columns: 1fr; gap: 1rem; } }
 
-        /* ===== FOOD CARD ===== */
+        /* ═══════════════════════════════════════════════════════
+           FOOD CARD - ULTRA PREMIUM
+        ═══════════════════════════════════════════════════════ */
         .food-card {
-            background: var(--card-bg);
-            border-radius: var(--radius);
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
-            border: 1px solid var(--border);
+            background: var(--card-bg); 
+            border-radius: var(--radius-lg);
+            overflow: hidden; 
+            box-shadow: var(--shadow-md);
+            border: 2px solid var(--border);
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: cardPop 0.5s ease backwards;
+            position: relative;
         }
+
+        .food-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                135deg,
+                rgba(245,197,24,0.1) 0%,
+                transparent 100%
+            );
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 1;
+        }
+
         .food-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-hover);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--tiu-gold);
+        }
+
+        .food-card:hover::before {
+            opacity: 1;
+        }
+
+        @keyframes cardPop {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
         }
 
         .food-img-wrap {
-            position: relative;
-            width: 100%;
-            height: 130px;
-            background: linear-gradient(135deg, #eef1fa 0%, #f0e8e8 100%);
+            position: relative; 
+            width: 100%; 
+            height: 150px;
+            background: linear-gradient(135deg, #f0f2f8 0%, #e8eaf4 100%);
             overflow: hidden;
         }
-        @media (min-width: 560px) { .food-img-wrap { height: 155px; } }
-        @media (min-width: 900px) { .food-img-wrap { height: 175px; } }
+        @media (min-width: 540px) { .food-img-wrap { height: 170px; } }
+        @media (min-width: 900px) { .food-img-wrap { height: 190px; } }
 
-        .food-img-wrap img {
-            width: 100%; height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s;
+        .food-img-wrap img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            transition: transform 0.4s;
         }
-        .food-card:hover .food-img-wrap img { transform: scale(1.06); }
+        .food-card:hover .food-img-wrap img { 
+            transform: scale(1.15); 
+        }
 
         .food-emoji-fallback {
-            width: 100%; height: 100%;
+            width: 100%; 
+            height: 100%; 
             display: flex;
-            align-items: center;
-            justify-content: center;
+            align-items: center; 
+            justify-content: center; 
             font-size: 3.5rem;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
         }
-        @media (min-width: 560px) { .food-emoji-fallback { font-size: 4rem; } }
 
+        /* Veg Badge - Enhanced */
         .veg-badge {
-            position: absolute;
-            top: 7px;
-            left: 7px;
-            width: 17px;
-            height: 17px;
-            border: 2px solid var(--green);
-            border-radius: 3px;
-            background: white;
-            display: flex;
-            align-items: center;
+            position: absolute; 
+            top: 10px; 
+            left: 10px;
+            width: 20px; 
+            height: 20px; 
+            border: 2.5px solid #1a9e3a;
+            border-radius: 4px; 
+            background: rgba(255,255,255,0.98);
+            display: flex; 
+            align-items: center; 
             justify-content: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            z-index: 2;
         }
-        .veg-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
+        .veg-dot { 
+            width: 8px; 
+            height: 8px; 
+            border-radius: 50%; 
+            background: #1a9e3a; 
+        }
 
-        .food-body { padding: 0.75rem; }
-        @media (min-width: 560px) { .food-body { padding: 0.9rem; } }
+        /* TIU Tag - Enhanced */
+        .food-tiu-tag {
+            position: absolute; 
+            top: 0; 
+            right: 0;
+            background: linear-gradient(135deg, var(--tiu-blue) 0%, var(--tiu-blue-mid) 100%);
+            color: var(--tiu-gold);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.65rem; 
+            font-weight: 800; 
+            letter-spacing: 1.5px;
+            text-transform: uppercase; 
+            padding: 0.35rem 0.75rem;
+            border-bottom-left-radius: var(--radius-md);
+            box-shadow: 0 2px 8px rgba(26,60,150,0.3);
+            z-index: 2;
+        }
+
+        .food-body { 
+            padding: 1rem 1.1rem 1.15rem; 
+        }
+        @media (min-width: 540px) { 
+            .food-body { 
+                padding: 1.15rem 1.25rem 1.3rem; 
+            } 
+        }
 
         .food-name {
+            font-family: 'Rajdhani', sans-serif; 
             font-weight: 700;
-            font-size: 0.88rem;
-            color: var(--text);
-            line-height: 1.3;
-            margin-bottom: 0.3rem;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            font-size: 1rem; 
+            color: var(--ink); 
+            line-height: 1.25;
+            margin-bottom: 0.35rem;
+            overflow: hidden; 
             display: -webkit-box;
-            -webkit-line-clamp: 2;
+            -webkit-line-clamp: 2; 
             -webkit-box-orient: vertical;
+            letter-spacing: 0.3px;
         }
-        @media (min-width: 560px) { .food-name { font-size: 0.95rem; } }
-        @media (min-width: 900px) { .food-name { font-size: 1rem; } }
+        @media (min-width: 540px) { 
+            .food-name { 
+                font-size: 1.1rem; 
+            } 
+        }
 
         .food-desc {
-            color: var(--text-muted);
-            font-size: 0.75rem;
+            color: var(--muted); 
+            font-size: 0.75rem; 
             line-height: 1.4;
-            margin-bottom: 0.5rem;
-            overflow: hidden;
+            margin-bottom: 0.6rem;
+            overflow: hidden; 
             display: -webkit-box;
-            -webkit-line-clamp: 2;
+            -webkit-line-clamp: 2; 
             -webkit-box-orient: vertical;
         }
 
         .food-rating {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.2rem;
-            background: var(--accent);
-            color: var(--text);
-            padding: 0.18rem 0.42rem;
-            border-radius: 5px;
-            font-size: 0.72rem;
-            font-weight: 600;
-            margin-bottom: 0.55rem;
+            display: inline-flex; 
+            align-items: center; 
+            gap: 0.25rem;
+            background: linear-gradient(135deg, var(--tiu-gold) 0%, var(--tiu-gold-light) 100%);
+            color: var(--black);
+            padding: 0.25rem 0.6rem; 
+            border-radius: 6px;
+            font-family: 'Rajdhani', sans-serif; 
+            font-size: 0.75rem;
+            font-weight: 800; 
+            letter-spacing: 0.5px; 
+            margin-bottom: 0.75rem;
+            box-shadow: 0 2px 6px rgba(245,197,24,0.3);
         }
 
-        .food-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 0.4rem;
+        .food-footer { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            gap: 0.5rem; 
         }
 
         .food-price {
-            font-family: 'Syne', sans-serif;
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--text);
+            font-family: 'Bebas Neue', sans-serif; 
+            font-size: 1.5rem;
+            color: var(--tiu-red); 
+            letter-spacing: 0.5px; 
             flex-shrink: 0;
+            text-shadow: 0 2px 4px rgba(208,30,30,0.2);
         }
-        @media (min-width: 560px) { .food-price { font-size: 1.2rem; } }
+        @media (min-width: 540px) { 
+            .food-price { 
+                font-size: 1.65rem; 
+            } 
+        }
 
+        /* Add Button - Premium Gradient */
         .add-btn {
-            background: var(--primary);
-            color: white;
+            background: linear-gradient(135deg, var(--tiu-blue) 0%, var(--tiu-blue-mid) 100%);
+            color: white; 
             border: none;
-            padding: 0.45rem 0.85rem;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 0.78rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: 'DM Sans', sans-serif;
-            letter-spacing: 0.3px;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-        .add-btn:hover { background: var(--primary-dark); transform: scale(1.04); }
-        .add-btn:active { transform: scale(0.97); }
-        .add-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
-
-        .qty-ctrl {
-            display: flex;
-            align-items: center;
-            gap: 0.45rem;
-            background: var(--blue);
-            border-radius: 8px;
-            padding: 0.3rem 0.55rem;
-            flex-shrink: 0;
-        }
-
-        .qty-btn {
-            background: white;
-            color: var(--blue);
-            border: none;
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
+            padding: 0.6rem 1.1rem; 
+            border-radius: var(--radius-md);
+            font-family: 'Rajdhani', sans-serif; 
             font-weight: 800;
-            font-size: 0.95rem;
+            font-size: 0.85rem; 
+            letter-spacing: 0.8px; 
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.15s;
-            line-height: 1;
+            transition: all 0.3s; 
+            white-space: nowrap; 
             flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(26,60,150,0.25);
         }
-        .qty-btn:active { transform: scale(0.88); }
+        .add-btn:hover { 
+            background: linear-gradient(135deg, var(--tiu-blue-mid) 0%, #2d5fd9 100%);
+            transform: scale(1.08);
+            box-shadow: 0 6px 20px rgba(26,60,150,0.4);
+        }
+        .add-btn:active { 
+            transform: scale(0.95); 
+        }
+        .add-btn:disabled { 
+            background: linear-gradient(135deg, #c5c5d5 0%, #b0b0c0 100%);
+            color: #888; 
+            cursor: not-allowed; 
+            transform: none; 
+            box-shadow: none; 
+        }
 
+        /* Quantity Control - Enhanced */
+        .qty-ctrl {
+            display: flex; 
+            align-items: center; 
+            gap: 0.6rem;
+            background: linear-gradient(135deg, var(--tiu-blue) 0%, var(--tiu-blue-mid) 100%);
+            border-radius: var(--radius-md);
+            padding: 0.4rem 0.75rem; 
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(26,60,150,0.25);
+        }
+        .qty-btn {
+            background: rgba(255,255,255,0.25); 
+            color: white; 
+            border: none;
+            width: 24px; 
+            height: 24px; 
+            border-radius: 50%;
+            font-weight: 800; 
+            font-size: 1rem; 
+            cursor: pointer;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            transition: all 0.2s; 
+            line-height: 1; 
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+        .qty-btn:hover  { 
+            background: rgba(255,255,255,0.4); 
+            transform: scale(1.1);
+        }
+        .qty-btn:active { 
+            transform: scale(0.9); 
+        }
         .qty-num {
-            color: white;
-            font-weight: 700;
-            min-width: 18px;
-            text-align: center;
-            font-size: 0.9rem;
+            color: white; 
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 800; 
+            min-width: 20px;
+            text-align: center; 
+            font-size: 1rem;
         }
 
-        /* ===== BOTTOM CART BAR ===== */
+        /* ═══════════════════════════════════════════════════════
+           BOTTOM CART BAR - PREMIUM GLASS
+        ═══════════════════════════════════════════════════════ */
         .cart-bar {
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            background: var(--card-bg);
-            padding: 0.9rem 1.25rem;
-            box-shadow: 0 -4px 24px rgba(15,15,15,0.1);
-            display: none;
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            right: 0;
+            background: rgba(15, 37, 88, 0.98);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            border-top: 3px solid var(--tiu-gold);
+            padding: 1.25rem 1.5rem;
+            box-shadow: 
+                0 -8px 40px rgba(10,28,90,0.5),
+                inset 0 1px 0 rgba(255,255,255,0.1);
+            display: none; 
             z-index: 1001;
-            border-top: 2px solid var(--blue);
         }
-        .cart-bar.visible { display: block; animation: slideUp 0.3s ease; }
+        .cart-bar.visible { 
+            display: block; 
+            animation: barSlideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
 
-        @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
+        @keyframes barSlideUp { 
+            from { transform: translateY(100%); opacity: 0; } 
+            to { transform: translateY(0); opacity: 1; } 
         }
 
         .cart-bar-inner {
-            max-width: 1440px;
+            max-width: 1440px; 
             margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 1rem;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            gap: 1.5rem;
         }
 
-        .cart-bar-info { display: flex; flex-direction: column; gap: 0.15rem; }
-        .cart-bar-count { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
-        .cart-bar-total { font-family: 'Syne', sans-serif; font-size: 1.25rem; font-weight: 800; color: var(--text); }
+        .cart-bar-info { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 0.15rem; 
+        }
+        .cart-bar-count {
+            font-family: 'Rajdhani', sans-serif; 
+            font-size: 0.8rem;
+            font-weight: 700; 
+            color: rgba(255,255,255,0.7);
+            letter-spacing: 1px; 
+            text-transform: uppercase;
+        }
+        .cart-bar-total {
+            font-family: 'Bebas Neue', sans-serif; 
+            font-size: 1.75rem;
+            color: var(--tiu-gold); 
+            letter-spacing: 1.5px;
+            text-shadow: 0 2px 8px rgba(245,197,24,0.3);
+        }
 
         .view-cart-btn {
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--tiu-red) 0%, var(--tiu-red-light) 100%);
             color: white;
-            padding: 0.85rem 1.75rem;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 0.95rem;
-            border: none;
-            cursor: pointer;
+            padding: 0.95rem 2rem; 
+            border-radius: var(--radius-lg);
+            font-family: 'Rajdhani', sans-serif; 
+            font-weight: 800;
+            font-size: 1rem; 
+            letter-spacing: 1.2px; 
+            text-transform: uppercase;
+            border: none; 
+            cursor: pointer; 
             text-decoration: none;
-            display: inline-block;
-            transition: all 0.2s;
-            font-family: 'DM Sans', sans-serif;
+            display: inline-block; 
+            transition: all 0.3s;
+            box-shadow: 0 6px 20px rgba(208,30,30,0.4);
         }
-        .view-cart-btn:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        .view-cart-btn:hover { 
+            background: linear-gradient(135deg, var(--tiu-red-light) 0%, #ff5555 100%);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 32px rgba(208,30,30,0.5);
+        }
 
-        /* ===== TOAST ===== */
+        /* ═══════════════════════════════════════════════════════
+           TOAST - PREMIUM
+        ═══════════════════════════════════════════════════════ */
         .toast {
-            position: fixed;
-            top: 80px;
-            right: 16px;
-            background: var(--card-bg);
-            padding: 0.85rem 1.25rem;
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(15,15,15,0.15);
-            display: none;
+            position: fixed; 
+            top: 90px; 
+            right: 20px;
+            background: rgba(18, 18, 42, 0.98);
+            backdrop-filter: blur(20px);
+            border: 1.5px solid rgba(245,197,24,0.3);
+            padding: 1rem 1.4rem; 
+            border-radius: var(--radius-md);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+            display: none; 
             z-index: 3000;
-            min-width: 220px;
-            max-width: 320px;
-            align-items: center;
-            gap: 0.65rem;
-            font-size: 0.9rem;
-            font-weight: 500;
-            border-left: 4px solid var(--blue);
-            animation: toastIn 0.3s ease;
+            min-width: 240px; 
+            max-width: 340px;
+            align-items: center; 
+            gap: 0.75rem;
+            font-size: 0.9rem; 
+            font-weight: 600; 
+            color: white;
+            border-left: 5px solid var(--tiu-gold);
         }
-        .toast.show { display: flex; }
-        .toast.error { border-left-color: var(--primary); }
+        .toast.show { 
+            display: flex; 
+            animation: toastSlide 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .toast.error { 
+            border-left-color: var(--tiu-red); 
+            border-color: rgba(208,30,30,0.4);
+        }
 
-        @keyframes toastIn {
+        @keyframes toastSlide {
             from { transform: translateX(120%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            to   { transform: translateX(0); opacity: 1; }
         }
 
-        @media (max-width: 480px) {
-            .toast { right: 10px; left: 10px; min-width: auto; }
+        @media (max-width: 580px) { 
+            .toast { 
+                right: 12px; 
+                left: 12px; 
+                min-width: auto; 
+            } 
         }
 
-        /* ===== LOADING ===== */
-        .loading-state {
-            text-align: center;
-            padding: 4rem 1rem;
-            color: var(--text-muted);
+        /* ═══════════════════════════════════════════════════════
+           LOADING & EMPTY STATES - ENHANCED
+        ═══════════════════════════════════════════════════════ */
+        .loading-state { 
+            text-align: center; 
+            padding: 5rem 1.5rem; 
+            color: var(--muted); 
         }
         .spinner {
-            width: 44px; height: 44px;
-            border: 3px solid var(--border);
-            border-top-color: var(--blue);
-            border-radius: 50%;
+            width: 52px; 
+            height: 52px;
+            border: 4px solid var(--border);
+            border-top-color: var(--tiu-blue);
+            border-right-color: var(--tiu-gold);
+            border-radius: 50%; 
             animation: spin 0.8s linear infinite;
-            margin: 0 auto 1rem;
+            margin: 0 auto 1.5rem;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .loading-state p { font-size: 0.95rem; font-weight: 500; }
+        @keyframes spin { 
+            to { transform: rotate(360deg); } 
+        }
+        .loading-state p { 
+            font-family: 'Rajdhani', sans-serif; 
+            font-size: 1.1rem; 
+            font-weight: 700; 
+            letter-spacing: 0.8px; 
+        }
 
-        /* ===== EMPTY STATE ===== */
-        .empty-state {
-            text-align: center;
-            padding: 3rem 1rem;
-            color: var(--text-muted);
+        .empty-state { 
+            text-align: center; 
+            padding: 4rem 1.5rem; 
+            color: var(--muted); 
         }
-        .empty-state .big-emoji { font-size: 3.5rem; margin-bottom: 0.75rem; }
-        .empty-state h3 { font-family: 'Syne', sans-serif; font-size: 1.1rem; color: var(--text); margin-bottom: 0.4rem; }
-        .empty-state p { font-size: 0.88rem; }
+        .empty-state .big-emoji { 
+            font-size: 4.5rem; 
+            margin-bottom: 1rem; 
+            display: block; 
+            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.1));
+        }
+        .empty-state h3 { 
+            font-family: 'Bebas Neue', sans-serif; 
+            font-size: 1.8rem; 
+            letter-spacing: 1.5px; 
+            color: var(--ink); 
+            margin-bottom: 0.5rem; 
+        }
+        .empty-state p { 
+            font-size: 0.95rem; 
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
 
-<!-- NAVBAR -->
+<!-- ══════════════════════════════════════════════════════════════
+     NAVBAR - PREMIUM GLASS MORPHISM
+══════════════════════════════════════════════════════════════ -->
 <nav class="navbar">
     <div class="nav-left">
         <div class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
             <span></span><span></span><span></span>
         </div>
-        <!-- ✦ LOGO beside hamburger ✦ -->
         <div class="logo-wrap" onclick="window.scrollTo({top:0,behavior:'smooth'})">
-            <img
-                class="logo-img"
+            <img class="logo-img"
                 src="https://firebasestorage.googleapis.com/v0/b/waveride-bike-rental-service.firebasestorage.app/o/136034-removebg-preview.png?alt=media&token=8f360cff-b989-4a26-89c4-5ba8b4e651e9"
                 alt="TIU × The Biriyani Canteen"
-                onerror="this.style.display='none'"
-            />
+                onerror="this.style.display='none'">
         </div>
         <div class="nav-dropdown" id="navMenu">
-            <span class="nav-item" style="background:var(--bg); pointer-events:none;">🏠 Home</span>
+            <span class="nav-item" style="pointer-events:none; opacity:0.5;">🏠 Home</span>
             <a href="orders.html"  class="nav-item hidden" id="ordersLink">📦 My Orders</a>
             <a href="profile.html" class="nav-item hidden" id="profileLink">👤 Profile</a>
             <span class="nav-item hidden" id="logoutLink" onclick="logout()">🚪 Logout</span>
             <a href="login.html"   class="nav-item" id="loginLink">🔑 Login</a>
         </div>
     </div>
-
-    <a href="checkout.html" class="cart-btn" id="cartBtn">
-        🛒 Cart
-        <span class="cart-badge" id="cartBadge">0</span>
-    </a>
+    <div class="nav-right">
+        <a href="checkout.html" class="cart-btn" id="cartBtn">
+            🛒 Cart
+            <span class="cart-badge" id="cartBadge">0</span>
+        </a>
+    </div>
 </nav>
 
-<!-- STORE CLOSED BANNER -->
+<!-- ══════════════════════════════════════════════════════════════
+     STORE CLOSED BANNER
+══════════════════════════════════════════════════════════════ -->
 <div class="store-closed-banner" id="storeClosedBanner">
-    🔒 &nbsp; We're currently closed. New orders are not being accepted right now. Check back soon!
+    🔒 &nbsp; Kitchen is currently closed — No new orders right now. Check back soon!
 </div>
 
-<!-- MAIN CONTENT -->
-<div class="container" id="mainContainer">
-    <div class="loading-state">
-        <div class="spinner"></div>
-        <p>Loading delicious food…</p>
+<!-- ══════════════════════════════════════════════════════════════
+     IMAGE MARQUEE BANNER - PREMIUM FEATURE
+══════════════════════════════════════════════════════════════ -->
+<div class="marquee-banner">
+    <div class="marquee-title">🍛 TIU Campus Favorites 🍛</div>
+    <div class="marquee-container">
+        <div class="marquee-content">
+            <!-- First set -->
+            <a href="index.html" class="marquee-item">
+                <img src="https://firebasestorage.googleapis.com/v0/b/hungrybites-c7930.firebasestorage.app/o/IMG_1262.JPG?alt=media&token=44c9c15a-4879-46a3-963e-a42271c79e4c" alt="TIU Special 1">
+            </a>
+            <a href="index.html" class="marquee-item">
+                <img src="https://firebasestorage.googleapis.com/v0/b/hungrybites-c7930.firebasestorage.app/o/IMG_1263.JPG?alt=media&token=31f40576-a75a-47f8-a7b2-ade69013eabf" alt="TIU Special 2">
+            </a>
+            <a href="index.html" class="marquee-item">
+                <img src="https://firebasestorage.googleapis.com/v0/b/hungrybites-c7930.firebasestorage.app/o/IMG_1264.JPG?alt=media&token=f4d9d2cc-2e51-4d43-b52f-1d91bd0e93ee" alt="TIU Special 3">
+            </a>
+            <!-- Duplicate for seamless loop -->
+            <a href="index.html" class="marquee-item">
+                <img src="https://firebasestorage.googleapis.com/v0/b/hungrybites-c7930.firebasestorage.app/o/IMG_1262.JPG?alt=media&token=44c9c15a-4879-46a3-963e-a42271c79e4c" alt="TIU Special 1">
+            </a>
+            <a href="index.html" class="marquee-item">
+                <img src="https://firebasestorage.googleapis.com/v0/b/hungrybites-c7930.firebasestorage.app/o/IMG_1263.JPG?alt=media&token=31f40576-a75a-47f8-a7b2-ade69013eabf" alt="TIU Special 2">
+            </a>
+            <a href="index.html" class="marquee-item">
+                <img src="https://firebasestorage.googleapis.com/v0/b/hungrybites-c7930.firebasestorage.app/o/IMG_1264.JPG?alt=media&token=f4d9d2cc-2e51-4d43-b52f-1d91bd0e93ee" alt="TIU Special 3">
+            </a>
+        </div>
     </div>
 </div>
 
-<!-- BOTTOM CART BAR -->
+<!-- ══════════════════════════════════════════════════════════════
+     HERO BANNER - ULTRA PREMIUM
+══════════════════════════════════════════════════════════════ -->
+<div class="hero-banner">
+    <div class="hero-text">
+        <div class="hero-eyebrow">Techno India University</div>
+        <div class="hero-title">The <em>Biriyani</em><br>Canteen</div>
+        <div class="hero-sub">Fresh from your campus kitchen 🎓</div>
+    </div>
+    <div class="hero-badge">
+        <div class="hero-badge-emoji">🍛</div>
+        <div class="hero-badge-label">Campus<br>Fresh</div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     MAIN CONTENT
+══════════════════════════════════════════════════════════════ -->
+<div class="container" id="mainContainer">
+    <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading the menu…</p>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     BOTTOM CART BAR - PREMIUM GLASS
+══════════════════════════════════════════════════════════════ -->
 <div class="cart-bar" id="cartBar">
     <div class="cart-bar-inner">
         <div class="cart-bar-info">
@@ -605,12 +1391,17 @@
     </div>
 </div>
 
-<!-- TOAST -->
+<!-- ══════════════════════════════════════════════════════════════
+     TOAST - PREMIUM
+══════════════════════════════════════════════════════════════ -->
 <div class="toast" id="toast">
     <span id="toastIcon">✅</span>
     <span id="toastMsg">Done!</span>
 </div>
 
+<!-- ══════════════════════════════════════════════════════════════
+     JAVASCRIPT - SAME FUNCTIONALITY, ENHANCED UI
+══════════════════════════════════════════════════════════════ -->
 <script type="module">
     import { initializeApp }       from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -629,13 +1420,8 @@
     const auth = getAuth(app);
     const db   = getDatabase(app);
 
-    let cart          = [];
-    let allFoodData   = {};
-    let currentUser   = null;
-    let isAuth        = false;
-    let storeIsOpen   = true;
-    let guestId       = null;
-    let cartSyncUnsub = null;
+    let cart = [], allFoodData = {}, currentUser = null, isAuth = false,
+        storeIsOpen = true, guestId = null, cartSyncUnsub = null;
 
     const CATEGORY_ORDER = [
         { key: "Biriyani",     display: "Biriyani",   emoji: "🥘" },
@@ -662,15 +1448,14 @@
 
     function initGuestId() {
         let id = localStorage.getItem('tiutbc_guestId');
-        if (!id) { id = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`; localStorage.setItem('tiutbc_guestId', id); }
+        if (!id) { id = `guest_${Date.now()}_${Math.random().toString(36).substr(2,9)}`; localStorage.setItem('tiutbc_guestId', id); }
         guestId = id;
     }
 
     function watchStoreStatus() {
         onValue(ref(db, 'tiutbc/storeStatus'), snap => {
             storeIsOpen = (snap.val() || {}).isOpen !== false;
-            const banner = $('storeClosedBanner');
-            storeIsOpen ? banner.classList.remove('visible') : banner.classList.add('visible');
+            $('storeClosedBanner').classList.toggle('visible', !storeIsOpen);
             renderMenu();
         });
     }
@@ -698,26 +1483,26 @@
     function attachCartSync(uid) {
         if (cartSyncUnsub) { cartSyncUnsub(); cartSyncUnsub = null; }
         cartSyncUnsub = onValue(ref(db, `tiutbc/carts/${uid}`), snap => {
-            const newCart = snap.exists() ? Object.keys(snap.val()).map(id => ({ id, ...snap.val()[id] })) : [];
-            if (JSON.stringify(cart) !== JSON.stringify(newCart)) { cart = newCart; saveCartLocal(); updateCartUI(); renderMenu(); }
+            const nc = snap.exists() ? Object.keys(snap.val()).map(id => ({ id, ...snap.val()[id] })) : [];
+            if (JSON.stringify(cart) !== JSON.stringify(nc)) { cart = nc; saveCartLocal(); updateCartUI(); renderMenu(); }
         });
     }
 
     async function migrateGuestCart(uid) {
         try {
-            const guestSnap = await get(ref(db, `tiutbc/carts/${guestId}`));
-            if (!guestSnap.exists()) return;
-            const guestData = guestSnap.val();
-            const userSnap  = await get(ref(db, `tiutbc/carts/${uid}`));
-            let merged = userSnap.exists() ? { ...userSnap.val() } : {};
-            Object.keys(guestData).forEach(itemId => {
-                if (merged[itemId]) { merged[itemId].quantity += guestData[itemId].quantity; merged[itemId].lastUpdated = Date.now(); }
-                else merged[itemId] = { ...guestData[itemId], lastUpdated: Date.now() };
+            const gs = await get(ref(db, `tiutbc/carts/${guestId}`));
+            if (!gs.exists()) return;
+            const gd = gs.val();
+            const us = await get(ref(db, `tiutbc/carts/${uid}`));
+            let m = us.exists() ? { ...us.val() } : {};
+            Object.keys(gd).forEach(k => {
+                if (m[k]) { m[k].quantity += gd[k].quantity; m[k].lastUpdated = Date.now(); }
+                else m[k] = { ...gd[k], lastUpdated: Date.now() };
             });
-            await set(ref(db, `tiutbc/carts/${uid}`), merged);
+            await set(ref(db, `tiutbc/carts/${uid}`), m);
             try { await remove(ref(db, `tiutbc/carts/${guestId}`)); } catch (_) {}
             showToast('Cart restored!');
-        } catch (e) { console.warn('Guest cart migration error:', e); }
+        } catch (e) { console.warn('Migration error:', e); }
     }
 
     function loadFoodItems() {
@@ -725,52 +1510,108 @@
     }
 
     function renderMenu() {
-        const container = $('mainContainer');
+        const c = $('mainContainer');
         if (!Object.keys(allFoodData).length) return;
         let html = '';
+
         if (!isAuth) {
-            html += `<div class="login-banner"><div><h3>👋 Welcome, Guest!</h3><p>Browse our menu and login to place your order</p></div><a href="login.html" class="login-btn">Login / Sign Up</a></div>`;
+            html += `
+            <div class="login-banner">
+                <div class="login-banner-content">
+                    <h3>👋 Hey, TIU Student!</h3>
+                    <p>Login with your TIU account to place an order</p>
+                </div>
+                <a href="login.html" class="login-btn">Login / Sign Up</a>
+            </div>`;
         }
+
         let anyRendered = false;
         CATEGORY_ORDER.forEach(cat => {
             const catData = allFoodData[cat.key];
             if (!catData) return;
             const emoji = catData.emoji || cat.emoji;
-            const activeItems = [];
+            const items = [];
             Object.keys(catData).forEach(k => {
                 if (k === 'emoji') return;
                 const item = catData[k];
-                if (item && item.name && item.isActive !== false) activeItems.push({ id: k, ...item, _catKey: cat.key });
+                if (item && item.name && item.isActive !== false) items.push({ id: k, ...item, _catKey: cat.key });
             });
-            if (!activeItems.length) return;
+            if (!items.length) return;
             anyRendered = true;
-            html += `<div class="category-section"><div class="category-header"><div class="category-emoji">${emoji}</div><div><div class="category-title">${esc(cat.display)}</div><div class="category-count">${activeItems.length} item${activeItems.length !== 1 ? 's' : ''}</div></div></div><div class="food-grid">${activeItems.map(item => renderCard(item)).join('')}</div></div>`;
+
+            html += `
+            <div class="category-section">
+                <div class="category-header">
+                    <div class="cat-icon-wrap">${emoji}</div>
+                    <div class="category-meta">
+                        <div class="category-title">${esc(cat.display)}</div>
+                        <div class="category-count">${items.length} item${items.length !== 1 ? 's' : ''} available</div>
+                    </div>
+                </div>
+                <div class="food-grid">
+                    ${items.map((item, idx) => renderCard(item, idx)).join('')}
+                </div>
+            </div>`;
         });
-        if (!anyRendered) { html += `<div class="empty-state"><div class="big-emoji">🍽️</div><h3>Menu Coming Soon</h3><p>We're preparing something delicious. Check back soon!</p></div>`; }
-        container.innerHTML = html;
+
+        if (!anyRendered) {
+            html += `<div class="empty-state"><span class="big-emoji">🍽️</span><h3>Menu Coming Soon</h3><p>Something delicious is being prepared!</p></div>`;
+        }
+        c.innerHTML = html;
     }
 
-    function renderCard(item) {
+    function renderCard(item, idx) {
         const qty = getQty(item.id);
-        const isDisabled = !storeIsOpen;
+        const dis = !storeIsOpen;
+        const delay = Math.min(idx * 0.05, 0.6);
+
         const imgHTML = item.imageurl
-            ? `<img src="${esc(item.imageurl)}" alt="${esc(item.name)}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><div class="food-emoji-fallback" style="display:none;">${item.emoji || '🍽️'}</div>`
+            ? `<img src="${esc(item.imageurl)}" alt="${esc(item.name)}" loading="lazy"
+                    onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+               <div class="food-emoji-fallback" style="display:none;">${item.emoji || '🍽️'}</div>`
             : `<div class="food-emoji-fallback">${item.emoji || '🍽️'}</div>`;
-        const btnHTML = isDisabled
+
+        const btnHTML = dis
             ? `<button class="add-btn" disabled>Closed</button>`
             : qty > 0
-                ? `<div class="qty-ctrl"><button class="qty-btn" onclick="changeQty('${esc(item.id)}', -1, event)">−</button><span class="qty-num">${qty}</span><button class="qty-btn" onclick="changeQty('${esc(item.id)}', 1, event)">+</button></div>`
-                : `<button class="add-btn" onclick="addItem('${esc(item.id)}','${esc(item.name)}',${item.price || 0},'${esc(item.emoji || '')}','${esc(item._catKey)}', event)">Add</button>`;
-        return `<div class="food-card" data-id="${esc(item.id)}" data-name="${esc(item.name)}" data-price="${item.price || 0}" data-emoji="${esc(item.emoji || '')}" data-cat="${esc(item._catKey)}"><div class="food-img-wrap">${imgHTML}<div class="veg-badge"><div class="veg-dot"></div></div></div><div class="food-body"><div class="food-name">${esc(item.name)}</div>${item.description ? `<div class="food-desc">${esc(item.description)}</div>` : ''}<div class="food-rating">★ 4.5</div><div class="food-footer"><div class="food-price">₹${item.price || 0}</div>${btnHTML}</div></div></div>`;
+                ? `<div class="qty-ctrl">
+                       <button class="qty-btn" onclick="changeQty('${esc(item.id)}',-1,event)">−</button>
+                       <span class="qty-num">${qty}</span>
+                       <button class="qty-btn" onclick="changeQty('${esc(item.id)}',1,event)">+</button>
+                   </div>`
+                : `<button class="add-btn" onclick="addItem('${esc(item.id)}','${esc(item.name)}',${item.price||0},'${esc(item.emoji||'')}','${esc(item._catKey)}',event)">Add +</button>`;
+
+        return `
+        <div class="food-card"
+             style="animation-delay:${delay}s"
+             data-id="${esc(item.id)}"
+             data-name="${esc(item.name)}"
+             data-price="${item.price||0}"
+             data-emoji="${esc(item.emoji||'')}"
+             data-cat="${esc(item._catKey)}">
+            <div class="food-img-wrap">
+                ${imgHTML}
+                <div class="veg-badge"><div class="veg-dot"></div></div>
+                <div class="food-tiu-tag">TIU</div>
+            </div>
+            <div class="food-body">
+                <div class="food-name">${esc(item.name)}</div>
+                ${item.description ? `<div class="food-desc">${esc(item.description)}</div>` : ''}
+                <div class="food-rating">★ 4.5</div>
+                <div class="food-footer">
+                    <div class="food-price">₹${item.price||0}</div>
+                    ${btnHTML}
+                </div>
+            </div>
+        </div>`;
     }
 
-    function getQty(id) { const found = cart.find(i => i.id === id); return found ? found.quantity : 0; }
+    function getQty(id) { const f = cart.find(i => i.id === id); return f ? f.quantity : 0; }
 
     window.addItem = function(id, name, price, emoji, category, e) {
         if (e) e.stopPropagation();
-        if (!storeIsOpen) { showToast('Store is currently closed', 'error'); return; }
-        const ts = Date.now();
-        const idx = cart.findIndex(i => i.id === id);
+        if (!storeIsOpen) { showToast('Kitchen is currently closed', 'error'); return; }
+        const ts = Date.now(), idx = cart.findIndex(i => i.id === id);
         if (idx > -1) { cart[idx].quantity++; cart[idx].lastUpdated = ts; }
         else cart.push({ id, name, price: Number(price), emoji, category, quantity: 1, timestamp: ts, lastUpdated: ts });
         saveCartLocal(); syncCartToDB(); updateCartUI(); updateCardBtn(id);
@@ -793,51 +1634,54 @@
         const { name, price, emoji, cat } = card.dataset;
         const footer = card.querySelector('.food-footer');
         const priceEl = card.querySelector('.food-price');
-        const disabled = !storeIsOpen;
-        const btnHTML = disabled
+        const dis = !storeIsOpen;
+        const btnHTML = dis
             ? `<button class="add-btn" disabled>Closed</button>`
             : qty > 0
-                ? `<div class="qty-ctrl"><button class="qty-btn" onclick="changeQty('${esc(id)}', -1, event)">−</button><span class="qty-num">${qty}</span><button class="qty-btn" onclick="changeQty('${esc(id)}', 1, event)">+</button></div>`
-                : `<button class="add-btn" onclick="addItem('${esc(id)}','${esc(name)}',${price},'${esc(emoji)}','${esc(cat)}', event)">Add</button>`;
+                ? `<div class="qty-ctrl"><button class="qty-btn" onclick="changeQty('${esc(id)}',-1,event)">−</button><span class="qty-num">${qty}</span><button class="qty-btn" onclick="changeQty('${esc(id)}',1,event)">+</button></div>`
+                : `<button class="add-btn" onclick="addItem('${esc(id)}','${esc(name)}',${price},'${esc(emoji)}','${esc(cat)}',event)">Add +</button>`;
         footer.innerHTML = priceEl.outerHTML + btnHTML;
     }
 
     function syncCartToDB() {
         const uid = currentUser ? currentUser.uid : guestId;
         if (!uid) return;
-        const cartRef = ref(db, `tiutbc/carts/${uid}`);
-        if (!cart.length) { remove(cartRef).catch(() => {}); return; }
-        const data = {}; const ts = Date.now();
+        const cr = ref(db, `tiutbc/carts/${uid}`);
+        if (!cart.length) { remove(cr).catch(() => {}); return; }
+        const data = {}, ts = Date.now();
         cart.forEach(item => { data[item.id] = { name: item.name, price: item.price, emoji: item.emoji, category: item.category, quantity: item.quantity, timestamp: item.timestamp || ts, lastUpdated: ts }; });
-        set(cartRef, data).catch(e => console.error('Cart sync error:', e));
+        set(cr, data).catch(e => console.error('Sync error:', e));
     }
 
     function saveCartLocal() { try { localStorage.setItem('tiutbc_cart', JSON.stringify(cart)); } catch (_) {} }
-    function loadCartLocal() { try { const raw = localStorage.getItem('tiutbc_cart'); if (raw) cart = JSON.parse(raw); } catch (_) { cart = []; } }
+    function loadCartLocal() { try { const r = localStorage.getItem('tiutbc_cart'); if (r) cart = JSON.parse(r); } catch (_) { cart = []; } }
 
     function updateCartUI() {
-        const totalQty = cart.reduce((s, i) => s + i.quantity, 0);
-        const totalAmt = cart.reduce((s, i) => s + i.price * i.quantity, 0);
+        const qty = cart.reduce((s, i) => s + i.quantity, 0);
+        const amt = cart.reduce((s, i) => s + i.price * i.quantity, 0);
         const badge = $('cartBadge');
-        badge.textContent = totalQty;
-        totalQty > 0 ? badge.classList.add('visible') : badge.classList.remove('visible');
+        badge.textContent = qty;
+        badge.classList.toggle('visible', qty > 0);
         const bar = $('cartBar');
-        if (totalQty > 0) { bar.classList.add('visible'); $('cartBarCount').textContent = `${totalQty} item${totalQty !== 1 ? 's' : ''}`; $('cartBarTotal').textContent = `₹${totalAmt}`; }
-        else bar.classList.remove('visible');
+        if (qty > 0) {
+            bar.classList.add('visible');
+            $('cartBarCount').textContent = `${qty} item${qty !== 1 ? 's' : ''}`;
+            $('cartBarTotal').textContent = `₹${amt}`;
+        } else bar.classList.remove('visible');
     }
 
     window.toggleMenu = function() { $('navMenu').classList.toggle('active'); };
     document.addEventListener('click', e => {
-        const menu = $('navMenu'); const ham = $('hamburger');
-        if (menu && ham && !menu.contains(e.target) && !ham.contains(e.target)) menu.classList.remove('active');
+        const m = $('navMenu'), h = $('hamburger');
+        if (m && h && !m.contains(e.target) && !h.contains(e.target)) m.classList.remove('active');
     });
 
     window.logout = function() {
-        if (!confirm('Logout?')) return;
+        if (!confirm('Log out?')) return;
         signOut(auth).then(() => {
             if (cartSyncUnsub) { cartSyncUnsub(); cartSyncUnsub = null; }
             localStorage.removeItem('tiutbc_cart'); cart = [];
-            showToast('Logged out successfully');
+            showToast('Logged out');
             setTimeout(() => window.location.href = 'login.html', 800);
         }).catch(() => showToast('Logout failed', 'error'));
     };
