@@ -697,7 +697,7 @@
                 }
                 isAdmin = true;
                 loadUsers();
-                loadCarts();       // ← now listens to root 'carts/' path
+                loadCarts();
                 loadOrders();
                 loadStoreStatus();
                 loadFoodItems();
@@ -799,16 +799,16 @@
         window.closeUserModal = function() { $('userDetailsModal').classList.remove('active'); };
 
         // ========== CARTS ==========
-function loadCarts() {
-    const cartsRef = dbRef(db, 'tiutbc/carts');
-    const callback = snapshot => {
-        allCarts = snapshot.val() || {};
-        updateCartStats();
-        displayCarts();
-    };
-    onValue(cartsRef, callback);
-    dbListeners.push({ ref: cartsRef, callback });
-}
+        function loadCarts() {
+            const cartsRef = dbRef(db, 'tiutbc/carts');
+            const callback = snapshot => {
+                allCarts = snapshot.val() || {};
+                updateCartStats();
+                displayCarts();
+            };
+            onValue(cartsRef, callback);
+            dbListeners.push({ ref: cartsRef, callback });
+        }
 
         async function displayCarts() {
             const container = $('cartsContainer');
@@ -821,15 +821,13 @@ function loadCarts() {
 
             container.innerHTML = '<div class="empty-state"><div class="loading-spinner"></div><div class="empty-state-text">Loading cart details...</div></div>';
 
-            // Helper: get latest timestamp across all valid items in a cart
             const getLatest = cart => {
                 const vals = Object.entries(cart)
-                    .filter(([k]) => k !== 'null')   // ← FIXED: skip corrupted "null" string keys
+                    .filter(([k]) => k !== 'null')
                     .map(([, i]) => i.lastUpdated || i.timestamp || 0);
                 return vals.length ? Math.max(...vals) : 0;
             };
 
-            // Fetch any missing user details in parallel
             await Promise.all(userIds.map(async uid => {
                 if (allUsers[uid]) return;
                 if (uid.startsWith('guest_')) {
@@ -843,7 +841,6 @@ function loadCarts() {
                 allUsers[uid] = { name: 'Unknown User', email: 'N/A', phoneNumber: 'N/A' };
             }));
 
-            // Sort by most recently updated cart first
             const sorted = [...userIds].sort((a, b) => getLatest(allCarts[b]) - getLatest(allCarts[a]));
 
             container.innerHTML = '';
@@ -863,7 +860,6 @@ function loadCarts() {
         }
 
         function createCartCard(userId, cartItems, user, lastUpdated) {
-            // Guard: skip if cartItems is not an object or has no valid entries
             if (!cartItems || typeof cartItems !== 'object') return null;
 
             const card = document.createElement('div');
@@ -873,14 +869,12 @@ function loadCarts() {
             const phone = user?.phoneNumber || 'N/A';
             const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
 
-            // FIX: filter out "null" string keys (corrupted entries from the app)
             const items = Object.entries(cartItems)
                 .filter(([id]) => id !== 'null')
                 .map(([id, item]) => ({ id, ...item }));
 
-            if (!items.length) return null; // skip empty/corrupted carts
+            if (!items.length) return null;
 
-            // Format last updated time
             let lastUpdatedStr = 'N/A';
             if (lastUpdated) {
                 const d = new Date(lastUpdated);
@@ -941,7 +935,6 @@ function loadCarts() {
         function updateCartStats() {
             let val = 0, cnt = 0;
             Object.values(allCarts).forEach(cart => {
-                // FIX: skip "null" string keys when computing stats
                 Object.entries(cart).forEach(([k, item]) => {
                     if (k === 'null' || !item || typeof item !== 'object') return;
                     const qty = parseInt(item.quantity) || 0;
@@ -1441,7 +1434,6 @@ function loadCarts() {
             catNames.forEach(catName => {
                 const catData = categories[catName];
                 const emoji = catData.emoji || '🍽️';
-                // FIX: also filter out "null" key in food items (same corruption pattern)
                 const items = Object.keys(catData || {})
                     .filter(k => k !== 'emoji' && k !== 'null')
                     .reduce((o, k) => { o[k] = catData[k]; return o; }, {});
