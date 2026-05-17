@@ -799,18 +799,16 @@
         window.closeUserModal = function() { $('userDetailsModal').classList.remove('active'); };
 
         // ========== CARTS ==========
-        // FIX: Listen on root 'carts/' — that is where the app writes cart data.
-        // The admin panel was previously listening on 'tiutbc/carts' which does not exist.
-        function loadCarts() {
-            const cartsRef = dbRef(db, 'carts');   // ← FIXED: was 'tiutbc/carts'
-            const callback = snapshot => {
-                allCarts = snapshot.val() || {};
-                updateCartStats();
-                displayCarts();
-            };
-            onValue(cartsRef, callback);
-            dbListeners.push({ ref: cartsRef, callback });
-        }
+function loadCarts() {
+    const cartsRef = dbRef(db, 'tiutbc/carts');
+    const callback = snapshot => {
+        allCarts = snapshot.val() || {};
+        updateCartStats();
+        displayCarts();
+    };
+    onValue(cartsRef, callback);
+    dbListeners.push({ ref: cartsRef, callback });
+}
 
         async function displayCarts() {
             const container = $('cartsContainer');
