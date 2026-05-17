@@ -23,6 +23,8 @@
             --shadow-hover: 0 8px 32px rgba(26,18,8,0.15);
             --radius: 14px;
             --navbar-h: 80px;
+            --sk-base: #ede8e2;
+            --sk-shine: #f7f3ef;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -43,18 +45,23 @@
             position: sticky;
             top: 0;
             z-index: 1000;
-            display: flex;
-            justify-content: space-between;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
             align-items: center;
-            gap: 1rem;
+            gap: 0.5rem;
         }
 
-        .nav-left { display: flex; align-items: center; gap: 0.65rem; }
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            justify-content: flex-start;
+        }
 
-        /* ===== LOGO ===== */
         .logo-wrap {
             display: flex;
             align-items: center;
+            justify-content: center;
             cursor: pointer;
             text-decoration: none;
             user-select: none;
@@ -74,9 +81,11 @@
             transform: scale(1.05);
         }
 
-        /* hide divider/text — logo image alone is the brand mark */
-        .logo-divider,
-        .logo-text-block { display: none; }
+        .nav-right {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
 
         .hamburger {
             display: flex;
@@ -159,7 +168,7 @@
 
         @keyframes dropDown {
             from { opacity: 0; transform: translateY(-8px); }
-            to { opacity: 1; transform: translateY(0); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
         .nav-item {
@@ -191,7 +200,8 @@
                 gap: 0.25rem;
             }
             .nav-item { padding: 0.4rem 0.9rem; font-size: 0.88rem; }
-            .logo-img { height: 56px; }
+            .logo-img  { height: 56px; }
+            .nav-left  { gap: 0.25rem; }
         }
 
         /* ===== CONTAINER ===== */
@@ -216,7 +226,7 @@
             box-shadow: 0 4px 20px rgba(232,67,26,0.25);
         }
         .login-banner h3 { font-family: 'Syne', sans-serif; font-size: 1.05rem; margin-bottom: 0.2rem; }
-        .login-banner p { font-size: 0.82rem; opacity: 0.92; }
+        .login-banner p  { font-size: 0.82rem; opacity: 0.92; }
         .login-btn {
             background: white;
             color: var(--primary);
@@ -230,10 +240,7 @@
             flex-shrink: 0;
         }
         .login-btn:hover { transform: scale(1.03); }
-
-        @media (max-width: 480px) {
-            .login-banner { flex-direction: column; text-align: center; }
-        }
+        @media (max-width: 480px) { .login-banner { flex-direction: column; text-align: center; } }
 
         /* ===== CATEGORY HEADER ===== */
         .category-section { margin-bottom: 2.25rem; }
@@ -262,10 +269,10 @@
             grid-template-columns: repeat(2, 1fr);
             gap: 0.85rem;
         }
-        @media (min-width: 560px) { .food-grid { grid-template-columns: repeat(3, 1fr); gap: 1rem; } }
-        @media (min-width: 900px) { .food-grid { grid-template-columns: repeat(4, 1fr); gap: 1.1rem; } }
+        @media (min-width: 560px)  { .food-grid { grid-template-columns: repeat(3, 1fr); gap: 1rem; } }
+        @media (min-width: 900px)  { .food-grid { grid-template-columns: repeat(4, 1fr); gap: 1.1rem; } }
         @media (min-width: 1200px) { .food-grid { grid-template-columns: repeat(5, 1fr); gap: 1.25rem; } }
-        @media (max-width: 340px) { .food-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 340px)  { .food-grid { grid-template-columns: 1fr; } }
 
         /* ===== FOOD CARD ===== */
         .food-card {
@@ -291,11 +298,16 @@
         @media (min-width: 560px) { .food-img-wrap { height: 155px; } }
         @media (min-width: 900px) { .food-img-wrap { height: 175px; } }
 
+        /* Image starts invisible; fades in after load */
         .food-img-wrap img {
             width: 100%; height: 100%;
             object-fit: cover;
-            transition: transform 0.3s;
+            position: relative;
+            z-index: 1;
+            opacity: 0;
+            transition: transform 0.3s, opacity 0.4s ease;
         }
+        .food-img-wrap.img-ready img { opacity: 1; }
         .food-card:hover .food-img-wrap img { transform: scale(1.06); }
 
         .food-emoji-fallback {
@@ -319,6 +331,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            z-index: 3;
         }
         .veg-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
 
@@ -395,7 +408,7 @@
             white-space: nowrap;
             flex-shrink: 0;
         }
-        .add-btn:hover { background: var(--primary-dark); transform: scale(1.04); }
+        .add-btn:hover  { background: var(--primary-dark); transform: scale(1.04); }
         .add-btn:active { transform: scale(0.97); }
         .add-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
 
@@ -451,7 +464,7 @@
 
         @keyframes slideUp {
             from { transform: translateY(100%); }
-            to { transform: translateY(0); }
+            to   { transform: translateY(0); }
         }
 
         .cart-bar-inner {
@@ -463,7 +476,7 @@
             gap: 1rem;
         }
 
-        .cart-bar-info { display: flex; flex-direction: column; gap: 0.15rem; }
+        .cart-bar-info  { display: flex; flex-direction: column; gap: 0.15rem; }
         .cart-bar-count { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
         .cart-bar-total { font-family: 'Syne', sans-serif; font-size: 1.25rem; font-weight: 800; color: var(--text); }
 
@@ -503,62 +516,153 @@
             border-left: 4px solid var(--green);
             animation: toastIn 0.3s ease;
         }
-        .toast.show { display: flex; }
+        .toast.show  { display: flex; }
         .toast.error { border-left-color: var(--primary); }
 
         @keyframes toastIn {
             from { transform: translateX(120%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            to   { transform: translateX(0); opacity: 1; }
         }
-
-        @media (max-width: 480px) {
-            .toast { right: 10px; left: 10px; min-width: auto; }
-        }
-
-        /* ===== LOADING ===== */
-        .loading-state {
-            text-align: center;
-            padding: 4rem 1rem;
-            color: var(--text-muted);
-        }
-        .spinner {
-            width: 44px; height: 44px;
-            border: 3px solid var(--border);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto 1rem;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .loading-state p { font-size: 0.95rem; font-weight: 500; }
+        @media (max-width: 480px) { .toast { right: 10px; left: 10px; min-width: auto; } }
 
         /* ===== EMPTY STATE ===== */
-        .empty-state {
-            text-align: center;
-            padding: 3rem 1rem;
-            color: var(--text-muted);
-        }
+        .empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-muted); }
         .empty-state .big-emoji { font-size: 3.5rem; margin-bottom: 0.75rem; }
         .empty-state h3 { font-family: 'Syne', sans-serif; font-size: 1.1rem; color: var(--text); margin-bottom: 0.4rem; }
-        .empty-state p { font-size: 0.88rem; }
+        .empty-state p  { font-size: 0.88rem; }
+
+        /* ============================================================
+           SKELETON LOADING SYSTEM
+           Two layers:
+             1. Page-level  — fake category+card blocks before Firebase
+             2. Image-level — shimmer overlay per card image until loaded
+        ============================================================ */
+
+        @keyframes shimmer {
+            0%   { background-position: -700px 0; }
+            100% { background-position:  700px 0; }
+        }
+
+        /* Shared shimmer mixin applied via .sk class */
+        .sk {
+            background: linear-gradient(
+                90deg,
+                var(--sk-base) 25%,
+                var(--sk-shine) 50%,
+                var(--sk-base) 75%
+            );
+            background-size: 700px 100%;
+            animation: shimmer 1.5s ease-in-out infinite;
+            border-radius: 6px;
+            display: block;
+        }
+
+        /* ── Skeleton category section ── */
+        .sk-section { margin-bottom: 2.25rem; }
+
+        .sk-header {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.65rem;
+            border-bottom: 2px solid var(--border);
+        }
+        .sk-emoji { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; }
+        .sk-htext { flex: 1; }
+        .sk-title { height: 20px; width: min(145px, 42%); margin-bottom: 7px; }
+        .sk-sub   { height: 12px; width: min(80px, 26%); }
+
+        /* ── Skeleton card ── */
+        .sk-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        /* Skeleton image block — same heights as real .food-img-wrap */
+        .sk-img {
+            width: 100%;
+            height: 130px;
+            border-radius: 0;
+        }
+        @media (min-width: 560px) { .sk-img { height: 155px; } }
+        @media (min-width: 900px) { .sk-img { height: 175px; } }
+
+        .sk-body  { padding: 0.75rem; }
+        @media (min-width: 560px) { .sk-body { padding: 0.9rem; } }
+
+        .sk-name  { height: 15px; width: 82%; margin-bottom: 6px; }
+        .sk-name2 { height: 13px; width: 60%; margin-bottom: 10px; }
+        .sk-desc  { height: 11px; width: 90%; margin-bottom: 5px; }
+        .sk-desc2 { height: 11px; width: 68%; margin-bottom: 12px; }
+        .sk-badge { height: 18px; width: 44px; border-radius: 5px; margin-bottom: 14px; }
+
+        .sk-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .sk-price { height: 22px; width: 52px; }
+        .sk-btn   { height: 32px; width: 60px; border-radius: 8px; }
+
+        /* Stagger shimmer phase so cards pulse at slightly different times */
+        .sk-card:nth-child(2) .sk { animation-delay: 0.12s; }
+        .sk-card:nth-child(3) .sk { animation-delay: 0.24s; }
+        .sk-card:nth-child(4) .sk { animation-delay: 0.36s; }
+        .sk-card:nth-child(5) .sk { animation-delay: 0.08s; }
+        .sk-card:nth-child(6) .sk { animation-delay: 0.20s; }
+        .sk-card:nth-child(7) .sk { animation-delay: 0.32s; }
+        .sk-card:nth-child(8) .sk { animation-delay: 0.44s; }
+
+        /* ── Per-image shimmer overlay ──
+           Absolutely fills the .food-img-wrap and fades out
+           when the wrapper gets .img-ready (via onload).            */
+        .img-skeleton-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            pointer-events: none;
+            background: linear-gradient(
+                90deg,
+                var(--sk-base) 25%,
+                var(--sk-shine) 50%,
+                var(--sk-base) 75%
+            );
+            background-size: 700px 100%;
+            animation: shimmer 1.5s ease-in-out infinite;
+            transition: opacity 0.4s ease;
+        }
+        .food-img-wrap.img-ready .img-skeleton-overlay {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* ── Real category sections fade-in after skeleton replaced ── */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .category-section { animation: fadeInUp 0.32s ease both; }
+        .category-section:nth-child(2) { animation-delay: 0.05s; }
+        .category-section:nth-child(3) { animation-delay: 0.10s; }
+        .category-section:nth-child(4) { animation-delay: 0.15s; }
+        .category-section:nth-child(5) { animation-delay: 0.20s; }
+        .category-section:nth-child(6) { animation-delay: 0.25s; }
+        .category-section:nth-child(7) { animation-delay: 0.30s; }
+        .category-section:nth-child(8) { animation-delay: 0.35s; }
     </style>
 </head>
 <body>
 
 <!-- NAVBAR -->
 <nav class="navbar">
+    <!-- LEFT: hamburger + dropdown links -->
     <div class="nav-left">
         <div class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
             <span></span><span></span><span></span>
-        </div>
-        <!-- ✦ LOGO beside hamburger ✦ -->
-        <div class="logo-wrap" onclick="window.scrollTo({top:0,behavior:'smooth'})">
-            <img
-                class="logo-img"
-                src="https://firebasestorage.googleapis.com/v0/b/waveride-bike-rental-service.firebasestorage.app/o/136034-removebg-preview.png?alt=media&token=8f360cff-b989-4a26-89c4-5ba8b4e651e9"
-                alt="TIU × The Biriyani Canteen"
-                onerror="this.style.display='none'"
-            />
         </div>
         <div class="nav-dropdown" id="navMenu">
             <span class="nav-item" style="background:var(--bg); pointer-events:none;">🏠 Home</span>
@@ -569,10 +673,23 @@
         </div>
     </div>
 
-    <a href="checkout.html" class="cart-btn" id="cartBtn">
-        🛒 Cart
-        <span class="cart-badge" id="cartBadge">0</span>
-    </a>
+    <!-- CENTER: logo -->
+    <div class="logo-wrap" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+        <img
+            class="logo-img"
+            src="https://firebasestorage.googleapis.com/v0/b/waveride-bike-rental-service.firebasestorage.app/o/136034-removebg-preview.png?alt=media&token=8f360cff-b989-4a26-89c4-5ba8b4e651e9"
+            alt="TIU × The Biriyani Canteen"
+            onerror="this.style.display='none'"
+        />
+    </div>
+
+    <!-- RIGHT: cart -->
+    <div class="nav-right">
+        <a href="checkout.html" class="cart-btn" id="cartBtn">
+            🛒 Cart
+            <span class="cart-badge" id="cartBadge">0</span>
+        </a>
+    </div>
 </nav>
 
 <!-- STORE CLOSED BANNER -->
@@ -580,13 +697,8 @@
     🔒 &nbsp; We're currently closed. New orders are not being accepted right now. Check back soon!
 </div>
 
-<!-- MAIN CONTENT -->
-<div class="container" id="mainContainer">
-    <div class="loading-state">
-        <div class="spinner"></div>
-        <p>Loading delicious food…</p>
-    </div>
-</div>
+<!-- MAIN CONTENT — skeleton injected immediately by JS below -->
+<div class="container" id="mainContainer"></div>
 
 <!-- BOTTOM CART BAR -->
 <div class="cart-bar" id="cartBar">
@@ -645,6 +757,56 @@
     const $ = id => document.getElementById(id);
     const esc = t => { if (!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; };
 
+    /* ─────────────────────────────────────────────
+       PAGE-LEVEL SKELETON
+       Called once at boot — shows fake category
+       sections with shimmer cards while Firebase
+       data is in flight. renderMenu() replaces it.
+    ───────────────────────────────────────────── */
+    function renderSkeleton() {
+        const SECTIONS = 3;
+        const CARDS_PER_SECTION = [4, 4, 4]; // cards shown per fake section
+        const container = $('mainContainer');
+        let html = '';
+
+        for (let s = 0; s < SECTIONS; s++) {
+            const count = CARDS_PER_SECTION[s] || 4;
+            html += `
+            <div class="sk-section">
+                <div class="sk-header">
+                    <div class="sk sk-emoji"></div>
+                    <div class="sk-htext">
+                        <div class="sk sk-title"></div>
+                        <div class="sk sk-sub"></div>
+                    </div>
+                </div>
+                <div class="food-grid">`;
+
+            for (let c = 0; c < count; c++) {
+                html += `
+                    <div class="sk-card">
+                        <div class="sk sk-img"></div>
+                        <div class="sk-body">
+                            <div class="sk sk-name"></div>
+                            <div class="sk sk-name2"></div>
+                            <div class="sk sk-desc"></div>
+                            <div class="sk sk-desc2"></div>
+                            <div class="sk sk-badge"></div>
+                            <div class="sk-footer">
+                                <div class="sk sk-price"></div>
+                                <div class="sk sk-btn"></div>
+                            </div>
+                        </div>
+                    </div>`;
+            }
+            html += `</div></div>`;
+        }
+        container.innerHTML = html;
+    }
+
+    /* ─────────────────────────────────────────────
+       TOAST
+    ───────────────────────────────────────────── */
     function showToast(msg, type = 'success') {
         const t = $('toast');
         $('toastIcon').textContent = type === 'success' ? '✅' : '❌';
@@ -654,12 +816,18 @@
         t._timer = setTimeout(() => t.classList.remove('show'), 3000);
     }
 
+    /* ─────────────────────────────────────────────
+       GUEST ID  (persisted to localStorage)
+    ───────────────────────────────────────────── */
     function initGuestId() {
         let id = localStorage.getItem('tiutbc_guestId');
         if (!id) { id = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`; localStorage.setItem('tiutbc_guestId', id); }
         guestId = id;
     }
 
+    /* ─────────────────────────────────────────────
+       STORE STATUS
+    ───────────────────────────────────────────── */
     function watchStoreStatus() {
         onValue(ref(db, 'tiutbc/storeStatus'), snap => {
             storeIsOpen = (snap.val() || {}).isOpen !== false;
@@ -669,6 +837,9 @@
         });
     }
 
+    /* ─────────────────────────────────────────────
+       AUTH
+    ───────────────────────────────────────────── */
     onAuthStateChanged(auth, async user => {
         const wasGuest = !isAuth;
         currentUser = user; isAuth = !!user;
@@ -686,7 +857,7 @@
         const show = el => el && el.classList.remove('hidden');
         const hide = el => el && el.classList.add('hidden');
         if (isAuth) { show($('ordersLink')); show($('profileLink')); show($('logoutLink')); hide($('loginLink')); }
-        else { hide($('ordersLink')); hide($('profileLink')); hide($('logoutLink')); show($('loginLink')); }
+        else        { hide($('ordersLink')); hide($('profileLink')); hide($('logoutLink')); show($('loginLink')); }
     }
 
     function attachCartSync(uid) {
@@ -714,17 +885,25 @@
         } catch (e) { console.warn('Guest cart migration error:', e); }
     }
 
+    /* ─────────────────────────────────────────────
+       FOOD DATA
+    ───────────────────────────────────────────── */
     function loadFoodItems() {
         onValue(ref(db, 'tiutbc/foodItems'), snap => { allFoodData = snap.val() || {}; renderMenu(); });
     }
 
+    /* ─────────────────────────────────────────────
+       RENDER MENU  (replaces page skeleton)
+    ───────────────────────────────────────────── */
     function renderMenu() {
         const container = $('mainContainer');
-        if (!Object.keys(allFoodData).length) return;
+        if (!Object.keys(allFoodData).length) return; // keep skeleton until data arrives
+
         let html = '';
         if (!isAuth) {
             html += `<div class="login-banner"><div><h3>👋 Welcome, Guest!</h3><p>Browse our menu and login to place your order</p></div><a href="login.html" class="login-btn">Login / Sign Up</a></div>`;
         }
+
         let anyRendered = false;
         CATEGORY_ORDER.forEach(cat => {
             const catData = allFoodData[cat.key];
@@ -738,32 +917,83 @@
             });
             if (!activeItems.length) return;
             anyRendered = true;
-            html += `<div class="category-section"><div class="category-header"><div class="category-emoji">${emoji}</div><div><div class="category-title">${esc(cat.display)}</div><div class="category-count">${activeItems.length} item${activeItems.length !== 1 ? 's' : ''}</div></div></div><div class="food-grid">${activeItems.map(item => renderCard(item)).join('')}</div></div>`;
+            html += `<div class="category-section">
+                <div class="category-header">
+                    <div class="category-emoji">${emoji}</div>
+                    <div>
+                        <div class="category-title">${esc(cat.display)}</div>
+                        <div class="category-count">${activeItems.length} item${activeItems.length !== 1 ? 's' : ''}</div>
+                    </div>
+                </div>
+                <div class="food-grid">${activeItems.map(item => renderCard(item)).join('')}</div>
+            </div>`;
         });
-        if (!anyRendered) { html += `<div class="empty-state"><div class="big-emoji">🍽️</div><h3>Menu Coming Soon</h3><p>We're preparing something delicious. Check back soon!</p></div>`; }
+
+        if (!anyRendered) {
+            html += `<div class="empty-state"><div class="big-emoji">🍽️</div><h3>Menu Coming Soon</h3><p>We're preparing something delicious. Check back soon!</p></div>`;
+        }
         container.innerHTML = html;
     }
 
+    /* ─────────────────────────────────────────────
+       RENDER CARD — per-image skeleton overlay
+       The .img-skeleton-overlay shimmer sits on top
+       of the image; onload adds .img-ready to the
+       wrapper which CSS-transitions the overlay to
+       opacity:0, revealing the loaded image.
+    ───────────────────────────────────────────── */
     function renderCard(item) {
-        const qty = getQty(item.id);
+        const qty        = getQty(item.id);
         const isDisabled = !storeIsOpen;
+
         const imgHTML = item.imageurl
-            ? `<img src="${esc(item.imageurl)}" alt="${esc(item.name)}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><div class="food-emoji-fallback" style="display:none;">${item.emoji || '🍽️'}</div>`
+            ? `<div class="img-skeleton-overlay"></div>
+               <img
+                 src="${esc(item.imageurl)}"
+                 alt="${esc(item.name)}"
+                 loading="lazy"
+                 onload="this.parentElement.classList.add('img-ready')"
+                 onerror="this.parentElement.classList.add('img-ready');this.style.display='none';this.nextElementSibling.style.display='flex';">
+               <div class="food-emoji-fallback" style="display:none;">${item.emoji || '🍽️'}</div>`
             : `<div class="food-emoji-fallback">${item.emoji || '🍽️'}</div>`;
+
         const btnHTML = isDisabled
             ? `<button class="add-btn" disabled>Closed</button>`
             : qty > 0
                 ? `<div class="qty-ctrl"><button class="qty-btn" onclick="changeQty('${esc(item.id)}', -1, event)">−</button><span class="qty-num">${qty}</span><button class="qty-btn" onclick="changeQty('${esc(item.id)}', 1, event)">+</button></div>`
                 : `<button class="add-btn" onclick="addItem('${esc(item.id)}','${esc(item.name)}',${item.price || 0},'${esc(item.emoji || '')}','${esc(item._catKey)}', event)">Add</button>`;
-        return `<div class="food-card" data-id="${esc(item.id)}" data-name="${esc(item.name)}" data-price="${item.price || 0}" data-emoji="${esc(item.emoji || '')}" data-cat="${esc(item._catKey)}"><div class="food-img-wrap">${imgHTML}<div class="veg-badge"><div class="veg-dot"></div></div></div><div class="food-body"><div class="food-name">${esc(item.name)}</div>${item.description ? `<div class="food-desc">${esc(item.description)}</div>` : ''}<div class="food-rating">★ 4.5</div><div class="food-footer"><div class="food-price">₹${item.price || 0}</div>${btnHTML}</div></div></div>`;
+
+        return `<div class="food-card"
+            data-id="${esc(item.id)}"
+            data-name="${esc(item.name)}"
+            data-price="${item.price || 0}"
+            data-emoji="${esc(item.emoji || '')}"
+            data-cat="${esc(item._catKey)}">
+            <div class="food-img-wrap">
+                ${imgHTML}
+                <div class="veg-badge"><div class="veg-dot"></div></div>
+            </div>
+            <div class="food-body">
+                <div class="food-name">${esc(item.name)}</div>
+                ${item.description ? `<div class="food-desc">${esc(item.description)}</div>` : ''}
+                <div class="food-rating">★ 4.5</div>
+                <div class="food-footer">
+                    <div class="food-price">₹${item.price || 0}</div>
+                    ${btnHTML}
+                </div>
+            </div>
+        </div>`;
     }
 
     function getQty(id) { const found = cart.find(i => i.id === id); return found ? found.quantity : 0; }
 
+    /* ─────────────────────────────────────────────
+       CART ACTIONS
+    ───────────────────────────────────────────── */
     window.addItem = function(id, name, price, emoji, category, e) {
         if (e) e.stopPropagation();
         if (!storeIsOpen) { showToast('Store is currently closed', 'error'); return; }
-        const ts = Date.now();
+        const ts  = Date.now();
         const idx = cart.findIndex(i => i.id === id);
         if (idx > -1) { cart[idx].quantity++; cart[idx].lastUpdated = ts; }
         else cart.push({ id, name, price: Number(price), emoji, category, quantity: 1, timestamp: ts, lastUpdated: ts });
@@ -783,10 +1013,10 @@
     function updateCardBtn(id) {
         const card = document.querySelector(`[data-id="${CSS.escape(id)}"]`);
         if (!card) return;
-        const qty = getQty(id);
+        const qty      = getQty(id);
         const { name, price, emoji, cat } = card.dataset;
-        const footer = card.querySelector('.food-footer');
-        const priceEl = card.querySelector('.food-price');
+        const footer   = card.querySelector('.food-footer');
+        const priceEl  = card.querySelector('.food-price');
         const disabled = !storeIsOpen;
         const btnHTML = disabled
             ? `<button class="add-btn" disabled>Closed</button>`
@@ -796,6 +1026,9 @@
         footer.innerHTML = priceEl.outerHTML + btnHTML;
     }
 
+    /* ─────────────────────────────────────────────
+       PERSISTENCE  (Firebase + localStorage)
+    ───────────────────────────────────────────── */
     function syncCartToDB() {
         const uid = currentUser ? currentUser.uid : guestId;
         if (!uid) return;
@@ -809,6 +1042,9 @@
     function saveCartLocal() { try { localStorage.setItem('tiutbc_cart', JSON.stringify(cart)); } catch (_) {} }
     function loadCartLocal() { try { const raw = localStorage.getItem('tiutbc_cart'); if (raw) cart = JSON.parse(raw); } catch (_) { cart = []; } }
 
+    /* ─────────────────────────────────────────────
+       CART UI
+    ───────────────────────────────────────────── */
     function updateCartUI() {
         const totalQty = cart.reduce((s, i) => s + i.quantity, 0);
         const totalAmt = cart.reduce((s, i) => s + i.price * i.quantity, 0);
@@ -820,9 +1056,12 @@
         else bar.classList.remove('visible');
     }
 
+    /* ─────────────────────────────────────────────
+       NAV TOGGLE
+    ───────────────────────────────────────────── */
     window.toggleMenu = function() { $('navMenu').classList.toggle('active'); };
     document.addEventListener('click', e => {
-        const menu = $('navMenu'); const ham = $('hamburger');
+        const menu = $('navMenu'), ham = $('hamburger');
         if (menu && ham && !menu.contains(e.target) && !ham.contains(e.target)) menu.classList.remove('active');
     });
 
@@ -836,7 +1075,17 @@
         }).catch(() => showToast('Logout failed', 'error'));
     };
 
-    initGuestId(); loadCartLocal(); updateCartUI(); watchStoreStatus(); loadFoodItems();
+    /* ─────────────────────────────────────────────
+       BOOT ORDER
+       renderSkeleton() runs synchronously before any
+       network call so the user sees content instantly.
+    ───────────────────────────────────────────── */
+    initGuestId();
+    loadCartLocal();
+    updateCartUI();
+    renderSkeleton();    // ← instant shimmer grid, no blank screen
+    watchStoreStatus();
+    loadFoodItems();
 </script>
 </body>
 </html>
