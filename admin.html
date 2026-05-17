@@ -658,7 +658,6 @@
 
         const $ = id => document.getElementById(id);
 
-        // FIX: escapeHtml was missing — defined here to prevent crashes
         function escapeHtml(text) {
             if (!text) return '';
             const div = document.createElement('div');
@@ -698,7 +697,7 @@
                 }
                 isAdmin = true;
                 loadUsers();
-                loadCarts();
+                loadCarts();       // ← now listens to root 'carts/' path
                 loadOrders();
                 loadStoreStatus();
                 loadFoodItems();
@@ -800,12 +799,14 @@
         window.closeUserModal = function() { $('userDetailsModal').classList.remove('active'); };
 
         // ========== CARTS ==========
+        // FIX: Listen on root 'carts/' — that is where the app writes cart data.
+        // The admin panel was previously listening on 'tiutbc/carts' which does not exist.
         function loadCarts() {
-            const cartsRef = dbRef(db, 'tiutbc/carts');
+            const cartsRef = dbRef(db, 'carts');   // ← FIXED: was 'tiutbc/carts'
             const callback = snapshot => {
                 allCarts = snapshot.val() || {};
-                displayCarts();
                 updateCartStats();
+                displayCarts();
             };
             onValue(cartsRef, callback);
             dbListeners.push({ ref: cartsRef, callback });
@@ -814,20 +815,23 @@
         async function displayCarts() {
             const container = $('cartsContainer');
             const userIds = Object.keys(allCarts);
+
             if (!userIds.length) {
                 container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🛒</div><div class="empty-state-text">No active carts</div></div>';
                 return;
             }
+
             container.innerHTML = '<div class="empty-state"><div class="loading-spinner"></div><div class="empty-state-text">Loading cart details...</div></div>';
 
-            // Helper: get latest timestamp across all items in a cart
+            // Helper: get latest timestamp across all valid items in a cart
             const getLatest = cart => {
-                const vals = Object.values(cart);
-                if (!vals.length) return 0;
-                return Math.max(...vals.map(i => i.lastUpdated || i.timestamp || 0));
+                const vals = Object.entries(cart)
+                    .filter(([k]) => k !== 'null')   // ← FIXED: skip corrupted "null" string keys
+                    .map(([, i]) => i.lastUpdated || i.timestamp || 0);
+                return vals.length ? Math.max(...vals) : 0;
             };
 
-            // Fetch any missing user details
+            // Fetch any missing user details in parallel
             await Promise.all(userIds.map(async uid => {
                 if (allUsers[uid]) return;
                 if (uid.startsWith('guest_')) {
@@ -837,7 +841,7 @@
                 try {
                     const snap = await get(dbRef(db, `tiutbc/users/${uid}/allDetails`));
                     if (snap.exists()) { allUsers[uid] = snap.val(); return; }
-                } catch { /* permission denied or network error */ }
+                } catch { /* permission denied or network error — fall through */ }
                 allUsers[uid] = { name: 'Unknown User', email: 'N/A', phoneNumber: 'N/A' };
             }));
 
@@ -848,7 +852,8 @@
             sorted.forEach(uid => {
                 try {
                     const lastUpdated = getLatest(allCarts[uid]);
-                    container.appendChild(createCartCard(uid, allCarts[uid], allUsers[uid], lastUpdated));
+                    const card = createCartCard(uid, allCarts[uid], allUsers[uid], lastUpdated);
+                    if (card) container.appendChild(card);
                 } catch (e) {
                     console.error('Error rendering cart for', uid, e);
                 }
@@ -860,13 +865,22 @@
         }
 
         function createCartCard(userId, cartItems, user, lastUpdated) {
+            // Guard: skip if cartItems is not an object or has no valid entries
+            if (!cartItems || typeof cartItems !== 'object') return null;
+
             const card = document.createElement('div');
             card.className = 'cart-card';
             const name = user?.name || 'Unknown User';
             const email = user?.email || 'N/A';
             const phone = user?.phoneNumber || 'N/A';
             const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-            const items = Object.entries(cartItems).map(([id, item]) => ({ id, ...item }));
+
+            // FIX: filter out "null" string keys (corrupted entries from the app)
+            const items = Object.entries(cartItems)
+                .filter(([id]) => id !== 'null')
+                .map(([id, item]) => ({ id, ...item }));
+
+            if (!items.length) return null; // skip empty/corrupted carts
 
             // Format last updated time
             let lastUpdatedStr = 'N/A';
@@ -876,7 +890,6 @@
                 const diffMs = now - d;
                 const diffMins = Math.floor(diffMs / 60000);
                 const diffHrs = Math.floor(diffMins / 60);
-                const diffDays = Math.floor(diffHrs / 24);
                 if (diffMins < 1) lastUpdatedStr = 'Just now';
                 else if (diffMins < 60) lastUpdatedStr = `${diffMins}m ago`;
                 else if (diffHrs < 24) lastUpdatedStr = `${diffHrs}h ${diffMins % 60}m ago`;
@@ -886,22 +899,26 @@
             let html = '';
             let subtotal = 0;
             items.forEach(item => {
-                const total = item.price * item.quantity;
+                const price = parseFloat(item.price) || 0;
+                const qty = parseInt(item.quantity) || 0;
+                const total = price * qty;
                 subtotal += total;
                 html += `
                     <div class="cart-item">
                         <div class="cart-item-info">
                             <span class="cart-item-emoji">${escapeHtml(item.emoji || '🍽️')}</span>
                             <div class="cart-item-details">
-                                <div class="cart-item-name">${escapeHtml(item.name)}</div>
-                                <div class="cart-item-qty">x${item.quantity}</div>
+                                <div class="cart-item-name">${escapeHtml(item.name || 'Unknown Item')}</div>
+                                <div class="cart-item-qty">x${qty}</div>
                             </div>
                         </div>
                         <div class="cart-item-price">₹${total.toFixed(2)}</div>
                     </div>`;
             });
+
             const fee = subtotal >= 200 ? 0 : 30;
             const total = subtotal + fee;
+
             card.innerHTML = `
                 <div class="cart-header">
                     <div class="cart-user-info">
@@ -926,7 +943,14 @@
         function updateCartStats() {
             let val = 0, cnt = 0;
             Object.values(allCarts).forEach(cart => {
-                Object.values(cart).forEach(item => { cnt += item.quantity || 0; val += item.price * (item.quantity || 0); });
+                // FIX: skip "null" string keys when computing stats
+                Object.entries(cart).forEach(([k, item]) => {
+                    if (k === 'null' || !item || typeof item !== 'object') return;
+                    const qty = parseInt(item.quantity) || 0;
+                    const price = parseFloat(item.price) || 0;
+                    cnt += qty;
+                    val += price * qty;
+                });
             });
             $('totalCarts').textContent = Object.keys(allCarts).length;
             $('totalCartValue').textContent = '₹' + val.toFixed(2);
@@ -987,7 +1011,6 @@
                 </div>`;
             }
 
-            // Helper: build the assignment panel HTML and schedule partner load
             const buildAssignmentPanel = (showAutoFirst) => {
                 setTimeout(() => loadPartnersForAssignment(orderId), 100);
                 return `
@@ -1014,7 +1037,6 @@
                     <button class="action-btn btn-reject" onclick="updateOrderStatus('${orderId}', 'rejected')">❌ Reject Order</button>
                 </div>`;
             } else if (status === 'confirmed') {
-                // No assignment here — just move to cooking
                 actions = `${ctaButtons}<div class="order-actions">
                     <button class="action-btn btn-cooking" onclick="updateOrderStatus('${orderId}', 'cooking')">🍳 Start Cooking</button>
                 </div>`;
@@ -1027,8 +1049,6 @@
                     <button class="action-btn btn-delivery" onclick="updateOrderStatus('${orderId}', 'out-for-delivery')">🚚 Out for Delivery</button>
                 </div>`;
             } else if (status === 'out-for-delivery') {
-                // Assignment panel only shows after admin marks Out for Delivery.
-                // Auto-assign button is shown prominently first, manual partner list below.
                 actions = `${ctaButtons}
                 ${assignedBadge}
                 ${buildAssignmentPanel(true)}
@@ -1236,7 +1256,6 @@
                 html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.5rem;margin-bottom:3rem;">';
                 online.forEach(p => {
                     const activeOrders = getPartnerActiveOrders(p.uid);
-                    // FIX: use 'vehicle' field (not vehicleType/vehicleNumber which don't exist)
                     html += `<div class="partner-card online">
                         <div class="partner-header">
                             <div class="partner-status-dot online"></div>
@@ -1327,7 +1346,6 @@
             if (!partner) { showNotification('Partner not found', true); return; }
             if (!confirm(`Assign this order to ${partner.name}?`)) return;
             try {
-                // Only update assignedTo — do NOT change status, admin controls that separately
                 await update(dbRef(db, `tiutbc/orders/${orderId}/orderDetails`), {
                     assignedTo: partnerId,
                     assignedAt: Date.now(),
@@ -1348,7 +1366,6 @@
                 if (!available.length) { showNotification('No online delivery partners available', true); return; }
                 const best = available[0];
                 if (!confirm(`Auto-assign to ${best.name}?\n\nCurrently has ${best.activeOrders} active order(s).`)) return;
-                // Only update assignedTo — do NOT change status, admin controls that separately
                 await update(dbRef(db, `tiutbc/orders/${orderId}/orderDetails`), {
                     assignedTo: best.uid,
                     assignedAt: Date.now(),
@@ -1360,7 +1377,6 @@
         };
 
         // ========== STORE CONTROL ==========
-        // FIX: Both read and write now use 'tiutbc/storeStatus' consistently
         function loadStoreStatus() {
             const storeRef = dbRef(db, 'tiutbc/storeStatus');
             const callback = snapshot => {
@@ -1401,7 +1417,6 @@
             const btn = $('storeToggleBtn');
             btn.disabled = true;
             try {
-                // FIX: Read AND write from/to 'tiutbc/storeStatus' (was reading from root 'storeStatus')
                 const snap = await get(dbRef(db, 'tiutbc/storeStatus'));
                 const curr = snap.val() || { isOpen: false };
                 await set(dbRef(db, 'tiutbc/storeStatus'), { isOpen: !curr.isOpen, updatedAt: new Date().toISOString() });
@@ -1428,7 +1443,10 @@
             catNames.forEach(catName => {
                 const catData = categories[catName];
                 const emoji = catData.emoji || '🍽️';
-                const items = Object.keys(catData || {}).filter(k => k !== 'emoji').reduce((o, k) => { o[k] = catData[k]; return o; }, {});
+                // FIX: also filter out "null" key in food items (same corruption pattern)
+                const items = Object.keys(catData || {})
+                    .filter(k => k !== 'emoji' && k !== 'null')
+                    .reduce((o, k) => { o[k] = catData[k]; return o; }, {});
                 const sec = document.createElement('div');
                 sec.className = 'category-section';
                 const safeId = `cat-${catName.replace(/[^a-zA-Z0-9]/g, '-')}`;
@@ -1454,7 +1472,6 @@
                 `<img src="${item.imageurl}" alt="${escapeHtml(item.name)}" class="item-image" onerror="this.style.display='none'">` :
                 `<div class="item-emoji-display">${escapeHtml(item.emoji || '🍽️')}</div>`;
             const active = item.isActive !== false;
-            // FIX: use data attributes to avoid quote issues in onclick
             const safeItemId = escapeHtml(itemId);
             const safeCatName = escapeHtml(catName);
             card.innerHTML = `
@@ -1592,7 +1609,6 @@
         };
 
         // ========== UI ==========
-        // FIX: switchTab now uses data-tab attribute for reliable matching instead of textContent
         window.switchTab = function(tabName) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
