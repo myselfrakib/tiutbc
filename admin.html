@@ -346,6 +346,23 @@
             .stat-card { padding: 1.2rem; }
             .stat-value { font-size: 1.8rem; }
         }
+
+        /* Restrictions Panel Styles */
+        .restriction-container { display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2rem; }
+        .restriction-card { background: white; border-radius: 15px; padding: 2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border-top: 4px solid #667eea; }
+        .restriction-card-header { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1.2rem; border-bottom: 2px solid #ecf0f1; }
+        .restriction-card-icon { font-size: 2rem; background: #f0f4ff; width: 55px; height: 55px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .restriction-card-title { font-size: 1.3rem; font-weight: 700; color: #2c3e50; margin-bottom: 0.3rem; }
+        .restriction-card-desc { font-size: 0.9rem; color: #7f8c8d; line-height: 1.4; }
+        .form-help { font-size: 0.8rem; color: #7f8c8d; margin-top: 0.4rem; font-style: italic; }
+        .restriction-actions-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #ecf0f1; }
+        .toggle-control { display: flex; align-items: center; gap: 0.6rem; cursor: pointer; font-size: 0.95rem; color: #2c3e50; }
+        .toggle-control input[type="checkbox"] { width: 20px; height: 20px; accent-color: #667eea; cursor: pointer; }
+        .mini-btn-group { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+        .btn-mini { background: #f0f4ff; color: #667eea; border: 1px solid #c7d2fe; padding: 0.5rem 0.9rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; }
+        .btn-mini:hover { background: #667eea; color: white; }
+        .btn-mini-reset { background: #fff5f5; color: #e74c3c; border-color: #fecaca; }
+        .btn-mini-reset:hover { background: #e74c3c; color: white; }
     </style>
 </head>
 <body>
@@ -371,6 +388,7 @@
         <div class="mobile-menu-item" data-tab="reviews" onclick="switchTab('reviews')">⭐ Reviews</div>
         <div class="mobile-menu-item" data-tab="partners" onclick="switchTab('partners')">🏍️ Partners</div>
         <div class="mobile-menu-item" data-tab="store" onclick="switchTab('store')">🍛 Store Control</div>
+        <div class="mobile-menu-item" data-tab="restrictions" onclick="switchTab('restrictions')">🛡️ Restrictions</div>
         <div class="mobile-menu-item" data-tab="food" onclick="switchTab('food')">🍛 Manage Menu</div>
     </div>
 
@@ -384,6 +402,7 @@
             <button class="tab" data-tab="reviews" onclick="switchTab('reviews')">⭐ Reviews</button>
             <button class="tab" data-tab="partners" onclick="switchTab('partners')">🏍️ Partners</button>
             <button class="tab" data-tab="store" onclick="switchTab('store')">🍛 Store Control</button>
+            <button class="tab" data-tab="restrictions" onclick="switchTab('restrictions')">🛡️ Restrictions</button>
             <button class="tab" data-tab="food" onclick="switchTab('food')">🍛 Manage Menu</button>
         </div>
 
@@ -489,6 +508,126 @@
                     <button class="store-toggle-btn" id="storeToggleBtn" onclick="toggleStoreStatus()" disabled>
                         <span id="toggleBtnIcon">⏳</span>
                         <span id="toggleBtnText">Loading...</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESTRICTIONS TAB -->
+        <div id="restrictionsTab" class="tab-content">
+            <h2 class="section-title">🛡️ Ordering Restrictions & Controls</h2>
+            
+            <div class="restriction-container">
+                <!-- Geo-fencing & Campus Location -->
+                <div class="restriction-card">
+                    <div class="restriction-card-header">
+                        <div class="restriction-card-icon">📍</div>
+                        <div>
+                            <div class="restriction-card-title">Campus Geofencing & Location Restriction</div>
+                            <div class="restriction-card-desc">Strictly restrict orders to Techno India University campus coordinates and radius.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Campus Latitude *</label>
+                            <input type="number" step="any" id="restrictionLat" value="22.576307" placeholder="22.576307">
+                            <span class="form-help">Target latitude of university center</span>
+                        </div>
+                        <div class="form-group">
+                            <label>Campus Longitude *</label>
+                            <input type="number" step="any" id="restrictionLng" value="88.428045" placeholder="88.428045">
+                            <span class="form-help">Target longitude of university center</span>
+                        </div>
+                        <div class="form-group">
+                            <label>Orderable Radius (Meters) *</label>
+                            <input type="number" min="10" step="10" id="restrictionRadius" value="200" placeholder="200">
+                            <span class="form-help">Maximum distance allowed (default 200m)</span>
+                        </div>
+                    </div>
+
+                    <div class="restriction-actions-bar">
+                        <label class="toggle-control">
+                            <input type="checkbox" id="restrictionGeoEnabled" checked>
+                            <span class="toggle-text"><strong>Enable Strict Geofence Restriction</strong> (Users outside radius cannot place orders)</span>
+                        </label>
+                        <div class="mini-btn-group">
+                            <button type="button" class="btn-mini" onclick="useCurrentLocationAsCenter()">📍 Use My GPS</button>
+                            <button type="button" class="btn-mini" onclick="viewCenterOnMap()">🗺️ Open in Maps</button>
+                            <button type="button" class="btn-mini btn-mini-reset" onclick="resetGeoToDefault()">🔄 Reset Defaults</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Anti-Spam Rate Limit -->
+                <div class="restriction-card">
+                    <div class="restriction-card-header">
+                        <div class="restriction-card-icon">🚫</div>
+                        <div>
+                            <div class="restriction-card-title">Anti-Spam & Order Frequency Limit</div>
+                            <div class="restriction-card-desc">Prevent spam and unauthorized flood orders by restricting orders per account within an hourly window.</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Max Orders Allowed Per Account *</label>
+                            <input type="number" min="1" max="100" id="restrictionMaxOrders" value="2" placeholder="2">
+                            <span class="form-help">Max orders one account can submit (default 2)</span>
+                        </div>
+                        <div class="form-group">
+                            <label>Time Window (Minutes) *</label>
+                            <input type="number" min="5" max="1440" id="restrictionWindowMins" value="60" placeholder="60">
+                            <span class="form-help">Time window in minutes (60 mins = 1 hour)</span>
+                        </div>
+                    </div>
+
+                    <div class="restriction-actions-bar">
+                        <label class="toggle-control">
+                            <input type="checkbox" id="restrictionRateLimitEnabled" checked>
+                            <span class="toggle-text"><strong>Enable Anti-Spam Rate Limit</strong> (Block ordering if limit is exceeded within time window)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Partial Advance Payment -->
+                <div class="restriction-card">
+                    <div class="restriction-card-header">
+                        <div class="restriction-card-icon">💳</div>
+                        <div>
+                            <div class="restriction-card-title">Partial Advance Payment Requirement</div>
+                            <div class="restriction-card-desc">Enforce mandatory partial advance payment to confirm and place orders.</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Partial Payment Mode *</label>
+                            <select id="restrictionPaymentMode">
+                                <option value="percentage">Percentage (%) of Total Amount</option>
+                                <option value="fixed">Fixed Amount (₹)</option>
+                            </select>
+                            <span class="form-help">Calculate advance as % or fixed rupee amount</span>
+                        </div>
+                        <div class="form-group">
+                            <label>Advance Value *</label>
+                            <input type="number" min="1" step="1" id="restrictionPartialValue" value="10" placeholder="10">
+                            <span class="form-help">E.g., 10 for 10% advance payment</span>
+                        </div>
+                    </div>
+
+                    <div class="restriction-actions-bar">
+                        <label class="toggle-control">
+                            <input type="checkbox" id="restrictionPartialEnabled" checked>
+                            <span class="toggle-text"><strong>Enable Partial Advance Payment Requirement</strong> (Mandatory partial payment to confirm order)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Save Button -->
+                <div style="margin-top: 1.5rem; text-align: center;">
+                    <button type="button" class="btn-primary" id="saveRestrictionsBtn" onclick="saveRestrictions()" style="max-width: 400px; margin: 0 auto; padding: 1.2rem; font-size: 1.1rem;">
+                        💾 Save Restriction Settings
                     </button>
                 </div>
             </div>
@@ -703,6 +842,7 @@
                 loadFoodItems();
                 loadReviews();
                 loadDeliveryPartners();
+                loadRestrictions();
             } catch (err) { showNotification('Error verifying admin: ' + err.message, true); }
         });
 
@@ -1089,6 +1229,15 @@
                         <span>₹${(orderDetails.deliveryFee || 0).toFixed(2)}</span>
                     </div>
                     <div class="total-row grand-total"><span>Total</span><span>₹${(orderDetails.total || 0).toFixed(2)}</span></div>
+                    ${orderDetails.advancePaid ? `
+                    <div class="total-row" style="color:#27ae60;font-weight:700;"><span>Advance Paid Online (${orderDetails.partialPercentage ? orderDetails.partialPercentage + '%' : 'Advance'})</span><span>₹${parseFloat(orderDetails.advancePaid).toFixed(2)}</span></div>
+                    <div class="total-row" style="color:#e74c3c;font-weight:700;"><span>Remaining Due on Delivery</span><span>₹${parseFloat(orderDetails.remainingDue || 0).toFixed(2)}</span></div>
+                    ` : ''}
+                    ${orderDetails.userCoordinates ? `
+                    <div class="total-row" style="color:#3498db;font-size:0.85rem;margin-top:0.4rem;border-top:1px dashed #ccc;padding-top:0.4rem;">
+                        <span>📍 Customer GPS Distance</span>
+                        <span>~${orderDetails.userCoordinates.distanceMeters || 0}m from TIU Center</span>
+                    </div>` : ''}
                 </div>
                 ${actions}`;
             return card;
@@ -1413,6 +1562,132 @@
                 await set(dbRef(db, 'tiutbc/storeStatus'), { isOpen: !curr.isOpen, updatedAt: new Date().toISOString() });
                 showNotification(`Store ${!curr.isOpen ? 'opened' : 'closed'} successfully`);
             } catch (error) { showNotification('Error: ' + error.message, true); btn.disabled = false; }
+        };
+
+        // ========== RESTRICTIONS & CONTROLS ==========
+        function loadRestrictions() {
+            const rRef = dbRef(db, 'tiutbc/storeSettings/restrictions');
+            const callback = snapshot => {
+                const data = snapshot.val() || {};
+                const geo = data.geo || {};
+                const limits = data.orderLimits || {};
+                const partial = data.partialPayment || {};
+
+                if ($('restrictionLat')) {
+                    $('restrictionLat').value = geo.latitude !== undefined ? geo.latitude : 22.576307;
+                    $('restrictionLng').value = geo.longitude !== undefined ? geo.longitude : 88.428045;
+                    $('restrictionRadius').value = geo.radiusMeters !== undefined ? geo.radiusMeters : 200;
+                    $('restrictionGeoEnabled').checked = geo.enabled !== false;
+
+                    $('restrictionMaxOrders').value = limits.maxOrdersPerHour !== undefined ? limits.maxOrdersPerHour : 2;
+                    $('restrictionWindowMins').value = limits.windowMinutes !== undefined ? limits.windowMinutes : 60;
+                    $('restrictionRateLimitEnabled').checked = limits.enabled !== false;
+
+                    $('restrictionPaymentMode').value = partial.type || 'percentage';
+                    $('restrictionPartialValue').value = partial.value !== undefined ? partial.value : 10;
+                    $('restrictionPartialEnabled').checked = partial.enabled !== false;
+                }
+            };
+            onValue(rRef, callback);
+            dbListeners.push({ ref: rRef, callback });
+        }
+
+        window.saveRestrictions = async function() {
+            if (!isAdmin) { showNotification('Unauthorized', true); return; }
+            const btn = $('saveRestrictionsBtn');
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+
+            try {
+                const lat = parseFloat($('restrictionLat').value);
+                const lng = parseFloat($('restrictionLng').value);
+                const radius = parseFloat($('restrictionRadius').value);
+                const geoEnabled = $('restrictionGeoEnabled').checked;
+
+                const maxOrders = parseInt($('restrictionMaxOrders').value) || 2;
+                const windowMins = parseInt($('restrictionWindowMins').value) || 60;
+                const limitsEnabled = $('restrictionRateLimitEnabled').checked;
+
+                const paymentMode = $('restrictionPaymentMode').value;
+                const partialValue = parseFloat($('restrictionPartialValue').value) || 10;
+                const partialEnabled = $('restrictionPartialEnabled').checked;
+
+                if (isNaN(lat) || isNaN(lng) || isNaN(radius) || radius <= 0) {
+                    showNotification('Please enter valid coordinates and radius', true);
+                    btn.disabled = false;
+                    btn.textContent = '💾 Save Restriction Settings';
+                    return;
+                }
+
+                const restrictionsData = {
+                    geo: {
+                        latitude: lat,
+                        longitude: lng,
+                        radiusMeters: radius,
+                        enabled: geoEnabled
+                    },
+                    orderLimits: {
+                        maxOrdersPerHour: maxOrders,
+                        windowMinutes: windowMins,
+                        enabled: limitsEnabled
+                    },
+                    partialPayment: {
+                        type: paymentMode,
+                        value: partialValue,
+                        enabled: partialEnabled
+                    },
+                    updatedAt: new Date().toISOString(),
+                    updatedBy: auth.currentUser?.email || auth.currentUser?.uid || 'admin'
+                };
+
+                await set(dbRef(db, 'tiutbc/storeSettings/restrictions'), restrictionsData);
+                showNotification('✅ Restriction settings saved successfully!');
+            } catch (error) {
+                console.error('Error saving restrictions:', error);
+                showNotification('Failed to save restrictions: ' + error.message, true);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '💾 Save Restriction Settings';
+            }
+        };
+
+        window.useCurrentLocationAsCenter = function() {
+            if (!navigator.geolocation) {
+                showNotification('Geolocation is not supported by your browser', true);
+                return;
+            }
+            showNotification('Detecting your GPS location...');
+            navigator.geolocation.getCurrentPosition(
+                pos => {
+                    $('restrictionLat').value = pos.coords.latitude.toFixed(6);
+                    $('restrictionLng').value = pos.coords.longitude.toFixed(6);
+                    showNotification(`Location set to: ${pos.coords.latitude.toFixed(6)}, ${pos.coords.longitude.toFixed(6)}`);
+                },
+                err => {
+                    showNotification('Could not detect location: ' + err.message, true);
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
+        };
+
+        window.resetGeoToDefault = function() {
+            $('restrictionLat').value = '22.576307';
+            $('restrictionLng').value = '88.428045';
+            $('restrictionRadius').value = '200';
+            $('restrictionGeoEnabled').checked = true;
+            $('restrictionMaxOrders').value = '2';
+            $('restrictionWindowMins').value = '60';
+            $('restrictionRateLimitEnabled').checked = true;
+            $('restrictionPaymentMode').value = 'percentage';
+            $('restrictionPartialValue').value = '10';
+            $('restrictionPartialEnabled').checked = true;
+            showNotification('Reset to defaults: TIU Campus (22.576307, 88.428045, 200m), 2 orders/hr, 10% partial payment');
+        };
+
+        window.viewCenterOnMap = function() {
+            const lat = $('restrictionLat').value;
+            const lng = $('restrictionLng').value;
+            window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank');
         };
 
         // ========== FOOD ITEMS ==========

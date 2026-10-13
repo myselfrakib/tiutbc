@@ -1154,7 +1154,11 @@
                         total: orderData.orderDetails?.total || orderData.total,
                         status: orderData.orderDetails?.status || orderData.status,
                         createdAt: orderData.orderDetails?.createdAt || orderData.createdAt,
-                        orderNumber: orderData.orderDetails?.orderNumber || orderData.orderNumber
+                        orderNumber: orderData.orderDetails?.orderNumber || orderData.orderNumber,
+                        advancePaid: orderData.orderDetails?.advancePaid,
+                        remainingDue: orderData.orderDetails?.remainingDue,
+                        partialPercentage: orderData.orderDetails?.partialPercentage,
+                        paymentMethod: orderData.orderDetails?.paymentMethod
                     };
                     orders.push(order);
                     currentOrders[order.id] = order;
@@ -1251,6 +1255,16 @@
                             <span class="total-label">Total Amount:</span>
                             <span class="total-amount">₹${parseFloat(order.total).toFixed(2)}</span>
                         </div>
+                        ${order.advancePaid !== undefined && order.advancePaid > 0 ? `
+                        <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: #16a34a; font-weight: 600; margin-top: 0.4rem;">
+                            <span>Advance Paid Online (${order.partialPercentage || 10}%):</span>
+                            <span>₹${parseFloat(order.advancePaid).toFixed(2)}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: #dc2626; font-weight: 600; margin-top: 0.25rem;">
+                            <span>Remaining Due on Delivery:</span>
+                            <span>₹${parseFloat(order.remainingDue || 0).toFixed(2)}</span>
+                        </div>
+                        ` : ''}
                         ${timeline}
                         ${reviewSection}
                     </div>

@@ -410,23 +410,24 @@
                 </div>`).join('');
 
             const paymentMethod = orderDetails.paymentMethod || 'cod';
-            const paymentBadgeClass = paymentMethod === 'online' ? 'payment-badge online' : 'payment-badge';
-            const paymentText = paymentMethod === 'online' ? 'PAID ONLINE' : 'CASH ON DELIVERY';
             const total = orderDetails.total || 0;
+            const remainingDue = orderDetails.remainingDue !== undefined ? orderDetails.remainingDue : (paymentMethod === 'online' ? 0 : total);
+            const isCOD = (paymentMethod === 'cod' || paymentMethod === 'partial_cod') && remainingDue > 0;
+            const paymentBadgeClass = (paymentMethod === 'online' || remainingDue === 0) ? 'payment-badge online' : 'payment-badge';
+            const paymentText = paymentMethod === 'online' ? 'PAID ONLINE' : (paymentMethod === 'partial_cod' ? `PARTIAL COD (DUE: ₹${remainingDue.toFixed(0)})` : 'CASH ON DELIVERY');
 
             const isInTransit = status === 'out-for-delivery' || status === 'outfordelivery';
             const isDelivered = status === 'delivered';
             const paymentCollected = orderDetails.paymentCollected || false;
-            const isCOD = paymentMethod === 'cod';
 
             let actionSection = '';
             if (isInTransit) {
                 if (isCOD && !paymentCollected) {
                     actionSection = `
                         <div class="payment-collection-section">
-                            <div class="payment-collection-header">💰 Collect Payment: ₹${total.toFixed(0)}</div>
+                            <div class="payment-collection-header">💰 Collect Balance: ₹${remainingDue.toFixed(0)} ${orderDetails.advancePaid ? `(Advance ₹${orderDetails.advancePaid} Paid)` : ''}</div>
                             <div class="payment-collection-buttons">
-                                <button class="collect-btn upi-btn" onclick="collectViaUPI('${escapeHtml(order.id)}', ${total})">📱 UPI Payment</button>
+                                <button class="collect-btn upi-btn" onclick="collectViaUPI('${escapeHtml(order.id)}', ${remainingDue})">📱 UPI Payment</button>
                                 <button class="collect-btn cash-btn" onclick="collectCash('${escapeHtml(order.id)}')">💵 Cash Collected</button>
                             </div>
                         </div>

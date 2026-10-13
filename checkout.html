@@ -165,6 +165,27 @@
             .nav-items { display: flex !important; position: static; flex-direction: row; padding: 0; box-shadow: none; gap: 0.75rem; }
             .nav-item { border-bottom: none; padding: 0.4rem 0.6rem; }
         }
+
+        /* Location Verification Styling */
+        .location-banner { border-radius: 10px; padding: 1.1rem; background: #f8fafc; border: 2px solid #e2e8f0; transition: all 0.3s; margin-bottom: 0.5rem; }
+        .location-banner.verified { background: #f0fdf4; border-color: #86efac; }
+        .location-banner.outside { background: #fef2f2; border-color: #fca5a5; }
+        .location-banner.warning { background: #fffbeb; border-color: #fde68a; }
+        .location-status-row { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.6rem; }
+        .location-status-indicator { display: flex; align-items: center; gap: 0.6rem; font-weight: 700; font-size: 0.98rem; color: #1e293b; }
+        .location-dot { width: 13px; height: 13px; border-radius: 50%; background: #94a3b8; display: inline-block; }
+        .location-banner.verified .location-dot { background: #22c55e; box-shadow: 0 0 10px rgba(34,197,94,0.7); }
+        .location-banner.outside .location-dot { background: #ef4444; box-shadow: 0 0 10px rgba(239,68,68,0.7); }
+        .location-banner.warning .location-dot { background: #f59e0b; box-shadow: 0 0 8px rgba(245,158,11,0.5); }
+        .btn-location-check { background: white; border: 1.5px solid #cbd5e1; border-radius: 7px; padding: 0.45rem 0.85rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; color: #334155; transition: all 0.2s; }
+        .btn-location-check:hover:not(:disabled) { background: #f1f5f9; border-color: #94a3b8; }
+        .location-message-box { font-size: 0.9rem; color: #475569; line-height: 1.5; }
+        .location-banner.outside .location-message-box { color: #dc2626; font-weight: 600; }
+        .location-banner.verified .location-message-box { color: #16a34a; }
+        .advance-notice { background: #fff7ed; border-left: 4px solid var(--primary); padding: 0.85rem 1rem; border-radius: 6px; font-size: 0.88rem; color: #9a3412; margin-bottom: 1rem; line-height: 1.45; }
+        .payment-simulator-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 5000; align-items: center; justify-content: center; padding: 1rem; }
+        .payment-simulator-modal.active { display: flex; }
+        .payment-simulator-box { background: white; border-radius: 14px; padding: 1.8rem; max-width: 440px; width: 100%; box-shadow: 0 20px 45px rgba(0,0,0,0.25); text-align: center; }
     </style>
 </head>
 <body>
@@ -215,6 +236,25 @@
         </div>
 
         <div id="checkoutSections" style="display: none;">
+            <!-- Campus Geofence Verification Card -->
+            <div class="section-container" id="geoSectionContainer">
+                <div class="section-title">📍 Campus Location Verification</div>
+                <div class="location-banner warning" id="locationBanner">
+                    <div class="location-status-row">
+                        <div class="location-status-indicator" id="locationStatusIndicator">
+                            <span class="location-dot" id="locationDot"></span>
+                            <span id="locationStatusText">Verifying your location within campus...</span>
+                        </div>
+                        <button type="button" class="btn-location-check" id="btnCheckLocation" onclick="APP.detectLocation(true)">
+                            🔄 Check Location
+                        </button>
+                    </div>
+                    <div class="location-message-box" id="locationMessageBox">
+                        Detecting GPS location to verify you are within Techno India University campus (200m radius)...
+                    </div>
+                </div>
+            </div>
+
             <div class="section-container">
                 <div class="section-title">🚪 Delivery Location</div>
                 <div id="roomDisplayArea"></div>
@@ -222,25 +262,51 @@
 
             <div class="section-container">
                 <div class="section-title">💳 Payment Method</div>
-                <div class="payment-option" id="payment-cod" onclick="APP.selectPayment('cod')">
-                    <input type="radio" name="payment" id="cod" value="cod">
+                <div class="advance-notice" id="advanceNotice">
+                    ⚠️ <strong>Partial Payment Required:</strong> A 10% advance payment online is required to place your order. The remaining 90% can be paid on delivery.
+                </div>
+                <div class="payment-option selected" id="payment-partial" onclick="APP.selectPayment('partial')">
+                    <input type="radio" name="payment" id="partial" value="partial" checked>
                     <div class="payment-details">
-                        <div class="payment-title">Cash on Delivery</div>
-                        <div class="payment-description">Pay when order arrives</div>
+                        <div class="payment-title" id="partialPaymentTitle">10% Advance Online + Cash on Delivery</div>
+                        <div class="payment-description" id="partialPaymentDesc">Pay 10% advance online to place order, pay balance on delivery</div>
                     </div>
                 </div>
                 <div class="payment-option" id="payment-online" onclick="APP.selectPayment('online')">
                     <input type="radio" name="payment" id="online" value="online">
                     <div class="payment-details">
-                        <div class="payment-title">Online Payment</div>
+                        <div class="payment-title" id="fullPaymentTitle">Pay Full Amount Online (100%)</div>
                         <div class="payment-description">Razorpay (UPI, Card, Net Banking)</div>
                     </div>
                 </div>
                 <div class="loader" id="loader">
                     <div class="spinner"></div>
-                    <p style="margin-top: 0.75rem; color: #666; font-size: 0.9rem;">Processing...</p>
+                    <p style="margin-top: 0.75rem; color: #666; font-size: 0.9rem;">Processing order...</p>
                 </div>
                 <button class="btn" id="placeOrderBtn" onclick="APP.handlePlaceOrder()" disabled>Select Payment Method</button>
+            </div>
+        </div>
+
+        <!-- Payment Simulator Modal (for testing / fallback) -->
+        <div class="payment-simulator-modal" id="paymentSimulatorModal">
+            <div class="payment-simulator-box">
+                <div style="font-size: 2.2rem; margin-bottom: 0.75rem;">💳</div>
+                <h3 style="font-size: 1.3rem; color: var(--primary); margin-bottom: 0.5rem;" id="simModalTitle">Complete Advance Payment</h3>
+                <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 1.25rem;" id="simModalDesc">Confirm payment to proceed with placing your order.</p>
+                <div style="background: #f8fafc; border-radius: 10px; padding: 1rem; margin-bottom: 1.5rem; text-align: left;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem; font-size: 0.9rem;">
+                        <span style="color: #64748b;">Amount Payable Now:</span>
+                        <strong style="color: #1e293b; font-size: 1.1rem;" id="simChargeAmount">₹0</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: #64748b;" id="simRemainingRow">
+                        <span>Balance Due on Delivery:</span>
+                        <strong id="simRemainingAmount">₹0</strong>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 0.75rem;">
+                    <button type="button" class="btn-secondary" onclick="APP.closePaymentSimulator()" style="flex: 1;">Cancel</button>
+                    <button type="button" class="btn" onclick="APP.confirmSimulatorPayment()" style="flex: 1;" id="simConfirmBtn">Confirm Payment</button>
+                </div>
             </div>
         </div>
     </div>
@@ -316,7 +382,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
-        import { getDatabase, ref, push, set, get, remove, update, onValue } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
+        import { getDatabase, ref, push, set, get, remove, update, onValue, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI",
@@ -337,7 +403,7 @@
         const APP = {
             cart: [],
             currentUser: null,
-            selectedPayment: null,
+            selectedPayment: 'partial',
             deliveryRoom: null,
             savedRooms: [],
             selectedRoomId: null,
@@ -348,11 +414,38 @@
             DELIVERY_FEE: 40,
             FIRST_TWO_ORDERS_FREE: 1,
 
+            // Restrictions state
+            restrictions: {
+                geo: {
+                    latitude: 22.576307,
+                    longitude: 88.428045,
+                    radiusMeters: 200,
+                    enabled: true
+                },
+                orderLimits: {
+                    maxOrdersPerHour: 2,
+                    windowMinutes: 60,
+                    enabled: true
+                },
+                partialPayment: {
+                    type: 'percentage',
+                    value: 10,
+                    enabled: true
+                }
+            },
+            isLocationVerified: false,
+            isWithinRadius: false,
+            userCoords: null,
+            userDistance: null,
+            pendingSimulatorOrder: null,
+
             // Initialize app
-            init() {
+            async init() {
                 this.loadCart();
                 this.setupAuthListener();
                 this.setupEventListeners();
+                await this.loadRestrictions();
+                this.detectLocation(false);
             },
 
             // Setup event listeners
@@ -371,12 +464,198 @@
                         this.userTotalOrders = await this.getUserTotalOrdersCount();
                         this.syncCartFromDB(user.uid);
                         await this.loadSavedRooms();
-                        this.selectPayment('cod');
+                        this.selectPayment('partial');
                         this.renderCart();
                     } else {
                         window.location.href = 'login.html';
                     }
                 });
+            },
+
+            // Restrictions operations
+            async loadRestrictions() {
+                try {
+                    const snap = await get(ref(db, 'tiutbc/storeSettings/restrictions'));
+                    if (snap.exists()) {
+                        const val = snap.val();
+                        if (val.geo) Object.assign(this.restrictions.geo, val.geo);
+                        if (val.orderLimits) Object.assign(this.restrictions.orderLimits, val.orderLimits);
+                        if (val.partialPayment) Object.assign(this.restrictions.partialPayment, val.partialPayment);
+                    }
+                } catch (e) {
+                    console.warn('Could not load dynamic restrictions, using defaults:', e);
+                }
+            },
+
+            calculatePartialPayment(subtotal) {
+                const cfg = this.restrictions.partialPayment;
+                if (!cfg.enabled) {
+                    return {
+                        advance: subtotal,
+                        remaining: 0,
+                        percentage: 100,
+                        label: 'Full (100%)'
+                    };
+                }
+                if (cfg.type === 'fixed') {
+                    const adv = Math.min(subtotal, Math.max(1, Math.round(cfg.value || 10)));
+                    return {
+                        advance: adv,
+                        remaining: Math.max(0, subtotal - adv),
+                        percentage: Math.round((adv / (subtotal || 1)) * 100),
+                        label: `₹${adv} Advance`
+                    };
+                }
+                const pct = cfg.value || 10;
+                const adv = Math.min(subtotal, Math.max(1, Math.round(subtotal * (pct / 100))));
+                return {
+                    advance: adv,
+                    remaining: Math.max(0, subtotal - adv),
+                    percentage: pct,
+                    label: `${pct}% Advance`
+                };
+            },
+
+            getDistanceInMeters(lat1, lon1, lat2, lon2) {
+                const R = 6371000;
+                const toRad = (d) => (d * Math.PI) / 180;
+                const dLat = toRad(lat2 - lat1);
+                const dLon = toRad(lon2 - lon1);
+                const a =
+                    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+                    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                return R * c;
+            },
+
+            detectLocation(userInitiated = false) {
+                const banner = document.getElementById('locationBanner');
+                const text = document.getElementById('locationStatusText');
+                const msgBox = document.getElementById('locationMessageBox');
+                const btn = document.getElementById('btnCheckLocation');
+
+                if (!navigator.geolocation) {
+                    this.isLocationVerified = false;
+                    this.isWithinRadius = false;
+                    if (banner) banner.className = 'location-banner outside';
+                    if (text) text.textContent = 'Geolocation Unsupported';
+                    if (msgBox) msgBox.textContent = 'Your browser does not support GPS location. Location verification is required to order.';
+                    this.updatePlaceOrderButtonState();
+                    return;
+                }
+
+                if (banner) banner.className = 'location-banner warning';
+                if (text) text.textContent = 'Verifying Campus Location...';
+                if (msgBox) msgBox.textContent = 'Detecting device GPS to confirm you are within Techno India University campus (200m radius)...';
+                if (btn) btn.disabled = true;
+
+                return new Promise((resolve) => {
+                    navigator.geolocation.getCurrentPosition(
+                        (pos) => {
+                            if (btn) btn.disabled = false;
+                            const userLat = pos.coords.latitude;
+                            const userLng = pos.coords.longitude;
+                            this.userCoords = { latitude: userLat, longitude: userLng };
+
+                            const targetLat = this.restrictions.geo.latitude;
+                            const targetLng = this.restrictions.geo.longitude;
+                            const maxRadius = this.restrictions.geo.radiusMeters;
+                            const distance = this.getDistanceInMeters(userLat, userLng, targetLat, targetLng);
+                            this.userDistance = Math.round(distance);
+
+                            if (this.restrictions.geo.enabled && distance > maxRadius) {
+                                this.isLocationVerified = true;
+                                this.isWithinRadius = false;
+                                if (banner) banner.className = 'location-banner outside';
+                                if (text) text.textContent = 'Outside Orderable Radius';
+                                if (msgBox) msgBox.innerHTML = `⚠️ <strong>You are outside the orderable radius.</strong> Orders can only be taken from within the university only.<br><small style="color:#666;">Current distance: ~${Math.round(distance)}m (Allowed: within ${maxRadius}m of campus center)</small>`;
+                                if (userInitiated) {
+                                    this.showError('You are outside the orderable radius. Orders can only be taken from within the university only.');
+                                }
+                            } else {
+                                this.isLocationVerified = true;
+                                this.isWithinRadius = true;
+                                if (banner) banner.className = 'location-banner verified';
+                                if (text) text.textContent = 'Campus Location Verified';
+                                if (msgBox) msgBox.innerHTML = `✅ You are within the university orderable radius (~${Math.round(distance)}m from campus center). Orders can be placed!`;
+                                if (userInitiated) {
+                                    this.showSuccess('Campus location verified successfully!');
+                                }
+                            }
+                            this.updatePlaceOrderButtonState();
+                            resolve(true);
+                        },
+                        (err) => {
+                            if (btn) btn.disabled = false;
+                            this.isLocationVerified = false;
+                            this.isWithinRadius = false;
+                            if (banner) banner.className = 'location-banner outside';
+                            if (text) text.textContent = 'Location Permission Required';
+                            if (msgBox) msgBox.innerHTML = `📍 <strong>Location access is required:</strong> Please allow location access in your browser to verify you are within the university campus. (Error: ${err.message})`;
+                            this.updatePlaceOrderButtonState();
+                            if (userInitiated) {
+                                this.showError('Please allow location access to verify you are within the university.');
+                            }
+                            resolve(false);
+                        },
+                        { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
+                    );
+                });
+            },
+
+            async checkOrderLimit() {
+                if (!this.restrictions.orderLimits.enabled || !this.currentUser) return true;
+
+                try {
+                    const ordersRef = ref(db, 'tiutbc/orders');
+                    const userOrdersQuery = query(ordersRef, orderByChild('userDetails/userId'), equalTo(this.currentUser.uid));
+                    const snap = await get(userOrdersQuery);
+
+                    if (!snap.exists()) return true;
+
+                    const windowMs = (this.restrictions.orderLimits.windowMinutes || 60) * 60 * 1000;
+                    const cutoffTime = Date.now() - windowMs;
+                    let countInWindow = 0;
+
+                    snap.forEach((child) => {
+                        const o = child.val();
+                        const createdAt = o.orderDetails?.createdAt || o.createdAt || 0;
+                        const status = o.orderDetails?.status || o.status || '';
+                        if (createdAt >= cutoffTime && status !== 'cancelled' && status !== 'rejected') {
+                            countInWindow++;
+                        }
+                    });
+
+                    const maxAllowed = this.restrictions.orderLimits.maxOrdersPerHour || 2;
+                    if (countInWindow >= maxAllowed) {
+                        return false;
+                    }
+                    return true;
+                } catch (e) {
+                    console.error('Rate limit check error:', e);
+                    return true;
+                }
+            },
+
+            updatePaymentOptionLabels(subtotal, partialDetails) {
+                const partialTitle = document.getElementById('partialPaymentTitle');
+                const partialDesc = document.getElementById('partialPaymentDesc');
+                const fullTitle = document.getElementById('fullPaymentTitle');
+                const notice = document.getElementById('advanceNotice');
+
+                if (partialTitle) {
+                    partialTitle.textContent = `${partialDetails.label} (₹${partialDetails.advance}) Online + COD`;
+                }
+                if (partialDesc) {
+                    partialDesc.textContent = `Pay ₹${partialDetails.advance} advance online now, pay remaining ₹${partialDetails.remaining} upon delivery`;
+                }
+                if (fullTitle) {
+                    fullTitle.textContent = `Pay Full Amount Online (₹${subtotal})`;
+                }
+                if (notice) {
+                    notice.innerHTML = `⚠️ <strong>Partial Payment Required:</strong> A ${partialDetails.label} (₹${partialDetails.advance}) advance payment online is required to place your order. The remaining balance (₹${partialDetails.remaining}) can be paid on delivery.`;
+                }
             },
 
             // Cart operations
@@ -460,6 +739,7 @@
                 sections.style.display = 'block';
                 const subtotal = this.cart.reduce((s, i) => s + i.price * i.quantity, 0);
                 const total = subtotal; // No delivery fee
+                const partialDetails = this.calculatePartialPayment(subtotal);
 
                 const cartHTML = this.cart.map((item, i) => `
                     <div class="cart-item">
@@ -484,8 +764,19 @@
                 content.innerHTML = cartHTML + `
                     <div class="cart-summary">
                         <div class="summary-row subtotal"><span>Subtotal</span><span>₹${subtotal.toFixed(2)}</span></div>
+                        <div class="summary-row" style="color:var(--primary); font-weight:600;">
+                            <span>Mandatory Advance (${partialDetails.label})</span>
+                            <span>₹${partialDetails.advance.toFixed(2)}</span>
+                        </div>
+                        <div class="summary-row" style="color:#666;">
+                            <span>Balance Due on Delivery</span>
+                            <span>₹${partialDetails.remaining.toFixed(2)}</span>
+                        </div>
                         <div class="cart-total"><span>Total</span><span>₹${total.toFixed(2)}</span></div>
                     </div>`;
+
+                this.updatePaymentOptionLabels(subtotal, partialDetails);
+                this.updatePlaceOrderButtonState();
             },
 
             // Quick toast notification
@@ -768,11 +1059,33 @@
 
             updatePlaceOrderButtonState() {
                 const btn = document.getElementById('placeOrderBtn');
+                if (!btn) return;
+
+                const subtotal = this.cart.reduce((s, i) => s + i.price * i.quantity, 0);
+                const partialDetails = this.calculatePartialPayment(subtotal);
+
+                if (this.restrictions.geo.enabled && (!this.isLocationVerified || !this.isWithinRadius)) {
+                    btn.disabled = true;
+                    if (!this.isLocationVerified) {
+                        btn.textContent = '📍 Campus Location Verification Required';
+                    } else {
+                        btn.textContent = '⚠️ Outside Orderable Radius (TIU Campus Only)';
+                    }
+                    return;
+                }
+
                 const enabled = !!this.deliveryRoom && !!this.selectedPayment;
                 btn.disabled = !enabled;
-                if (this.selectedPayment === 'cod') btn.textContent = 'Place Order (COD)';
-                else if (this.selectedPayment === 'online') btn.textContent = 'Pay Now';
-                else btn.textContent = 'Select Payment Method';
+
+                if (!this.deliveryRoom) {
+                    btn.textContent = 'Please Select Delivery Location';
+                } else if (this.selectedPayment === 'partial') {
+                    btn.textContent = `Pay ${partialDetails.label} (₹${partialDetails.advance}) & Place Order`;
+                } else if (this.selectedPayment === 'online') {
+                    btn.textContent = `Pay Full Amount (₹${subtotal}) Online`;
+                } else {
+                    btn.textContent = 'Select Payment Method';
+                }
             },
 
             async handlePlaceOrder() {
@@ -784,42 +1097,111 @@
                 
                 if (!this.selectedPayment) return this.showError('Please select payment method');
 
+                // Check store status
                 const snap = await get(ref(db, 'tiutbc/storeStatus/isOpen'));
                 if (!snap.exists() || !snap.val()) {
                     return this.showToast('error', 'Store Closed', 'We are not taking orders right now. Please try again later.');
                 }
 
-                this.selectedPayment === 'cod' ? this.placeOrder('cod', null) : this.initiateRazorpay();
+                // Strict Location verification (within 200m of TIU coordinate)
+                if (this.restrictions.geo.enabled) {
+                    if (!this.isLocationVerified) {
+                        await this.detectLocation(true);
+                    }
+                    if (!this.isLocationVerified || !this.isWithinRadius) {
+                        return this.showToast('error', 'Outside Order Radius', 'You are outside the orderable radius. Orders can only be taken from within the university only.');
+                    }
+                }
+
+                // Anti-spam 1 hour check (only 2 orders per 1 hour)
+                const canOrder = await this.checkOrderLimit();
+                if (!canOrder) {
+                    const maxOrders = this.restrictions.orderLimits.maxOrdersPerHour || 2;
+                    return this.showToast('error', 'Order Limit Reached', `Only ${maxOrders} orders can be placed from one account within 1 hr to prevent spamming. Please try again later.`);
+                }
+
+                this.initiatePaymentFlow();
             },
 
-            initiateRazorpay() {
+            initiatePaymentFlow() {
                 const subtotal = this.cart.reduce((s, i) => s + i.price * i.quantity, 0);
-                const deliveryFee = this.calculateDeliveryFee(subtotal);
-                const total = subtotal + deliveryFee;
+                const partialDetails = this.calculatePartialPayment(subtotal);
 
-                new Razorpay({
-                    key: this.RAZORPAY_KEY,
-                    amount: total * 100,
-                    currency: 'INR',
-                    name: 'TIU The Biriyani Canteen',
-                    description: 'Food Order',
-                    handler: (res) => this.placeOrder('online', res.razorpay_payment_id),
-                    prefill: { name: this.deliveryRoom.fullName, email: this.currentUser.email, contact: this.deliveryRoom.phone },
-                    theme: { color: '#ff6b35' },
-                    modal: { ondismiss: () => this.showError('Payment cancelled') }
-                }).open();
+                const isFull = this.selectedPayment === 'online';
+                const chargeAmount = isFull ? subtotal : partialDetails.advance;
+                const remainingDue = isFull ? 0 : partialDetails.remaining;
+                const methodLabel = isFull ? 'online' : 'partial_cod';
+
+                const advanceDetails = {
+                    advancePaid: chargeAmount,
+                    remainingDue,
+                    partialPercentage: partialDetails.percentage
+                };
+
+                // If real Razorpay key is configured, use Razorpay
+                if (typeof Razorpay !== 'undefined' && this.RAZORPAY_KEY && this.RAZORPAY_KEY !== 'rzp_test_your_key_here') {
+                    new Razorpay({
+                        key: this.RAZORPAY_KEY,
+                        amount: Math.round(chargeAmount * 100),
+                        currency: 'INR',
+                        name: 'TIU The Biriyani Canteen',
+                        description: isFull ? 'Food Order (Full Payment)' : `10% Advance Food Order (₹${chargeAmount})`,
+                        handler: (res) => {
+                            this.placeOrder(methodLabel, res.razorpay_payment_id, advanceDetails);
+                        },
+                        prefill: {
+                            name: this.deliveryRoom.fullName,
+                            email: this.currentUser?.email || '',
+                            contact: this.deliveryRoom.phone
+                        },
+                        theme: { color: '#ff6b35' },
+                        modal: { ondismiss: () => this.showError('Payment was cancelled') }
+                    }).open();
+                } else {
+                    // Test simulator when placeholder key is used
+                    this.showPaymentSimulator(chargeAmount, isFull, partialDetails, remainingDue, methodLabel, advanceDetails);
+                }
             },
 
-            async placeOrder(method, paymentId) {
+            showPaymentSimulator(chargeAmount, isFull, partialDetails, remainingDue, methodLabel, advanceDetails) {
+                this.pendingSimulatorOrder = { methodLabel, advanceDetails };
+                const modal = document.getElementById('paymentSimulatorModal');
+                document.getElementById('simModalTitle').textContent = isFull ? 'Pay Full Amount Online' : `Pay Advance (${partialDetails.label})`;
+                document.getElementById('simChargeAmount').textContent = `₹${chargeAmount}`;
+                const remRow = document.getElementById('simRemainingRow');
+                if (isFull) {
+                    remRow.style.display = 'none';
+                } else {
+                    remRow.style.display = 'flex';
+                    document.getElementById('simRemainingAmount').textContent = `₹${remainingDue}`;
+                }
+                modal.classList.add('active');
+            },
+
+            closePaymentSimulator() {
+                const modal = document.getElementById('paymentSimulatorModal');
+                if (modal) modal.classList.remove('active');
+                this.pendingSimulatorOrder = null;
+            },
+
+            confirmSimulatorPayment() {
+                if (!this.pendingSimulatorOrder) return;
+                const { methodLabel, advanceDetails } = this.pendingSimulatorOrder;
+                this.closePaymentSimulator();
+                const fakePaymentId = 'pay_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+                this.placeOrder(methodLabel, fakePaymentId, advanceDetails);
+            },
+
+            async placeOrder(method, paymentId, advanceDetails) {
                 if (!this.currentUser || !this.cart.length) return this.showError('Unable to place order');
 
                 const loader = document.getElementById('loader');
                 const btn = document.getElementById('placeOrderBtn');
-                loader.style.display = 'block';
-                btn.disabled = true;
+                if (loader) loader.style.display = 'block';
+                if (btn) btn.disabled = true;
 
                 const subtotal = this.cart.reduce((s, i) => s + i.price * i.quantity, 0);
-                const total = subtotal; // No delivery fee
+                const total = subtotal;
 
                 try {
                     const newOrderRef = push(ref(db, 'tiutbc/orders'));
@@ -839,12 +1221,20 @@
                             items: this.cart,
                             subtotal,
                             total,
+                            advancePaid: advanceDetails?.advancePaid !== undefined ? advanceDetails.advancePaid : total,
+                            remainingDue: advanceDetails?.remainingDue !== undefined ? advanceDetails.remainingDue : 0,
+                            partialPercentage: advanceDetails?.partialPercentage || 10,
                             paymentMethod: method,
-                            paymentStatus: method === 'online' ? 'paid' : 'pending',
-                            ...(paymentId && { paymentId }),
+                            paymentStatus: method === 'online' ? 'paid' : 'partially_paid',
+                            paymentId: paymentId || ('pay_' + Date.now()),
                             status: 'pending',
                             createdAt: Date.now(),
-                            orderNumber: orderId.slice(-6).toUpperCase()
+                            orderNumber: orderId.slice(-6).toUpperCase(),
+                            userCoordinates: this.userCoords ? {
+                                latitude: this.userCoords.latitude,
+                                longitude: this.userCoords.longitude,
+                                distanceMeters: this.userDistance || 0
+                            } : null
                         }
                     };
                     
@@ -864,9 +1254,9 @@
                     setTimeout(() => window.location.href = 'orders.html', 2500);
                 } catch (e) {
                     console.error('Order error:', e);
-                    this.showError('Failed to place order');
-                    loader.style.display = 'none';
-                    btn.disabled = false;
+                    this.showError('Failed to place order: ' + (e.message || e));
+                    if (loader) loader.style.display = 'none';
+                    if (btn) btn.disabled = false;
                 }
             },
 
