@@ -268,7 +268,7 @@
 
             <div class="section-container">
                 <div class="section-title">💳 Payment Method</div>
-                <div class="advance-notice" id="advanceNotice">
+                <div class="advance-notice" id="advanceNotice" style="display: none;">
                     ⚠️ <strong>Partial Payment Required:</strong> A 10% advance payment online is required to place your order. The remaining 90% can be paid on delivery.
                 </div>
                 <div class="payment-option selected" id="payment-partial" onclick="APP.selectPayment('partial')">
@@ -834,22 +834,10 @@
                 }
 
                 if (notice) {
-                    if (this.selectedPayment === 'cod') {
-                        notice.innerHTML = `💵 <strong>Full COD Selected:</strong> No advance payment required. Please pay full ₹${subtotal.toFixed(2)} in cash or UPI directly upon delivery.`;
-                        notice.style.background = '#ecfdf5';
-                        notice.style.borderColor = '#10b981';
-                        notice.style.color = '#065f46';
-                    } else if (this.selectedPayment === 'online') {
-                        notice.innerHTML = `💳 <strong>Pay Online Selected:</strong> You will pay full ₹${subtotal.toFixed(2)} online. Zero cash due on delivery.`;
-                        notice.style.background = '#eff6ff';
-                        notice.style.borderColor = '#3b82f6';
-                        notice.style.color = '#1e40af';
-                    } else if (allowFullCod) {
-                        notice.innerHTML = `💵 <strong>Full COD Available:</strong> Pay the full amount (₹${subtotal.toFixed(2)}) upon delivery in cash or UPI, or pay full amount online.`;
-                        notice.style.background = '#f0fdf4';
-                        notice.style.borderColor = '#22c55e';
-                        notice.style.color = '#15803d';
+                    if (this.selectedPayment === 'cod' || allowFullCod || this.selectedPayment === 'online' || !partialEnabled) {
+                        notice.style.display = 'none';
                     } else {
+                        notice.style.display = 'block';
                         notice.innerHTML = `⚠️ <strong>Partial Payment Required:</strong> A ${partialDetails.label} (₹${partialDetails.advance}) advance payment online is required to place your order. The remaining balance (₹${partialDetails.remaining}) can be paid on delivery.`;
                         notice.style.background = '#fff8e6';
                         notice.style.borderColor = '#f59e0b';
