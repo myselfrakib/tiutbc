@@ -278,6 +278,13 @@
                         <div class="payment-description" id="partialPaymentDesc">Pay 10% advance online to place order, pay balance on delivery</div>
                     </div>
                 </div>
+                <div class="payment-option" id="payment-cod" onclick="APP.selectPayment('cod')" style="display: none;">
+                    <input type="radio" name="payment" id="cod" value="cod">
+                    <div class="payment-details">
+                        <div class="payment-title" id="fullCodTitle">💵 Full Cash on Delivery (COD)</div>
+                        <div class="payment-description" id="fullCodDesc">Pay full amount on delivery (No online advance payment needed)</div>
+                    </div>
+                </div>
                 <div class="payment-option" id="payment-online" onclick="APP.selectPayment('online')">
                     <input type="radio" name="payment" id="online" value="online">
                     <div class="payment-details">
@@ -436,7 +443,8 @@
                 partialPayment: {
                     type: 'percentage',
                     value: 10,
-                    enabled: true
+                    enabled: true,
+                    allowFullCod: false
                 }
             },
             isLocationVerified: false,
@@ -474,7 +482,8 @@
                         this.userTotalOrders = await this.getUserTotalOrdersCount();
                         this.syncCartFromDB(user.uid);
                         await this.loadSavedRooms();
-                        this.selectPayment('partial');
+                        const defaultMethod = (this.restrictions.partialPayment?.allowFullCod && !this.restrictions.partialPayment?.enabled) ? 'cod' : 'partial';
+                        this.selectPayment(defaultMethod);
                         this.renderCart();
                     } else {
                         window.location.href = 'login.html';
@@ -759,7 +768,36 @@
                 const partialTitle = document.getElementById('partialPaymentTitle');
                 const partialDesc = document.getElementById('partialPaymentDesc');
                 const fullTitle = document.getElementById('fullPaymentTitle');
+                const fullCodTitle = document.getElementById('fullCodTitle');
+                const fullCodDesc = document.getElementById('fullCodDesc');
                 const notice = document.getElementById('advanceNotice');
+                const codOption = document.getElementById('payment-cod');
+                const partialOption = document.getElementById('payment-partial');
+
+                const allowFullCod = this.restrictions.partialPayment?.allowFullCod === true;
+                const partialEnabled = this.restrictions.partialPayment?.enabled !== false;
+
+                if (codOption) {
+                    if (allowFullCod || !partialEnabled) {
+                        codOption.style.display = 'flex';
+                    } else {
+                        codOption.style.display = 'none';
+                        if (this.selectedPayment === 'cod') {
+                            this.selectedPayment = 'partial';
+                            const pRadio = document.getElementById('partial');
+                            if (pRadio) pRadio.checked = true;
+                            document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+                            if (partialOption) partialOption.classList.add('selected');
+                        }
+                    }
+                }
+
+                if (fullCodTitle) {
+                    fullCodTitle.textContent = `💵 Full Cash on Delivery (₹${subtotal.toFixed(2)})`;
+                }
+                if (fullCodDesc) {
+                    fullCodDesc.textContent = `Pay full amount on delivery in cash or UPI (No advance payment needed)`;
+                }
 
                 if (partialTitle) {
                     partialTitle.textContent = `${partialDetails.label} (₹${partialDetails.advance}) Online + COD`;
@@ -768,10 +806,31 @@
                     partialDesc.textContent = `Pay ₹${partialDetails.advance} advance online now, pay remaining ₹${partialDetails.remaining} upon delivery`;
                 }
                 if (fullTitle) {
-                    fullTitle.textContent = `Pay Full Amount Online (₹${subtotal})`;
+                    fullTitle.textContent = `Pay Full Amount Online (₹${subtotal.toFixed(2)})`;
                 }
+
                 if (notice) {
-                    notice.innerHTML = `⚠️ <strong>Partial Payment Required:</strong> A ${partialDetails.label} (₹${partialDetails.advance}) advance payment online is required to place your order. The remaining balance (₹${partialDetails.remaining}) can be paid on delivery.`;
+                    if (this.selectedPayment === 'cod') {
+                        notice.innerHTML = `💵 <strong>Full COD Selected:</strong> No advance payment required. Please pay full ₹${subtotal.toFixed(2)} in cash or UPI directly upon delivery.`;
+                        notice.style.background = '#ecfdf5';
+                        notice.style.borderColor = '#10b981';
+                        notice.style.color = '#065f46';
+                    } else if (this.selectedPayment === 'online') {
+                        notice.innerHTML = `💳 <strong>Pay Online Selected:</strong> You will pay full ₹${subtotal.toFixed(2)} online. Zero cash due on delivery.`;
+                        notice.style.background = '#eff6ff';
+                        notice.style.borderColor = '#3b82f6';
+                        notice.style.color = '#1e40af';
+                    } else if (allowFullCod) {
+                        notice.innerHTML = `💡 <strong>Payment Options:</strong> Full COD is enabled! Or pay with partial advance (${partialDetails.label} / ₹${partialDetails.advance}) or full amount online.`;
+                        notice.style.background = '#f0fdf4';
+                        notice.style.borderColor = '#22c55e';
+                        notice.style.color = '#15803d';
+                    } else {
+                        notice.innerHTML = `⚠️ <strong>Partial Payment Required:</strong> A ${partialDetails.label} (₹${partialDetails.advance}) advance payment online is required to place your order. The remaining balance (₹${partialDetails.remaining}) can be paid on delivery.`;
+                        notice.style.background = '#fff8e6';
+                        notice.style.borderColor = '#f59e0b';
+                        notice.style.color = '#b45309';
+                    }
                 }
             },
 
@@ -878,9 +937,29 @@
                     </div>
                 `).join('');
 
-                content.innerHTML = cartHTML + `
-                    <div class="cart-summary">
-                        <div class="summary-row subtotal"><span>Subtotal</span><span>₹${subtotal.toFixed(2)}</span></div>
+                let advanceBreakdownHTML = '';
+                if (this.selectedPayment === 'cod') {
+                    advanceBreakdownHTML = `
+                        <div class="summary-row" style="color:#16a34a; font-weight:600;">
+                            <span>Advance Paid Online</span>
+                            <span>₹0.00</span>
+                        </div>
+                        <div class="summary-row" style="color:var(--primary); font-weight:600;">
+                            <span>Due on Delivery (Cash/UPI)</span>
+                            <span>₹${subtotal.toFixed(2)}</span>
+                        </div>`;
+                } else if (this.selectedPayment === 'online') {
+                    advanceBreakdownHTML = `
+                        <div class="summary-row" style="color:#16a34a; font-weight:600;">
+                            <span>Pay Online (100%)</span>
+                            <span>₹${subtotal.toFixed(2)}</span>
+                        </div>
+                        <div class="summary-row" style="color:#666;">
+                            <span>Balance Due on Delivery</span>
+                            <span>₹0.00</span>
+                        </div>`;
+                } else {
+                    advanceBreakdownHTML = `
                         <div class="summary-row" style="color:var(--primary); font-weight:600;">
                             <span>Mandatory Advance (${partialDetails.label})</span>
                             <span>₹${partialDetails.advance.toFixed(2)}</span>
@@ -888,7 +967,13 @@
                         <div class="summary-row" style="color:#666;">
                             <span>Balance Due on Delivery</span>
                             <span>₹${partialDetails.remaining.toFixed(2)}</span>
-                        </div>
+                        </div>`;
+                }
+
+                content.innerHTML = cartHTML + `
+                    <div class="cart-summary">
+                        <div class="summary-row subtotal"><span>Subtotal</span><span>₹${subtotal.toFixed(2)}</span></div>
+                        ${advanceBreakdownHTML}
                         <div class="cart-total"><span>Total</span><span>₹${total.toFixed(2)}</span></div>
                     </div>`;
 
@@ -1171,7 +1256,7 @@
                 if (radio) radio.checked = true;
                 const opt = document.getElementById(`payment-${method}`);
                 if (opt) opt.classList.add('selected');
-                this.updatePlaceOrderButtonState();
+                this.renderCart();
             },
 
             updatePlaceOrderButtonState() {
@@ -1196,10 +1281,12 @@
 
                 if (!this.deliveryRoom) {
                     btn.textContent = 'Please Select Delivery Location';
+                } else if (this.selectedPayment === 'cod') {
+                    btn.textContent = `Place Order with Cash on Delivery (₹${subtotal.toFixed(2)})`;
                 } else if (this.selectedPayment === 'partial') {
                     btn.textContent = `Pay ${partialDetails.label} (₹${partialDetails.advance}) & Place Order`;
                 } else if (this.selectedPayment === 'online') {
-                    btn.textContent = `Pay Full Amount (₹${subtotal}) Online`;
+                    btn.textContent = `Pay Full Amount (₹${subtotal.toFixed(2)}) Online`;
                 } else {
                     btn.textContent = 'Select Payment Method';
                 }
@@ -1247,6 +1334,17 @@
                 const subtotal = this.cart.reduce((s, i) => s + i.price * i.quantity, 0);
                 const partialDetails = this.calculatePartialPayment(subtotal);
 
+                if (this.selectedPayment === 'cod') {
+                    const advanceDetails = {
+                        advancePaid: 0,
+                        remainingDue: subtotal,
+                        partialPercentage: 0
+                    };
+                    const codPaymentId = 'cod_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+                    this.placeOrder('cod', codPaymentId, advanceDetails);
+                    return;
+                }
+
                 const isFull = this.selectedPayment === 'online';
                 const chargeAmount = isFull ? subtotal : partialDetails.advance;
                 const remainingDue = isFull ? 0 : partialDetails.remaining;
@@ -1265,7 +1363,7 @@
                         amount: Math.round(chargeAmount * 100),
                         currency: 'INR',
                         name: 'TIU The Biriyani Canteen',
-                        description: isFull ? 'Food Order (Full Payment)' : `10% Advance Food Order (₹${chargeAmount})`,
+                        description: isFull ? 'Food Order (Full Payment)' : `${partialDetails.label} Advance Food Order (₹${chargeAmount})`,
                         handler: (res) => {
                             this.placeOrder(methodLabel, res.razorpay_payment_id, advanceDetails);
                         },
@@ -1326,6 +1424,8 @@
                 try {
                     const newOrderRef = push(ref(db, 'tiutbc/orders'));
                     const orderId = newOrderRef.key;
+                    const isCod = method === 'cod';
+                    const isOnline = method === 'online';
                     
                     const orderData = {
                         userDetails: {
@@ -1341,12 +1441,12 @@
                             items: this.cart,
                             subtotal,
                             total,
-                            advancePaid: advanceDetails?.advancePaid !== undefined ? advanceDetails.advancePaid : total,
-                            remainingDue: advanceDetails?.remainingDue !== undefined ? advanceDetails.remainingDue : 0,
-                            partialPercentage: advanceDetails?.partialPercentage || 10,
+                            advancePaid: advanceDetails?.advancePaid !== undefined ? advanceDetails.advancePaid : (isCod ? 0 : total),
+                            remainingDue: advanceDetails?.remainingDue !== undefined ? advanceDetails.remainingDue : (isCod ? total : 0),
+                            partialPercentage: advanceDetails?.partialPercentage || 0,
                             paymentMethod: method,
-                            paymentStatus: method === 'online' ? 'paid' : 'partially_paid',
-                            paymentId: paymentId || ('pay_' + Date.now()),
+                            paymentStatus: isOnline ? 'paid' : (isCod ? 'pending' : 'partially_paid'),
+                            paymentId: paymentId || (isCod ? ('cod_' + Date.now()) : ('pay_' + Date.now())),
                             status: 'pending',
                             createdAt: Date.now(),
                             orderNumber: orderId.slice(-6).toUpperCase(),

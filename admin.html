@@ -631,6 +631,13 @@
                             <span class="toggle-text"><strong>Enable Partial Advance Payment Requirement</strong> (Mandatory partial payment to confirm order)</span>
                         </label>
                     </div>
+
+                    <div class="restriction-actions-bar" style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px dashed #ecf0f1;">
+                        <label class="toggle-control">
+                            <input type="checkbox" id="restrictionFullCodEnabled">
+                            <span class="toggle-text"><strong>Enable Full Cash on Delivery (COD) Option</strong> (Allow customers to choose 100% COD without paying advance online)</span>
+                        </label>
+                    </div>
                 </div>
 
                 <!-- Save Button -->
@@ -1598,6 +1605,9 @@
                 $('restrictionPaymentMode').value = partial.type || 'percentage';
                 $('restrictionPartialValue').value = partial.value !== undefined ? partial.value : 10;
                 $('restrictionPartialEnabled').checked = partial.enabled !== false;
+                if ($('restrictionFullCodEnabled')) {
+                    $('restrictionFullCodEnabled').checked = partial.allowFullCod === true;
+                }
             }
         }
 
@@ -1649,6 +1659,7 @@
                 const paymentMode = $('restrictionPaymentMode').value;
                 const partialValue = parseFloat($('restrictionPartialValue').value) || 10;
                 const partialEnabled = $('restrictionPartialEnabled').checked;
+                const fullCodEnabled = $('restrictionFullCodEnabled') ? $('restrictionFullCodEnabled').checked : false;
 
                 if (isNaN(lat) || isNaN(lng) || isNaN(radius) || radius <= 0) {
                     showNotification('Please enter valid coordinates and radius', true);
@@ -1672,7 +1683,8 @@
                     partialPayment: {
                         type: paymentMode,
                         value: partialValue,
-                        enabled: partialEnabled
+                        enabled: partialEnabled,
+                        allowFullCod: fullCodEnabled
                     },
                     updatedAt: new Date().toISOString(),
                     updatedBy: auth.currentUser?.email || auth.currentUser?.uid || 'admin'

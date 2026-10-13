@@ -1273,7 +1273,12 @@
                             <span>Remaining Due on Delivery:</span>
                             <span class="order-payment-amount">₹${parseFloat(order.remainingDue || 0).toFixed(2)}</span>
                         </div>
-                        ` : ''}
+                        ` : (order.paymentMethod === 'cod' ? `
+                        <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: #ea580c; font-weight: 600; margin-top: 0.4rem;">
+                            <span>Payment Method:</span>
+                            <span class="order-payment-amount">💵 Cash on Delivery (Due: ₹${parseFloat(order.total).toFixed(2)})</span>
+                        </div>
+                        ` : '')}
                         ${timeline}
                         ${reviewSection}
                     </div>
