@@ -829,7 +829,9 @@
             if (!user) { cleanupListeners(); window.location.href = 'adminlogin.html'; return; }
             try {
                 const admin = await get(dbRef(db, `tiutbc/admins/${user.uid}`));
-                if (!admin.exists() || !admin.val().admin) {
+                const adminData = admin.val() || {};
+                const hasAdminAccess = admin.exists() && (adminData.admin === true || adminData.isAdmin === true || adminData.isadmin === true);
+                if (!hasAdminAccess) {
                     showNotification('Unauthorized access', true);
                     setTimeout(() => { cleanupListeners(); window.location.href = 'adminlogin.html'; }, 2000);
                     return;

@@ -161,6 +161,48 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        .auth-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            background: #f1f5f9;
+            padding: 0.35rem;
+            border-radius: 12px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            background: transparent;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            border-radius: 9px;
+            transition: all 0.25s;
+        }
+
+        .auth-tab.active {
+            background: white;
+            color: #2c3e50;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .toggle-auth-text {
+            text-align: center;
+            margin-top: 1.25rem;
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        .toggle-auth-text a {
+            color: #2c3e50;
+            font-weight: 600;
+            text-decoration: underline;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -168,9 +210,15 @@
         <div class="logo">🔐 TIU Admin Panel</div>
         <div class="tagline">HungryBites Administration</div>
         
-        <h2>Admin Login</h2>
+        <div class="auth-tabs">
+            <button type="button" class="auth-tab active" id="tabLogin" onclick="switchAuthMode('login')">Admin Login</button>
+            <button type="button" class="auth-tab" id="tabSignup" onclick="switchAuthMode('signup')">Sign Up as Admin</button>
+        </div>
+
+        <h2 id="formTitle">Admin Login</h2>
         
-        <form id="adminForm" onsubmit="handleAdminLogin(event)">
+        <!-- LOGIN FORM -->
+        <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
             <div class="form-group">
                 <label>Admin Email</label>
                 <input type="email" id="adminEmail" placeholder="Enter admin email" required>
@@ -180,6 +228,33 @@
                 <input type="password" id="adminPassword" placeholder="Enter password" required>
             </div>
             <button type="submit" class="btn" id="loginBtn">Login as Admin</button>
+            <div class="toggle-auth-text">
+                Don't have an admin account? <a onclick="switchAuthMode('signup')">Sign up as Admin</a>
+            </div>
+        </form>
+
+        <!-- SIGNUP FORM -->
+        <form id="adminSignupForm" onsubmit="handleAdminSignup(event)" style="display: none;">
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="signupName" placeholder="Enter full name" required>
+            </div>
+            <div class="form-group">
+                <label>Admin Email</label>
+                <input type="email" id="signupEmail" placeholder="Enter admin email" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="signupPassword" placeholder="Create password (min 6 characters)" minlength="6" required>
+            </div>
+            <div class="form-group">
+                <label>Confirm Password</label>
+                <input type="password" id="signupConfirmPassword" placeholder="Confirm password" minlength="6" required>
+            </div>
+            <button type="submit" class="btn" id="signupBtn">Sign Up as Admin</button>
+            <div class="toggle-auth-text">
+                Already registered? <a onclick="switchAuthMode('login')">Back to Login</a>
+            </div>
         </form>
 
         <div class="loading" id="loading">
@@ -196,8 +271,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
-        import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+        import { getDatabase, ref, get, child, set } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCTB7d1-tjzU3DG0tvmkh1lWiZcmba10XI",
@@ -213,6 +288,16 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const database = getDatabase(app);
+
+        window.switchAuthMode = function(mode) {
+            hideMessages();
+            const isLogin = mode === 'login';
+            document.getElementById('tabLogin').classList.toggle('active', isLogin);
+            document.getElementById('tabSignup').classList.toggle('active', !isLogin);
+            document.getElementById('formTitle').textContent = isLogin ? 'Admin Login' : 'Sign Up as Admin';
+            document.getElementById('adminLoginForm').style.display = isLogin ? 'block' : 'none';
+            document.getElementById('adminSignupForm').style.display = isLogin ? 'none' : 'block';
+        };
 
         window.handleAdminLogin = async function(e) {
             e.preventDefault();
@@ -235,7 +320,8 @@
                     const adminData = snapshot.val();
                     
                     // Check if admin flag is true
-                    if (adminData.admin === true) {
+                    const isAdminGranted = adminData.admin === true || adminData.isAdmin === true || adminData.isadmin === true;
+                    if (isAdminGranted) {
                         showSuccess(`Welcome ${adminData.name || 'Admin'}! Redirecting to dashboard...`);
                         
                         // Store admin info in sessionStorage for the dashboard
@@ -281,9 +367,72 @@
             }
         };
 
+        window.handleAdminSignup = async function(e) {
+            e.preventDefault();
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('signupConfirmPassword').value;
+
+            hideMessages();
+
+            if (password !== confirmPassword) {
+                showError('Passwords do not match.');
+                return;
+            }
+
+            if (password.length < 6) {
+                showError('Password must be at least 6 characters.');
+                return;
+            }
+
+            showLoading(true);
+
+            try {
+                // Create user in Firebase Auth
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // Create user ID entry under tiutbc/admins with isadmin = false
+                await set(ref(database, `tiutbc/admins/${user.uid}`), {
+                    uid: user.uid,
+                    name: name,
+                    email: email,
+                    admin: false,
+                    isAdmin: false,
+                    isadmin: false,
+                    createdAt: Date.now()
+                });
+
+                // Immediately sign out so unauthorized user cannot access
+                await signOut(auth);
+
+                showLoading(false);
+                document.getElementById('adminSignupForm').reset();
+                showSuccess('Admin registration submitted. Your account is pending verification.');
+                setTimeout(() => {
+                    switchAuthMode('login');
+                }, 2000);
+            } catch (error) {
+                showLoading(false);
+                let errorMessage = 'An error occurred during registration. Please try again.';
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMessage = 'This email is already registered.';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = 'Invalid email address.';
+                } else if (error.code === 'auth/weak-password') {
+                    errorMessage = 'Password is too weak. Please use at least 6 characters.';
+                }
+                showError(errorMessage);
+            }
+        };
+
         function showLoading(show) {
             document.getElementById('loading').style.display = show ? 'block' : 'none';
-            document.getElementById('loginBtn').disabled = show;
+            const loginBtn = document.getElementById('loginBtn');
+            const signupBtn = document.getElementById('signupBtn');
+            if (loginBtn) loginBtn.disabled = show;
+            if (signupBtn) signupBtn.disabled = show;
         }
 
         function showError(message) {
