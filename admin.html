@@ -1522,8 +1522,11 @@
         function loadStoreStatus() {
             const storeRef = dbRef(db, 'tiutbc/storeStatus');
             const callback = snapshot => {
-                const status = snapshot.exists() ? snapshot.val() : { isOpen: false };
-                updateStoreUI(!!status.isOpen);
+                const data = snapshot.exists() ? snapshot.val() : { isOpen: false };
+                updateStoreUI(!!data.isOpen);
+                if (data.restrictions) {
+                    applyRestrictionsUI(data.restrictions);
+                }
             };
             onValue(storeRef, callback);
             dbListeners.push({ ref: storeRef, callback });
@@ -1561,33 +1564,57 @@
             try {
                 const snap = await get(dbRef(db, 'tiutbc/storeStatus'));
                 const curr = snap.val() || { isOpen: false };
-                await set(dbRef(db, 'tiutbc/storeStatus'), { isOpen: !curr.isOpen, updatedAt: new Date().toISOString() });
+                await update(dbRef(db, 'tiutbc/storeStatus'), { isOpen: !curr.isOpen, updatedAt: new Date().toISOString() });
                 showNotification(`Store ${!curr.isOpen ? 'opened' : 'closed'} successfully`);
             } catch (error) { showNotification('Error: ' + error.message, true); btn.disabled = false; }
         };
 
         // ========== RESTRICTIONS & CONTROLS ==========
+        function applyRestrictionsUI(data) {
+            data = data || {};
+            const geo = data.geo || {};
+            const limits = data.orderLimits || {};
+            const partial = data.partialPayment || {};
+
+            if ($('restrictionLat')) {
+                $('restrictionLat').value = geo.latitude !== undefined ? geo.latitude : 22.576307;
+                $('restrictionLng').value = geo.longitude !== undefined ? geo.longitude : 88.428045;
+                $('restrictionRadius').value = geo.radiusMeters !== undefined ? geo.radiusMeters : 200;
+                $('restrictionGeoEnabled').checked = geo.enabled !== false;
+
+                $('restrictionMaxOrders').value = limits.maxOrdersPerHour !== undefined ? limits.maxOrdersPerHour : 2;
+                $('restrictionWindowMins').value = limits.windowMinutes !== undefined ? limits.windowMinutes : 60;
+                $('restrictionRateLimitEnabled').checked = limits.enabled !== false;
+
+                $('restrictionPaymentMode').value = partial.type || 'percentage';
+                $('restrictionPartialValue').value = partial.value !== undefined ? partial.value : 10;
+                $('restrictionPartialEnabled').checked = partial.enabled !== false;
+            }
+        }
+
         function loadRestrictions() {
-            const rRef = dbRef(db, 'tiutbc/storeSettings/restrictions');
+            // First load from tiutbc/storeStatus/restrictions
+            const rRef = dbRef(db, 'tiutbc/storeStatus/restrictions');
             const callback = snapshot => {
-                const data = snapshot.val() || {};
-                const geo = data.geo || {};
-                const limits = data.orderLimits || {};
-                const partial = data.partialPayment || {};
-
-                if ($('restrictionLat')) {
-                    $('restrictionLat').value = geo.latitude !== undefined ? geo.latitude : 22.576307;
-                    $('restrictionLng').value = geo.longitude !== undefined ? geo.longitude : 88.428045;
-                    $('restrictionRadius').value = geo.radiusMeters !== undefined ? geo.radiusMeters : 200;
-                    $('restrictionGeoEnabled').checked = geo.enabled !== false;
-
-                    $('restrictionMaxOrders').value = limits.maxOrdersPerHour !== undefined ? limits.maxOrdersPerHour : 2;
-                    $('restrictionWindowMins').value = limits.windowMinutes !== undefined ? limits.windowMinutes : 60;
-                    $('restrictionRateLimitEnabled').checked = limits.enabled !== false;
-
-                    $('restrictionPaymentMode').value = partial.type || 'percentage';
-                    $('restrictionPartialValue').value = partial.value !== undefined ? partial.value : 10;
-                    $('restrictionPartialEnabled').checked = partial.enabled !== false;
+                if (snapshot.exists()) {
+                    applyRestrictionsUI(snapshot.val());
+                } else {
+                    // Try fallback paths or local cache
+                    get(dbRef(db, 'tiutbc/storeStatus')).then(snap => {
+                        const val = snap.val();
+                        if (val && val.restrictions) {
+                            applyRestrictionsUI(val.restrictions);
+                            return;
+                        }
+                        return get(dbRef(db, 'tiutbc/storeSettings/restrictions')).then(s2 => {
+                            if (s2.exists()) applyRestrictionsUI(s2.val());
+                        });
+                    }).catch(() => {
+                        try {
+                            const cached = localStorage.getItem('tiutbc_restrictions');
+                            if (cached) applyRestrictionsUI(JSON.parse(cached));
+                        } catch (_) {}
+                    });
                 }
             };
             onValue(rRef, callback);
@@ -1642,8 +1669,31 @@
                     updatedBy: auth.currentUser?.email || auth.currentUser?.uid || 'admin'
                 };
 
-                await set(dbRef(db, 'tiutbc/storeSettings/restrictions'), restrictionsData);
-                showNotification('✅ Restriction settings saved successfully!');
+                // Save to tiutbc/storeStatus which is permitted in Firebase RTDB rules
+                let saved = false;
+                try {
+                    await update(dbRef(db, 'tiutbc/storeStatus'), { restrictions: restrictionsData });
+                    saved = true;
+                } catch (e1) {
+                    try {
+                        await set(dbRef(db, 'tiutbc/storeStatus/restrictions'), restrictionsData);
+                        saved = true;
+                    } catch (e2) {
+                        try {
+                            await set(dbRef(db, 'tiutbc/storeSettings/restrictions'), restrictionsData);
+                            saved = true;
+                        } catch (e3) {
+                            throw e1;
+                        }
+                    }
+                }
+
+                if (saved) {
+                    try {
+                        localStorage.setItem('tiutbc_restrictions', JSON.stringify(restrictionsData));
+                    } catch (_) {}
+                    showNotification('✅ Restriction settings saved successfully!');
+                }
             } catch (error) {
                 console.error('Error saving restrictions:', error);
                 showNotification('Failed to save restrictions: ' + error.message, true);

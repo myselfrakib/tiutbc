@@ -1087,8 +1087,7 @@
         const campusBanner = $('campusBanner');
         if (!campusBanner) return;
 
-        onValue(ref(db, 'tiutbc/storeSettings/restrictions'), snap => {
-            const data = snap.val() || {};
+        const processRestrictions = (data) => {
             const geo = data.geo || {};
             const targetLat = geo.latitude !== undefined ? geo.latitude : 22.576307;
             const targetLng = geo.longitude !== undefined ? geo.longitude : 88.428045;
@@ -1128,6 +1127,20 @@
                     campusBanner.style.display = 'block';
                     campusBanner.innerHTML = `📍 <strong>Campus Exclusive:</strong> Orders can only be taken from within Techno India University (within ${radius}m radius).`;
                 }, { timeout: 8000, maximumAge: 60000 });
+            }
+        };
+
+        // Listen on storeStatus (restrictions field) and storeStatus/restrictions
+        onValue(ref(db, 'tiutbc/storeStatus'), snap => {
+            const val = snap.val() || {};
+            if (val.restrictions) {
+                processRestrictions(val.restrictions);
+            }
+        });
+
+        onValue(ref(db, 'tiutbc/storeStatus/restrictions'), snap => {
+            if (snap.exists()) {
+                processRestrictions(snap.val() || {});
             }
         });
     }

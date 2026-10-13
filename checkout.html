@@ -475,9 +475,28 @@
             // Restrictions operations
             async loadRestrictions() {
                 try {
-                    const snap = await get(ref(db, 'tiutbc/storeSettings/restrictions'));
-                    if (snap.exists()) {
-                        const val = snap.val();
+                    let val = null;
+                    const rSnap = await get(ref(db, 'tiutbc/storeStatus/restrictions'));
+                    if (rSnap.exists()) {
+                        val = rSnap.val();
+                    } else {
+                        const statusSnap = await get(ref(db, 'tiutbc/storeStatus'));
+                        if (statusSnap.exists() && statusSnap.val() && statusSnap.val().restrictions) {
+                            val = statusSnap.val().restrictions;
+                        } else {
+                            const setSnap = await get(ref(db, 'tiutbc/storeSettings/restrictions')).catch(() => null);
+                            if (setSnap && setSnap.exists()) val = setSnap.val();
+                        }
+                    }
+
+                    if (!val) {
+                        try {
+                            const local = localStorage.getItem('tiutbc_restrictions');
+                            if (local) val = JSON.parse(local);
+                        } catch (_) {}
+                    }
+
+                    if (val) {
                         if (val.geo) Object.assign(this.restrictions.geo, val.geo);
                         if (val.orderLimits) Object.assign(this.restrictions.orderLimits, val.orderLimits);
                         if (val.partialPayment) Object.assign(this.restrictions.partialPayment, val.partialPayment);
