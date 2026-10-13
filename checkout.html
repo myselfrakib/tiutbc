@@ -483,7 +483,7 @@
                         this.userTotalOrders = await this.getUserTotalOrdersCount();
                         this.syncCartFromDB(user.uid);
                         await this.loadSavedRooms();
-                        const defaultMethod = (this.restrictions.partialPayment?.allowFullCod && !this.restrictions.partialPayment?.enabled) ? 'cod' : 'partial';
+                        const defaultMethod = this.restrictions.partialPayment?.allowFullCod ? 'cod' : 'partial';
                         this.selectPayment(defaultMethod);
                         this.renderCart();
                     } else {
@@ -499,6 +499,10 @@
                     if (val.geo) Object.assign(this.restrictions.geo, val.geo);
                     if (val.orderLimits) Object.assign(this.restrictions.orderLimits, val.orderLimits);
                     if (val.partialPayment) Object.assign(this.restrictions.partialPayment, val.partialPayment);
+
+                    if (this.restrictions.partialPayment?.allowFullCod && this.selectedPayment === 'partial') {
+                        this.selectPayment('cod');
+                    }
 
                     // Background check and sync: re-evaluate location against latest admin restrictions
                     if (this.userCoords) {
@@ -548,6 +552,9 @@
                         if (val.geo) Object.assign(this.restrictions.geo, val.geo);
                         if (val.orderLimits) Object.assign(this.restrictions.orderLimits, val.orderLimits);
                         if (val.partialPayment) Object.assign(this.restrictions.partialPayment, val.partialPayment);
+                        if (this.restrictions.partialPayment?.allowFullCod && this.selectedPayment === 'partial') {
+                            this.selectPayment('cod');
+                        }
                     }
                 } catch (e) {
                     console.warn('Could not load dynamic restrictions, using defaults:', e);
@@ -793,6 +800,22 @@
                     }
                 }
 
+                // When full COD is selected / enabled, do not show the partial payment option in the checkout page
+                if (partialOption) {
+                    if (allowFullCod || this.selectedPayment === 'cod' || !partialEnabled) {
+                        partialOption.style.display = 'none';
+                        if (this.selectedPayment === 'partial') {
+                            this.selectedPayment = 'cod';
+                            const cRadio = document.getElementById('cod');
+                            if (cRadio) cRadio.checked = true;
+                            document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+                            if (codOption) codOption.classList.add('selected');
+                        }
+                    } else {
+                        partialOption.style.display = 'flex';
+                    }
+                }
+
                 if (fullCodTitle) {
                     fullCodTitle.textContent = `💵 Full Cash on Delivery (₹${subtotal.toFixed(2)})`;
                 }
@@ -822,7 +845,7 @@
                         notice.style.borderColor = '#3b82f6';
                         notice.style.color = '#1e40af';
                     } else if (allowFullCod) {
-                        notice.innerHTML = `💡 <strong>Payment Options:</strong> Full COD is enabled! Or pay with partial advance (${partialDetails.label} / ₹${partialDetails.advance}) or full amount online.`;
+                        notice.innerHTML = `💵 <strong>Full COD Available:</strong> Pay the full amount (₹${subtotal.toFixed(2)}) upon delivery in cash or UPI, or pay full amount online.`;
                         notice.style.background = '#f0fdf4';
                         notice.style.borderColor = '#22c55e';
                         notice.style.color = '#15803d';
