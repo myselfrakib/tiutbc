@@ -1089,6 +1089,30 @@
         const campusBanner = $('campusBanner');
         if (!campusBanner) return;
 
+        let currentUserCoords = null;
+        let campusGeoWatchId = null;
+
+        const evaluateCampusBanner = (lat, lng, targetLat, targetLng, radius) => {
+            const R = 6371000;
+            const toRad = d => d * Math.PI / 180;
+            const dLat = toRad(targetLat - lat);
+            const dLon = toRad(targetLng - lng);
+            const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(toRad(lat))*Math.cos(toRad(targetLat))*Math.sin(dLon/2)*Math.sin(dLon/2);
+            const dist = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+            if (dist > radius) {
+                campusBanner.style.background = '#fef2f2';
+                campusBanner.style.color = '#dc2626';
+                campusBanner.style.borderColor = '#fca5a5';
+                campusBanner.innerHTML = `⚠️ <strong>Outside Orderable Radius:</strong> You are ~${Math.round(dist)}m away. Orders can only be taken from within the university (within ${radius}m).`;
+            } else {
+                campusBanner.style.background = '#f0fdf4';
+                campusBanner.style.color = '#15803d';
+                campusBanner.style.borderColor = '#86efac';
+                campusBanner.innerHTML = `✅ <strong>Verified Inside TIU:</strong> You are ~${Math.round(dist)}m from campus center. Delivery available!`;
+            }
+        };
+
         const processRestrictions = (data) => {
             const geo = data.geo || {};
             const targetLat = geo.latitude !== undefined ? geo.latitude : 22.576307;
@@ -1103,32 +1127,21 @@
 
             campusBanner.style.display = 'block';
 
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(pos => {
-                    const lat = pos.coords.latitude;
-                    const lng = pos.coords.longitude;
-                    const R = 6371000;
-                    const toRad = d => d * Math.PI / 180;
-                    const dLat = toRad(targetLat - lat);
-                    const dLon = toRad(targetLng - lng);
-                    const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(toRad(lat))*Math.cos(toRad(targetLat))*Math.sin(dLon/2)*Math.sin(dLon/2);
-                    const dist = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            // Immediately re-evaluate in background if user coordinates already known
+            if (currentUserCoords) {
+                evaluateCampusBanner(currentUserCoords.lat, currentUserCoords.lng, targetLat, targetLng, radius);
+            }
 
-                    if (dist > radius) {
-                        campusBanner.style.background = '#fef2f2';
-                        campusBanner.style.color = '#dc2626';
-                        campusBanner.style.borderColor = '#fca5a5';
-                        campusBanner.innerHTML = `⚠️ <strong>Outside Orderable Radius:</strong> You are ~${Math.round(dist)}m away. Orders can only be taken from within the university (within ${radius}m).`;
-                    } else {
-                        campusBanner.style.background = '#f0fdf4';
-                        campusBanner.style.color = '#15803d';
-                        campusBanner.style.borderColor = '#86efac';
-                        campusBanner.innerHTML = `✅ <strong>Verified Inside TIU:</strong> You are ~${Math.round(dist)}m from campus center. Delivery available!`;
-                    }
-                }, () => {
-                    campusBanner.style.display = 'block';
-                    campusBanner.innerHTML = `📍 <strong>Campus Exclusive:</strong> Orders can only be taken from within Techno India University (within ${radius}m radius).`;
-                }, { timeout: 8000, maximumAge: 60000 });
+            if (navigator.geolocation && !campusGeoWatchId) {
+                try {
+                    campusGeoWatchId = navigator.geolocation.watchPosition(pos => {
+                        currentUserCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                        evaluateCampusBanner(pos.coords.latitude, pos.coords.longitude, targetLat, targetLng, radius);
+                    }, () => {
+                        campusBanner.style.display = 'block';
+                        campusBanner.innerHTML = `📍 <strong>Campus Exclusive:</strong> Orders can only be taken from within Techno India University (within ${radius}m radius).`;
+                    }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 10000 });
+                } catch (_) {}
             }
         };
 

@@ -444,6 +444,8 @@
             userCoords: null,
             userDistance: null,
             pendingSimulatorOrder: null,
+            geoWatchId: null,
+            geoIntervalId: null,
 
             // Initialize app
             async init() {
@@ -453,6 +455,7 @@
                 this.setupRestrictionsSync();
                 await this.loadRestrictions();
                 this.detectLocation(false);
+                this.startBackgroundLocationTracking();
             },
 
             // Setup event listeners
@@ -479,7 +482,7 @@
                 });
             },
 
-            // Setup real-time restrictions sync
+            // Setup real-time restrictions sync in background
             setupRestrictionsSync() {
                 const applyData = (val) => {
                     if (!val) return;
@@ -487,13 +490,11 @@
                     if (val.orderLimits) Object.assign(this.restrictions.orderLimits, val.orderLimits);
                     if (val.partialPayment) Object.assign(this.restrictions.partialPayment, val.partialPayment);
 
+                    // Background check and sync: re-evaluate location against latest admin restrictions
                     if (this.userCoords) {
-                        const targetLat = this.restrictions.geo.latitude;
-                        const targetLng = this.restrictions.geo.longitude;
-                        const maxRadius = this.restrictions.geo.radiusMeters;
-                        const distance = this.getDistanceInMeters(this.userCoords.latitude, this.userCoords.longitude, targetLat, targetLng);
-                        this.userDistance = Math.round(distance);
-                        this.isWithinRadius = !this.restrictions.geo.enabled || distance <= maxRadius;
+                        this.handlePositionUpdate(this.userCoords.latitude, this.userCoords.longitude, false);
+                    } else if (this.restrictions.geo && !this.restrictions.geo.enabled) {
+                        this.updateLocationUI(0, true, this.restrictions.geo.radiusMeters, 0, 0);
                     }
                     this.renderCart();
                     this.updatePlaceOrderButtonState();
@@ -585,6 +586,93 @@
                 return R * c;
             },
 
+            // Start background location tracking and sync
+            startBackgroundLocationTracking() {
+                if (!navigator.geolocation) return;
+
+                try {
+                    if (this.geoWatchId !== null) navigator.geolocation.clearWatch(this.geoWatchId);
+                    this.geoWatchId = navigator.geolocation.watchPosition(
+                        (pos) => {
+                            this.handlePositionUpdate(pos.coords.latitude, pos.coords.longitude, false);
+                        },
+                        (err) => {
+                            console.warn('Background location watch:', err.message);
+                        },
+                        { enableHighAccuracy: true, maximumAge: 10000, timeout: 20000 }
+                    );
+                } catch (e) {
+                    console.warn('watchPosition not available:', e);
+                }
+
+                // Periodic background check to keep coordinates and distance updated
+                if (this.geoIntervalId !== null) clearInterval(this.geoIntervalId);
+                this.geoIntervalId = setInterval(() => {
+                    if (navigator.geolocation && document.visibilityState === 'visible') {
+                        navigator.geolocation.getCurrentPosition(
+                            (pos) => {
+                                this.handlePositionUpdate(pos.coords.latitude, pos.coords.longitude, false);
+                            },
+                            () => {},
+                            { enableHighAccuracy: true, maximumAge: 10000, timeout: 10000 }
+                        );
+                    }
+                }, 15000);
+            },
+
+            // Update UI banner when inside or outside orderable radius
+            updateLocationUI(distance, isWithin, maxRadius, userLat, userLng) {
+                const banner = document.getElementById('locationBanner');
+                const text = document.getElementById('locationStatusText');
+                const msgBox = document.getElementById('locationMessageBox');
+                if (!banner || !text || !msgBox) return;
+
+                if (!this.restrictions.geo.enabled) {
+                    this.isLocationVerified = true;
+                    this.isWithinRadius = true;
+                    banner.className = 'location-banner verified';
+                    text.textContent = 'Campus Location Restrictions Disabled';
+                    msgBox.innerHTML = '✅ Campus location restrictions are currently disabled. Orders can be placed!';
+                    this.updatePlaceOrderButtonState();
+                    return;
+                }
+
+                this.isLocationVerified = true;
+                this.isWithinRadius = isWithin;
+
+                if (!isWithin) {
+                    banner.className = 'location-banner outside';
+                    text.textContent = 'Outside Orderable Radius';
+                    msgBox.innerHTML = `⚠️ <strong>You are outside the orderable radius.</strong> Orders can only be taken from within the university only.<br><small style="color:#666;">Current distance: ~${Math.round(distance)}m (Allowed: within ${maxRadius}m of campus center)</small>`;
+                } else {
+                    banner.className = 'location-banner verified';
+                    text.textContent = 'Campus Location Verified';
+                    msgBox.innerHTML = `✅ You are within the university orderable radius (~${Math.round(distance)}m from campus center). Orders can be placed!`;
+                }
+                this.updatePlaceOrderButtonState();
+            },
+
+            handlePositionUpdate(userLat, userLng, userInitiated = false) {
+                this.userCoords = { latitude: userLat, longitude: userLng };
+                const targetLat = this.restrictions.geo.latitude;
+                const targetLng = this.restrictions.geo.longitude;
+                const maxRadius = this.restrictions.geo.radiusMeters;
+                const distance = this.getDistanceInMeters(userLat, userLng, targetLat, targetLng);
+                this.userDistance = Math.round(distance);
+                const isWithin = !this.restrictions.geo.enabled || distance <= maxRadius;
+
+                this.updateLocationUI(distance, isWithin, maxRadius, userLat, userLng);
+
+                if (userInitiated) {
+                    if (!isWithin) {
+                        this.showError('You are outside the orderable radius. Orders can only be taken from within the university only.');
+                    } else {
+                        this.showSuccess('Campus location verified successfully!');
+                    }
+                }
+                return isWithin;
+            },
+
             detectLocation(userInitiated = false) {
                 const banner = document.getElementById('locationBanner');
                 const text = document.getElementById('locationStatusText');
@@ -598,49 +686,22 @@
                     if (text) text.textContent = 'Geolocation Unsupported';
                     if (msgBox) msgBox.textContent = 'Your browser does not support GPS location. Location verification is required to order.';
                     this.updatePlaceOrderButtonState();
-                    return;
+                    return Promise.resolve(false);
                 }
 
-                if (banner) banner.className = 'location-banner warning';
-                if (text) text.textContent = 'Verifying Campus Location...';
-                if (msgBox) msgBox.textContent = 'Detecting device GPS to confirm you are within Techno India University campus (200m radius)...';
-                if (btn) btn.disabled = true;
+                if (userInitiated) {
+                    if (banner) banner.className = 'location-banner warning';
+                    if (text) text.textContent = 'Verifying Campus Location...';
+                    if (msgBox) msgBox.textContent = `Detecting device GPS to confirm you are within Techno India University campus (${this.restrictions.geo.radiusMeters}m radius)...`;
+                    if (btn) btn.disabled = true;
+                }
 
                 return new Promise((resolve) => {
                     navigator.geolocation.getCurrentPosition(
                         (pos) => {
                             if (btn) btn.disabled = false;
-                            const userLat = pos.coords.latitude;
-                            const userLng = pos.coords.longitude;
-                            this.userCoords = { latitude: userLat, longitude: userLng };
-
-                            const targetLat = this.restrictions.geo.latitude;
-                            const targetLng = this.restrictions.geo.longitude;
-                            const maxRadius = this.restrictions.geo.radiusMeters;
-                            const distance = this.getDistanceInMeters(userLat, userLng, targetLat, targetLng);
-                            this.userDistance = Math.round(distance);
-
-                            if (this.restrictions.geo.enabled && distance > maxRadius) {
-                                this.isLocationVerified = true;
-                                this.isWithinRadius = false;
-                                if (banner) banner.className = 'location-banner outside';
-                                if (text) text.textContent = 'Outside Orderable Radius';
-                                if (msgBox) msgBox.innerHTML = `⚠️ <strong>You are outside the orderable radius.</strong> Orders can only be taken from within the university only.<br><small style="color:#666;">Current distance: ~${Math.round(distance)}m (Allowed: within ${maxRadius}m of campus center)</small>`;
-                                if (userInitiated) {
-                                    this.showError('You are outside the orderable radius. Orders can only be taken from within the university only.');
-                                }
-                            } else {
-                                this.isLocationVerified = true;
-                                this.isWithinRadius = true;
-                                if (banner) banner.className = 'location-banner verified';
-                                if (text) text.textContent = 'Campus Location Verified';
-                                if (msgBox) msgBox.innerHTML = `✅ You are within the university orderable radius (~${Math.round(distance)}m from campus center). Orders can be placed!`;
-                                if (userInitiated) {
-                                    this.showSuccess('Campus location verified successfully!');
-                                }
-                            }
-                            this.updatePlaceOrderButtonState();
-                            resolve(true);
+                            const isWithin = this.handlePositionUpdate(pos.coords.latitude, pos.coords.longitude, userInitiated);
+                            resolve(isWithin);
                         },
                         (err) => {
                             if (btn) btn.disabled = false;
