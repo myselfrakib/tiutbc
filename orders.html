@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>TIU The Biriyani Canteen - My Orders</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #ff6b35;
@@ -437,6 +440,7 @@
         }
 
         .item-price {
+            font-family: 'Inter', -apple-system, sans-serif;
             font-weight: 700;
             font-size: clamp(0.95rem, 2.5vw, 1.05rem);
             color: var(--brown);
@@ -460,11 +464,16 @@
         }
 
         .total-amount {
+            font-family: 'Inter', -apple-system, sans-serif;
             color: var(--brown);
             background: linear-gradient(135deg, var(--brown) 0%, #8b5a3c 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+        }
+
+        .order-payment-amount {
+            font-family: 'Inter', -apple-system, sans-serif;
         }
 
         /* Progress Timeline */
@@ -1258,11 +1267,11 @@
                         ${order.advancePaid !== undefined && order.advancePaid > 0 ? `
                         <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: #16a34a; font-weight: 600; margin-top: 0.4rem;">
                             <span>Advance Paid Online (${order.partialPercentage || 10}%):</span>
-                            <span>₹${parseFloat(order.advancePaid).toFixed(2)}</span>
+                            <span class="order-payment-amount">₹${parseFloat(order.advancePaid).toFixed(2)}</span>
                         </div>
                         <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: #dc2626; font-weight: 600; margin-top: 0.25rem;">
                             <span>Remaining Due on Delivery:</span>
-                            <span>₹${parseFloat(order.remainingDue || 0).toFixed(2)}</span>
+                            <span class="order-payment-amount">₹${parseFloat(order.remainingDue || 0).toFixed(2)}</span>
                         </div>
                         ` : ''}
                         ${timeline}

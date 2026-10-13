@@ -4,6 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
     <title>TIU x The Biriyani Canteen - Checkout</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <style>
         :root {
@@ -46,13 +49,13 @@
         .cart-item-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; }
         .cart-item-details { flex: 1; min-width: 0; }
         .cart-item-name { font-size: clamp(0.95rem, 3vw, 1.05rem); font-weight: 600; margin-bottom: 0.2rem; word-wrap: break-word; }
-        .cart-item-price { color: #666; font-weight: 500; font-size: clamp(0.85rem, 2.5vw, 0.9rem); }
+        .cart-item-price { color: #666; font-weight: 500; font-size: clamp(0.85rem, 2.5vw, 0.9rem); font-family: 'Inter', -apple-system, sans-serif; }
         .cart-item-actions { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
         .cart-item-quantity { display: flex; align-items: center; gap: 0.6rem; background: #f8f8f8; padding: 0.3rem 0.6rem; border-radius: 8px; }
         .quantity-btn { background: var(--primary); color: white; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 1.1rem; font-weight: bold; transition: all 0.3s; display: flex; align-items: center; justify-content: center; }
         .quantity-btn:active { transform: scale(0.9); }
         .quantity-display { font-size: 1rem; font-weight: 600; min-width: 25px; text-align: center; }
-        .cart-item-total { font-size: clamp(1rem, 3vw, 1.15rem); font-weight: bold; color: #333; }
+        .cart-item-total { font-size: clamp(1rem, 3vw, 1.15rem); font-weight: bold; color: #333; font-family: 'Inter', -apple-system, sans-serif; }
         .remove-btn { background: #dc3545; color: white; border: none; padding: 0.5rem 0.85rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.3s; }
         .remove-btn:active { transform: scale(0.95); }
         
@@ -67,11 +70,14 @@
         
         .cart-summary { margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #eee; }
         .summary-row { display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-size: clamp(0.9rem, 2.5vw, 1rem); }
+        .summary-row span:last-child { font-family: 'Inter', -apple-system, sans-serif; font-weight: 600; }
         .summary-row.subtotal { color: #666; }
         .summary-row.delivery { color: #666; }
         .summary-row.delivery.free { color: var(--success-green); font-weight: 600; }
         .summary-row.delivery.free .delivery-value { text-decoration: line-through; color: #999; margin-right: 0.5rem; }
         .cart-total { display: flex; justify-content: space-between; font-size: clamp(1.3rem, 4vw, 1.5rem); font-weight: bold; color: var(--brown); margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #eee; }
+        .cart-total span:last-child { font-family: 'Inter', -apple-system, sans-serif; font-weight: 800; }
+        #simChargeAmount, #simRemainingAmount { font-family: 'Inter', -apple-system, sans-serif; }
         .section-title { font-size: clamp(1.1rem, 3vw, 1.3rem); font-weight: 600; color: #333; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
         .room-display-card { border: 2px solid var(--secondary); border-radius: 10px; padding: 0.9rem; background: #f0f9ff; }
         .room-display-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; }
