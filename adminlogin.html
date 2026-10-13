@@ -271,7 +271,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
         import { getDatabase, ref, get, child, set } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
 
         const firebaseConfig = {
@@ -287,7 +287,40 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        setPersistence(auth, browserLocalPersistence).catch(err => console.warn('Auth persistence error:', err));
         const database = getDatabase(app);
+
+        let isAuthenticating = false;
+
+        // Auto-login: if admin is already logged in, redirect to dashboard
+        onAuthStateChanged(auth, async (user) => {
+            if (user && !isAuthenticating) {
+                try {
+                    const dbRef = ref(database);
+                    const snapshot = await get(child(dbRef, `tiutbc/admins/${user.uid}`));
+                    if (snapshot.exists()) {
+                        const adminData = snapshot.val();
+                        const isAdminGranted = adminData.admin === true || adminData.isAdmin === true || adminData.isadmin === true;
+                        if (isAdminGranted) {
+                            showSuccess(`Welcome back ${adminData.name || 'Admin'}! Auto-logging in...`);
+                            const adminInfo = JSON.stringify({
+                                uid: user.uid,
+                                email: adminData.email,
+                                name: adminData.name,
+                                role: adminData.role
+                            });
+                            sessionStorage.setItem('adminData', adminInfo);
+                            localStorage.setItem('adminData', adminInfo);
+                            setTimeout(() => {
+                                window.location.href = 'admin.html';
+                            }, 800);
+                        }
+                    }
+                } catch (err) {
+                    console.warn('Auto-login error:', err);
+                }
+            }
+        });
 
         window.switchAuthMode = function(mode) {
             hideMessages();
@@ -306,6 +339,7 @@
 
             hideMessages();
             showLoading(true);
+            isAuthenticating = true;
 
             try {
                 // First authenticate with Firebase Auth
@@ -324,30 +358,35 @@
                     if (isAdminGranted) {
                         showSuccess(`Welcome ${adminData.name || 'Admin'}! Redirecting to dashboard...`);
                         
-                        // Store admin info in sessionStorage for the dashboard
-                        sessionStorage.setItem('adminData', JSON.stringify({
+                        // Store admin info for the dashboard
+                        const adminInfo = JSON.stringify({
                             uid: user.uid,
                             email: adminData.email,
                             name: adminData.name,
                             role: adminData.role
-                        }));
+                        });
+                        sessionStorage.setItem('adminData', adminInfo);
+                        localStorage.setItem('adminData', adminInfo);
                         
                         setTimeout(() => {
                             window.location.href = 'admin.html';
                         }, 1000);
                     } else {
                         // Admin flag is false or doesn't exist
-                        await auth.signOut();
+                        await signOut(auth);
+                        isAuthenticating = false;
                         showLoading(false);
                         showError('Access denied. Admin privileges not granted.');
                     }
                 } else {
                     // User not found in admins database
-                    await auth.signOut();
+                    await signOut(auth);
+                    isAuthenticating = false;
                     showLoading(false);
                     showError('Access denied. You are not an admin.');
                 }
             } catch (error) {
+                isAuthenticating = false;
                 showLoading(false);
                 let errorMessage = 'An error occurred. Please try again.';
                 
@@ -387,6 +426,7 @@
             }
 
             showLoading(true);
+            isAuthenticating = true;
 
             try {
                 // Create user in Firebase Auth
@@ -406,6 +446,7 @@
 
                 // Immediately sign out so unauthorized user cannot access
                 await signOut(auth);
+                isAuthenticating = false;
 
                 showLoading(false);
                 document.getElementById('adminSignupForm').reset();
@@ -414,6 +455,7 @@
                     switchAuthMode('login');
                 }, 2000);
             } catch (error) {
+                isAuthenticating = false;
                 showLoading(false);
                 let errorMessage = 'An error occurred during registration. Please try again.';
                 if (error.code === 'auth/email-already-in-use') {

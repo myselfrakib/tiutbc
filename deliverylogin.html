@@ -569,7 +569,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
         import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
 
         const firebaseConfig = {
@@ -585,7 +585,26 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        setPersistence(auth, browserLocalPersistence).catch(err => console.warn('Auth persistence error:', err));
         const db = getDatabase(app);
+
+        let isAuthenticating = false;
+
+        // Auto-login: if delivery agent is already authenticated and active, redirect to delivery.html
+        onAuthStateChanged(auth, async (user) => {
+            if (user && !isAuthenticating) {
+                try {
+                    const snap = await get(ref(db, `tiutbc/deliveryagent/${user.uid}`));
+                    if (snap.exists() && snap.val().status === true) {
+                        const agentData = snap.val();
+                        showToast('Welcome back, ' + (agentData.name || 'Partner') + '! Auto-logging in...', 'success');
+                        setTimeout(() => window.location.href = 'delivery.html', 800);
+                    }
+                } catch (e) {
+                    console.warn('Auto-login delivery partner check error:', e);
+                }
+            }
+        });
 
         // ── Tab switching ──────────────────────────────────────────────
         window.switchTab = function(tab) {
@@ -664,6 +683,7 @@
 
             if (!valid) return;
             setLoading('loginBtn', true);
+            isAuthenticating = true;
 
             try {
                 const cred = await signInWithEmailAndPassword(auth, email, password);
@@ -672,6 +692,7 @@
                 const snap = await get(ref(db, `tiutbc/deliveryagent/${uid}`));
                 if (!snap.exists()) {
                     await signOut(auth);
+                    isAuthenticating = false;
                     showToast('Agent record not found. Contact admin.', 'error');
                     setLoading('loginBtn', false);
                     return;
@@ -680,6 +701,7 @@
                 const agentData = snap.val();
                 if (agentData.status !== true) {
                     await signOut(auth);
+                    isAuthenticating = false;
                     showToast('Your account is pending admin approval. Please wait.', 'error');
                     setLoading('loginBtn', false);
                     return;
@@ -688,6 +710,7 @@
                 showToast('Welcome back, ' + (agentData.name || 'Partner') + '! 🎉', 'success');
                 setTimeout(() => window.location.href = 'delivery.html', 1200);
             } catch (err) {
+                isAuthenticating = false;
                 setLoading('loginBtn', false);
                 const msg = ['auth/user-not-found','auth/wrong-password','auth/invalid-credential'].includes(err.code)
                     ? 'Invalid email or password.'
@@ -732,6 +755,7 @@
 
             if (!valid) return;
             setLoading('signupBtn', true);
+            isAuthenticating = true;
 
             try {
                 const cred = await createUserWithEmailAndPassword(auth, email, password);
@@ -751,11 +775,13 @@
                 });
 
                 await signOut(auth); // Must wait for admin approval
+                isAuthenticating = false;
 
                 setLoading('signupBtn', false);
                 document.getElementById('signupSection').style.display = 'none';
                 document.getElementById('successScreen').classList.add('show');
             } catch (err) {
+                isAuthenticating = false;
                 setLoading('signupBtn', false);
                 const msg = err.code === 'auth/email-already-in-use'
                     ? 'This email is already registered.'
