@@ -444,6 +444,7 @@
                 this.loadCart();
                 this.setupAuthListener();
                 this.setupEventListeners();
+                this.setupRestrictionsSync();
                 await this.loadRestrictions();
                 this.detectLocation(false);
             },
@@ -469,6 +470,36 @@
                     } else {
                         window.location.href = 'login.html';
                     }
+                });
+            },
+
+            // Setup real-time restrictions sync
+            setupRestrictionsSync() {
+                const applyData = (val) => {
+                    if (!val) return;
+                    if (val.geo) Object.assign(this.restrictions.geo, val.geo);
+                    if (val.orderLimits) Object.assign(this.restrictions.orderLimits, val.orderLimits);
+                    if (val.partialPayment) Object.assign(this.restrictions.partialPayment, val.partialPayment);
+
+                    if (this.userCoords) {
+                        const targetLat = this.restrictions.geo.latitude;
+                        const targetLng = this.restrictions.geo.longitude;
+                        const maxRadius = this.restrictions.geo.radiusMeters;
+                        const distance = this.getDistanceInMeters(this.userCoords.latitude, this.userCoords.longitude, targetLat, targetLng);
+                        this.userDistance = Math.round(distance);
+                        this.isWithinRadius = !this.restrictions.geo.enabled || distance <= maxRadius;
+                    }
+                    this.renderCart();
+                    this.updatePlaceOrderButtonState();
+                };
+
+                onValue(ref(db, 'tiutbc/storeStatus'), (snap) => {
+                    const status = snap.val() || {};
+                    if (status.restrictions) applyData(status.restrictions);
+                });
+
+                onValue(ref(db, 'tiutbc/storeStatus/restrictions'), (snap) => {
+                    if (snap.exists()) applyData(snap.val());
                 });
             },
 
@@ -1115,6 +1146,9 @@
                 }
                 
                 if (!this.selectedPayment) return this.showError('Please select payment method');
+
+                // Refresh latest restrictions directly from database
+                await this.loadRestrictions();
 
                 // Check store status
                 const snap = await get(ref(db, 'tiutbc/storeStatus/isOpen'));
